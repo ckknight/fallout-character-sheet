@@ -1,0 +1,23 @@
+{
+	"root": true,
+	"preset": "default",
+	"indent": {
+		"value": "    "
+	},
+	"whiteSpace": {
+		"after": {
+			"FunctionReservedWord": 1
+		}
+	},
+	"plugins": [
+		"esformatter-quotes",
+		"esformatter-braces",
+		"esformatter-semicolons",
+		"esformatter-dot-notation",
+		"esformatter-var-each"
+	],
+	"quotes": {
+		"type": "single",
+		"avoidEscape": true
+	}
+}
