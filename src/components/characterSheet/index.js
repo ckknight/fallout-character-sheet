@@ -2,6 +2,7 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import cosmetic from './cosmetic';
 import primaryAttributeChart from './primaryAttributeChart';
+import skills from './skills';
 import combineLatestObject from '../../combineLatestObject';
 
 function safeParseJSON(value) {
@@ -24,12 +25,18 @@ export default function characterSheet({DOM, localStorageSource}) {
         value$: deserializedSavedData$.map(x => x.primary || {}),
         race$: cosmeticView.race$,
     });
+    const skillsView = skills({
+        DOM,
+        value$: deserializedSavedData$.map(x => x.primary || {}),
+        attributes$: primaryAttributeView.value$,
+    });
     return {
         DOM: combineLatestObject({
             cosmetic: cosmeticView.DOM,
             primary: primaryAttributeView.DOM,
+            skills: skillsView.DOM,
         })
-            .map(({cosmetic, primary}) => h('section', [cosmetic, primary])),
+            .map(({cosmetic, primary, skills}) => h('section', [cosmetic, primary, skills])),
         localStorageSink: combineLatestObject({
             cosmetic: cosmeticView.value$,
             primary: primaryAttributeView.value$,

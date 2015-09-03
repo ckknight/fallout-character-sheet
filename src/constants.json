@@ -1,0 +1,490 @@
+{
+    "COSMETIC": {
+        "age": 20,
+        "appearance": "",
+        "eyes": "",
+        "hair": "",
+        "name": "",
+        "sex": "",
+        "weight": 150
+    },
+    "PRIMARY_ATTRIBUTES": [
+        "strength",
+        "perception",
+        "endurance",
+        "charisma",
+        "intelligence",
+        "agility",
+        "luck"
+    ],
+    "RACE_STATS": {
+        "alphaMutant": {
+            "height": [
+                2.8,
+                3
+            ],
+            "levelsPerPerk": 4,
+            "primary": {
+                "agility": [
+                    1,
+                    8
+                ],
+                "charisma": [
+                    1,
+                    8
+                ],
+                "endurance": [
+                    3,
+                    12
+                ],
+                "intelligence": [
+                    1,
+                    11
+                ],
+                "luck": [
+                    1,
+                    10
+                ],
+                "perception": [
+                    1,
+                    10
+                ],
+                "strength": [
+                    4,
+                    13
+                ],
+                "total": 40
+            },
+            "secondary": {
+                "resistGas": [
+                    0,
+                    35
+                ],
+                "resistPoison": 20,
+                "resistRadiation": 10
+            },
+            "weight": [
+                300,
+                400
+            ]
+        },
+        "betaMutant": {
+            "height": [
+                2.8,
+                3
+            ],
+            "levelsPerPerk": 4,
+            "primary": {
+                "agility": [
+                    1,
+                    8
+                ],
+                "charisma": [
+                    1,
+                    8
+                ],
+                "endurance": [
+                    4,
+                    12
+                ],
+                "intelligence": [
+                    1,
+                    8
+                ],
+                "luck": [
+                    1,
+                    10
+                ],
+                "perception": [
+                    1,
+                    10
+                ],
+                "strength": [
+                    5,
+                    13
+                ],
+                "total": 40
+            },
+            "secondary": {
+                "resistGas": [
+                    0,
+                    35
+                ],
+                "resistPoison": 20,
+                "resistRadiation": 10
+            },
+            "weight": [
+                300,
+                400
+            ]
+        },
+        "ghoul": {
+            "height": [
+                1.5,
+                2.5
+            ],
+            "hp": -5,
+            "levelsPerPerk": 4,
+            "primary": {
+                "agility": [
+                    1,
+                    8
+                ],
+                "charisma": [
+                    1,
+                    9
+                ],
+                "endurance": [
+                    1,
+                    10
+                ],
+                "intelligence": [
+                    2,
+                    13
+                ],
+                "luck": [
+                    5,
+                    10
+                ],
+                "perception": [
+                    4,
+                    14
+                ],
+                "strength": [
+                    1,
+                    6
+                ],
+                "total": 42
+            },
+            "secondary": {
+                "resistPoison": 10,
+                "resistRadiation": 40
+            },
+            "weight": [
+                80,
+                160
+            ]
+        },
+        "human": {
+            "height": [
+                1.5,
+                2.5
+            ],
+            "hp": 0,
+            "levelsPerPerk": 3,
+            "primary": {
+                "agility": [
+                    1,
+                    10
+                ],
+                "charisma": [
+                    1,
+                    10
+                ],
+                "endurance": [
+                    1,
+                    10
+                ],
+                "intelligence": [
+                    1,
+                    10
+                ],
+                "luck": [
+                    1,
+                    10
+                ],
+                "perception": [
+                    1,
+                    10
+                ],
+                "strength": [
+                    1,
+                    10
+                ],
+                "total": 40
+            },
+            "secondary": {
+                "resistElectricity": 10
+            },
+            "weight": [
+                110,
+                280
+            ]
+        }
+    },
+    "SKILLS": {
+        "medicine": {
+            "chems": {
+                "base": 10,
+                "intelligence": 2
+            },
+            "doctor": {
+                "base": 10,
+                "intelligence": 2
+            },
+            "firstAid": {
+                "base": 10,
+                "intelligence": 2
+            }
+        },
+        "rangedWeapons": {
+            "bigGuns": {
+                "endurance": 2,
+                "perception": 1,
+                "strength": 1
+            },
+            "energyWeapons": {
+                "base": 10,
+                "perception": 2
+            },
+            "explosives": {
+                "base": 10,
+                "perception": 2
+            },
+            "smallGuns": {
+                "agility": 1,
+                "base": 10,
+                "perception": 1
+            }
+        },
+        "simpleWeapons": {
+            "melee": {
+                "base": 10,
+                "strength": 2
+            },
+            "throwing": {
+                "agility": 4
+            },
+            "unarmed": {
+                "agility": 2,
+                "base": 10,
+                "strength": 1
+            }
+        },
+        "social": {
+            "barter": {
+                "base": 10,
+                "charisma": 2
+            },
+            "gambling": {
+                "base": 10,
+                "luck": 1,
+                "perception": 1
+            },
+            "speech": {
+                "base": 10,
+                "charisma": 2
+            }
+        },
+        "survival": {
+            "climb": {
+                "base": 10,
+                "endurance": 1,
+                "strength": 1
+            },
+            "jump": {
+                "agility": 1,
+                "base": 10,
+                "strength": 1
+            },
+            "outdoorsman": {
+                "base": 10,
+                "endurance": 2
+            },
+            "swim": {
+                "base": 10,
+                "endurance": 1,
+                "strength": 1
+            }
+        },
+        "technical": {
+            "pilot": {
+                "agility": 2,
+                "base": 10
+            },
+            "repair": {
+                "base": 10,
+                "intelligence": 2
+            },
+            "science": {
+                "base": 10,
+                "intelligence": 2
+            }
+        },
+        "thieving": {
+            "disguise": {
+                "base": 10,
+                "charisma": 1,
+                "perception": 1
+            },
+            "lockpick": {
+                "base": 10,
+                "perception": 2
+            },
+            "sneak": {
+                "agility": 2,
+                "base": 10
+            },
+            "steal": {
+                "agility": 1,
+                "base": 10,
+                "luck": 1
+            }
+        }
+    },
+    "TRAITS": {
+        "bloodyMess": {
+        },
+        "bruiser": {
+            "actionPoints": -2,
+            "raceBlacklist": [
+                "ghoul"
+            ],
+            "strength": 2
+        },
+        "chemReliant": {
+            "addictionChance": 2,
+            "addictionRecovery": 2
+        },
+        "chemResistant": {
+            "addictionChance": 0.5,
+            "chemDuration": 0.5
+        },
+        "fastMetabolism": {
+            "healingRate": 2,
+            "poisonResistance": 0,
+            "raceBlacklist": [
+                "ghoul"
+            ],
+            "radiationResistance": 0
+        },
+        "fastShot": {
+            "actionBlacklist": [
+                "targetedShot"
+            ],
+            "actionPointCost": -1
+        },
+        "fearTheReaper": {
+            "levelsPerPerk": -1,
+            "raceWhitelist": [
+                "ghoul"
+            ]
+        },
+        "finesse": {
+            "criticalChance": 10,
+            "damage": -0.25
+        },
+        "gifted": {
+            "primaryTotal": 5,
+            "skillPenalty": 10,
+            "skillPointsPerLevel": -5
+        },
+        "glowingOne": {
+            "effectBlacklist": [
+                "light"
+            ],
+            "nearby": {
+                "radsPerHour": 10
+            },
+            "raceWhitelist": [
+                "ghoul"
+            ],
+            "radiationResistance": 50
+        },
+        "goodNatured": {
+            "barter": 20,
+            "bigGuns": -10,
+            "doctor": 20,
+            "energyWeapons": -10,
+            "explosives": -10,
+            "firstAid": 20,
+            "melee": -10,
+            "smallGuns": -10,
+            "speech": 20,
+            "throwing": -10,
+            "unarmed": -10
+        },
+        "hamFisted": {
+            "bigGuns": -20,
+            "doctor": -20,
+            "energyWeapons": -20,
+            "firstAid": -20,
+            "lockpick": -20,
+            "raceWhitelist": [
+                "alphaMutant",
+                "betaMutant"
+            ],
+            "repair": -20,
+            "science": -20,
+            "smallGuns": -20,
+            "tag": "unarmed"
+        },
+        "jinxed": {
+            "criticalFailureChance": 50
+        },
+        "kamikaze": {
+            "armorClass": 0,
+            "sequence": 5
+        },
+        "nightPerson": {
+            "daytime": {
+                "intelligence": -1,
+                "perception": -1
+            },
+            "nighttime": {
+                "intelligence": 1,
+                "perception": 1
+            }
+        },
+        "oneHander": {
+            "oneHandedWeapons": 20,
+            "twoHandedWeapons": -40
+        },
+        "sexAppeal": {
+            "attractedSex": {
+                "barter": 40,
+                "charisma": 1,
+                "speech": 40
+            },
+            "raceWhitelist": [
+                "human"
+            ],
+            "unattractedSex": {
+                "barter": -40,
+                "charisma": -1,
+                "speech": -40
+            }
+        },
+        "skilled": {
+            "levelsPerPerk": 1,
+            "skillPointsPerLevel": 5
+        },
+        "smallFrame": {
+            "agility": 1,
+            "carryWeight": 0,
+            "raceBlacklist": [
+                "alphaMutant",
+                "betaMutant"
+            ]
+        },
+        "techWizard": {
+            "lockpick": 15,
+            "perception": -1,
+            "raceBlacklist": [
+                "betaMutant"
+            ],
+            "repair": 15,
+            "science": 15
+        },
+        "vatSkin": {
+            "armorClass": 10,
+            "nearby": {
+                "perception": -1
+            },
+            "raceWhitelist": [
+                "alphaMutant",
+                "betaMutant"
+            ]
+        }
+    }
+}

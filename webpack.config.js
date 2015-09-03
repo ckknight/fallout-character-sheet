@@ -12,7 +12,7 @@ module.exports = {
     output: {
         path: './dist',
         filename: 'app.js',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
     },
     devtool: 'source-map',
 
@@ -21,19 +21,19 @@ module.exports = {
 
     stats: {
         colors: true,
-        reasons: DEBUG
+        reasons: DEBUG,
     },
 
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.AggressiveMergingPlugin()
+        new webpack.optimize.AggressiveMergingPlugin(),
     ],
 
     resolve: {
-        extensions: ['', '.js'],
+        extensions: ['', '.js', '.json'],
         modulesDirectories: [
-            'node_modules'
+            'node_modules',
         ],
     },
 
@@ -42,8 +42,8 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 include: validJsFolders,
-                loader: 'eslint-loader'
-            }
+                loader: 'eslint-loader',
+            },
         ],
 
         loaders: [
@@ -57,11 +57,17 @@ module.exports = {
                         'es7.classProperties',
                         'es7.asyncFunctions',
                         'es7.objectRestSpread',
-                        'es7.trailingFunctionCommas'
-                    ]
-                }
-            }
-        ]
-    }
+                        'es7.trailingFunctionCommas',
+                    ],
+                },
+            },
+
+            {
+                test: /\.json$/,
+                include: validJsFolders,
+                loader: 'json-loader',
+            },
+        ],
+    },
 };
 /*eslint-enable */

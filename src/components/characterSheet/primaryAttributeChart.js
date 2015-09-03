@@ -1,9 +1,8 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
-import select from '../select';
 import combineLatestObject from '../../combineLatestObject';
-import { RACE_STATS, PRIMARY_ATTRIBUTES } from '../../constants';
+import { RACE_STATS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
