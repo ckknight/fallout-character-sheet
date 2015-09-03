@@ -54,7 +54,7 @@ function wrapSavedData(savedData$) {
             return key.split('.')
                 .reduce((data$, part) => data$.map(data => data && data[key]), savedData$)
                 .map(data => data || defaultValue);
-        },
+        }
     };
 }
 
@@ -81,25 +81,25 @@ function makePrimary(intents, savedData, race$) {
             .map(base => acc => ({
                         base,
                         min: acc.min,
-                        max: acc.max,
+                        max: acc.max
                 }));
         const modifyExtrema$ = race$
             .map(race => getPrimaryStatExtremaByRace(race, attribute))
             .map(([min, max]) => acc => ({
                         base: acc.base,
                         min,
-                        max,
+                        max
                 }));
         const attribute$ = Rx.Observable.merge(modifyValue$, modifyExtrema$)
             .startWith(new PrimaryAttribute({
-                key: attribute,
+                key: attribute
             }))
             .scan((acc, modifier) => {
                 const {change, min, max} = modifier(acc);
                 return acc.merge({
                     base: Math.min(max, Math.max(min, acc.base + change)),
                     min,
-                    max,
+                    max
                 });
             })
             .distinctUntilChanged()
@@ -108,7 +108,7 @@ function makePrimary(intents, savedData, race$) {
         acc.list.push(attribute$);
         return acc;
     }, {
-        list: [],
+        list: []
     });
 }
 
@@ -159,10 +159,10 @@ export default function model(intents, localStorageSource$) {
                     })
                         .map(a => a.base);
                     return acc;
-                }, {})),
+                }, {}))
             })
                 .throttle(500)
                 .map(o => JSON.stringify(o));
-        },
+        }
     };
 }

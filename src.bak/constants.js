@@ -1,3 +1,5 @@
+import Immutable from 'immutable';
+
 export const RACE_STATS = {
     human: {
         weight: [110, 280],

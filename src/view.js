@@ -6,9 +6,10 @@ import localize from './localization';
 
 function renderInput(key, value, props) {
     const type = typeof value === 'number' ? 'number' : 'text';
-    return <label key={key}>
-      {localize(key)}: <input type={type} value={value} className={key} {...props} />
-    </label>;
+    return <label key={ key }>
+             { localize(key); }:
+             <input type={ type } value={ value } className={ key } {...props} />
+           </label>;
 }
 
 function renderInput$(value$, key, props$) {
@@ -21,15 +22,15 @@ function renderInput$(value$, key, props$) {
 function renderSelect(key, value, options) {
     let initialOption = null;
     if (options.indexOf(value) === -1) {
-        initialOption = <option key={''} selected={true}>-</option>;
+        initialOption = <option key={ '' } selected={ true }>-</option>;
     }
     return <label>
-        {localize(key)}:
-        <select key={key} className={key}>
-            {initialOption}
-            {options.map(option => <option key={option} value={option} selected={value === option}>{localize(option)}</option>)}
-        </select>
-    </label>;
+             { localize(key); }:
+             <select key={ key } className={ key }>
+               { initialOption }
+               { options.map(option => <option key={ option } value={ option } selected={ value === option }>{ localize(option) }</option>) }
+             </select>
+           </label>;
 }
 
 function renderSelect$(value$, key, options) {
@@ -59,21 +60,20 @@ function getPrimaryStatExtremaByRace(race, attribute) {
 
 function renderSpecial$(state) {
     const li$s = state.primary.list
-        .map(attribute$ => attribute$.map(({key, base, effect, min, max}) => <li key={key} className={key}>
-            <span className='name'>{localize(key)}</span>
-            <span className='effect'>{effect}</span>
-            <input className='base' type='number' min={min} max={max} value={base} />
-            <span className='min'>{min}</span>
-            /
-            <span className='max'>{max}</span>
-        </li>))
+        .map(attribute$ => attribute$.map(({key, base, effect, min, max}) => <li key={ key } className={ key }>
+                                                                               <span className='name'>{ localize(key); }</span>
+                                                                               <span className='effect'>{ effect }</span>
+                                                                               <input className='base' type='number' min={ min } max={ max } value={ base } />
+                                                                               <span className='min'>{ min }</span> /
+                                                                               <span className='max'>{ max }</span>
+                                                                             </li>))
         .concat([
             state.primary.count$
-                .combineLatest(state.primary.total$, (count, total) => <span>{count}/{total}</span>)
+                .combineLatest(state.primary.total$, (count, total) => <span>{ count }/{ total }</span>),
         ]);
     return Rx.Observable.combineLatest(...li$s, (...lis) => <ol className="special">
-        {lis}
-    </ol>);
+                                                              { lis }
+                                                            </ol>);
 }
 
 function renderCosmetic(state) {
@@ -88,15 +88,15 @@ function renderCosmetic(state) {
         hair: renderInput$(cosmetic.hair$, 'hair'),
         appearance: renderInput$(cosmetic.appearance$, 'appearance'),
     }, ({name, age, sex, race, weight, eyes, hair, appearance}) => <div>
-        {name}
-        {age}
-        {sex}
-        {race}
-        {weight}
-        {eyes}
-        {hair}
-        {appearance}
-    </div>);
+                                                                     { name }
+                                                                     { age }
+                                                                     { sex }
+                                                                     { race }
+                                                                     { weight }
+                                                                     { eyes }
+                                                                     { hair }
+                                                                     { appearance }
+                                                                   </div>);
 }
 
 function render$(state) {
@@ -105,9 +105,9 @@ function render$(state) {
         special: renderSpecial$(state),
     // state: state$,
     }, ({cosmetic, special}) => <div>
-        {cosmetic}
-        {special}
-    </div>);
+                                  { cosmetic }
+                                  { special }
+                                </div>);
 }
 
 export default state => render$(state);

@@ -2,7 +2,9 @@
 	"root": true,
 	"preset": "default",
 	"indent": {
-		"value": "    "
+		"value": "    ",
+		"ArrowExpression": 0,
+		"CallExpression": 1
 	},
 	"whiteSpace": {
 		"after": {
@@ -14,6 +16,12 @@
 		"esformatter-braces",
 		"esformatter-semicolons",
 		"esformatter-dot-notation",
+		"esformatter-quote-props",
+		"esformatter-spaced-lined-comment",
+		"esformatter-add-trailing-commas",
+		"esformatter-jsx",
+		"esformatter-literal-notation",
+		"esformatter-parseint",
 		"esformatter-var-each"
 	],
 	"quotes": {
