@@ -91,3 +91,13 @@ export const PRIMARY_ATTRIBUTES = [
     'agility',
     'luck'
 ];
+
+export const COSMETIC = {
+    name: '',
+    age: 20,
+    sex: '',
+    weight: 150,
+    eyes: '',
+    hair: '',
+    appearance: ''
+};

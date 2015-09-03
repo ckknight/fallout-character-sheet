@@ -31,11 +31,13 @@ export default function intent(DOM) {
         changeWeight$: inputValues('.weight'),
         changeAge$: inputValues('.age'),
         changeRace$: inputValues('.race', 0),
+        changeEyes$: inputValues('.eyes'),
+        changeHair$: inputValues('.hair'),
+        changeAppearance$: inputValues('.appearance'),
 
         primary: PRIMARY_ATTRIBUTES
             .reduce((acc, attribute) => {
-                acc[`inc${capitalize(attribute)}$`] = click(`.${attribute} .inc`, 1);
-                acc[`dec${capitalize(attribute)}$`] = click(`.${attribute} .dec`, -1);
+                acc[`change${capitalize(attribute)}$`] = inputValues(`.${attribute} .base`);
                 return acc;
             }, {}),
     };

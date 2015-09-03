@@ -23,10 +23,13 @@ function renderSelect(key, value, options) {
     if (options.indexOf(value) === -1) {
         initialOption = <option key={''} selected={true}>-</option>;
     }
-    return <select key={key} className={key}>
-        {initialOption}
-        {options.map(option => <option key={option} value={option} selected={value === option}>{localize(option)}</option>)}
-    </select>;
+    return <label>
+        {localize(key)}:
+        <select key={key} className={key}>
+            {initialOption}
+            {options.map(option => <option key={option} value={option} selected={value === option}>{localize(option)}</option>)}
+        </select>
+    </label>;
 }
 
 function renderSelect$(value$, key, options) {
@@ -56,12 +59,14 @@ function getPrimaryStatExtremaByRace(race, attribute) {
 
 function renderSpecial$(state) {
     const li$s = state.primary.list
-        .map(attribute$ => ({key, value, min, max}) => <li key={key} className={key}>
+        .map(attribute$ => attribute$.map(({key, base, effect, min, max}) => <li key={key} className={key}>
             <span className='name'>{localize(key)}</span>
-            <button className='dec' disabled={value <= min}>-</button>
-            <span className='value'>{value}</span>
-            <button className='inc' disabled={value >= max}>+</button>
-        </li>)
+            <span className='effect'>{effect}</span>
+            <input className='base' type='number' min={min} max={max} value={base} />
+            <span className='min'>{min}</span>
+            /
+            <span className='max'>{max}</span>
+        </li>))
         .concat([
             state.primary.count$
                 .combineLatest(state.primary.total$, (count, total) => <span>{count}/{total}</span>)
@@ -71,21 +76,36 @@ function renderSpecial$(state) {
     </ol>);
 }
 
-function render$(state) {
+function renderCosmetic(state) {
+    const {cosmetic} = state;
     return combineLatest({
-        name: renderInput$(state.name$, 'name'),
-        age: renderInput$(state.age$, 'age'),
-        sex: renderInput$(state.sex$, 'sex'),
+        name: renderInput$(cosmetic.name$, 'name'),
+        age: renderInput$(cosmetic.age$, 'age'),
+        sex: renderInput$(cosmetic.sex$, 'sex'),
         race: renderSelect$(state.race$, 'race', Object.keys(RACE_STATS)),
-        // weight: renderInput$(state.weight$, 'weight'),
-        special: renderSpecial$(state),
-    // state: state$,
-    }, ({name, age, sex, race, weight, special, state}) => <div>
+        weight: renderInput$(cosmetic.weight$, 'weight'),
+        eyes: renderInput$(cosmetic.eyes$, 'eyes'),
+        hair: renderInput$(cosmetic.hair$, 'hair'),
+        appearance: renderInput$(cosmetic.appearance$, 'appearance'),
+    }, ({name, age, sex, race, weight, eyes, hair, appearance}) => <div>
         {name}
         {age}
         {sex}
         {race}
         {weight}
+        {eyes}
+        {hair}
+        {appearance}
+    </div>);
+}
+
+function render$(state) {
+    return combineLatest({
+        cosmetic: renderCosmetic(state),
+        special: renderSpecial$(state),
+    // state: state$,
+    }, ({cosmetic, special}) => <div>
+        {cosmetic}
         {special}
     </div>);
 }

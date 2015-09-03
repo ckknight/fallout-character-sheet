@@ -5,6 +5,9 @@ const LOCALIZATIONS = {
     sex: 'Sex',
     weight: 'Weight',
     height: 'Height',
+    eyes: 'Eyes',
+    hair: 'Hair',
+    appearance: 'Appearance',
 
     human: 'Human',
     ghoul: 'Ghoul',

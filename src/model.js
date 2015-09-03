@@ -51,7 +51,9 @@ function deserialize(localStorageSource$) {
 function wrapSavedData(savedData$) {
     return {
         get(key, defaultValue) {
-            return savedData$.map(data => data[key] || defaultValue);
+            return key.split('.')
+                .reduce((data$, part) => data$.map(data => data && data[key]), savedData$)
+                .map(data => data || defaultValue);
         }
     };
 }
@@ -73,30 +75,29 @@ function makePrimary(intents, savedData, race$) {
     const primaryIntents = intents.primary;
 
     return PRIMARY_ATTRIBUTES.reduce((acc, attribute) => {
-        const attribute$ = Rx.Observable.merge(
-            Rx.Observable.merge(
-                data$.map(p => p[attribute] || 5),
-                primaryIntents[`inc${capitalize(attribute)}$`],
-                primaryIntents[`dec${capitalize(attribute)}$`])
-                .map(change => acc => ({
-                            change: change,
-                            min: acc.min,
-                            max: acc.max
-                    })),
-            race$
-                .map(race => getPrimaryStatExtremaByRace(race, attribute))
-                .map(([min, max]) => acc => ({
-                            change: 0,
-                            min,
-                            max
-                    })))
+        const modifyValue$ = Rx.Observable.merge(
+            data$.map(p => p[attribute] || 5),
+            primaryIntents[`change${capitalize(attribute)}$`])
+            .map(base => acc => ({
+                        base,
+                        min: acc.min,
+                        max: acc.max
+                }));
+        const modifyExtrema$ = race$
+            .map(race => getPrimaryStatExtremaByRace(race, attribute))
+            .map(([min, max]) => acc => ({
+                        base: acc.base,
+                        min,
+                        max
+                }));
+        const attribute$ = Rx.Observable.merge(modifyValue$, modifyExtrema$)
             .startWith(new PrimaryAttribute({
                 key: attribute
             }))
             .scan((acc, modifier) => {
                 const {change, min, max} = modifier(acc);
                 return acc.merge({
-                    value: Math.min(max, Math.max(min, acc.value + change)),
+                    base: Math.min(max, Math.max(min, acc.base + change)),
                     min,
                     max
                 });
@@ -111,43 +112,52 @@ function makePrimary(intents, savedData, race$) {
     });
 }
 
+function makeCosmetic(intents, savedData) {
+    return {
+        name$: savedData.get('cosmetic.name', '')
+            .merge(intents.changeName$),
+        age$: savedData.get('cosmetic.age', 20)
+            .merge(intents.changeAge$),
+        sex$: savedData.get('cosmetic.sex', '')
+            .merge(intents.changeSex$),
+        weight$: savedData.get('cosmetic.weight', 150)
+            .merge(intents.changeWeight$),
+        eyes$: savedData.get('cosmetic.eyes', '')
+            .merge(intents.changeEyes$),
+        hair$: savedData.get('cosmetic.hair', '')
+            .merge(intents.changeHair$),
+        appearance$: savedData.get('cosmetic.appearance', '')
+            .merge(intents.changeAppearance$),
+    };
+}
+
 export default function model(intents, localStorageSource$) {
     const savedData = wrapSavedData(deserialize(localStorageSource$));
 
-    const name$ = savedData.get('name', '')
-        .merge(intents.changeName$);
-    const age$ = savedData.get('age', 20)
-        .merge(intents.changeAge$);
-    const sex$ = savedData.get('sex', '')
-        .merge(intents.changeSex$);
     const race$ = savedData.get('race', '')
         .merge(intents.changeRace$);
-    const weight$ = savedData.get('weight', 150)
-        .merge(intents.changeWeight$);
+    const cosmetic = makeCosmetic(intents, savedData);
+
     const primary = makePrimary(intents, savedData, race$);
     primary.count$ = Rx.Observable.combineLatest(PRIMARY_ATTRIBUTES.map(attribute => primary[attribute + '$']))
-        .map(points => points.reduce((x, y) => x + y.value, 0));
+        .map(points => points.reduce((x, y) => x + y.base, 0));
     primary.total$ = race$
         .filter(race => RACE_STATS[race])
         .map(race => RACE_STATS[race].primary.total)
         .startWith(40);
 
     return {
-        name$,
-        age$,
-        sex$,
         race$,
-        weight$,
+        cosmetic,
         primary,
         serialize$() {
             return combineLatest({
-                name: name$,
                 race: race$,
-                age: age$,
-                sex: sex$,
-                weight: weight$,
                 primary: combineLatest(PRIMARY_ATTRIBUTES.reduce((acc, attribute) => {
-                    acc[attribute] = primary[attribute + '$'].map(a => a.value);
+                    acc[attribute] = primary[attribute + '$'].do(x => {
+                        console.log(x.toJSON());
+                    })
+                        .map(a => a.base);
                     return acc;
                 }, {}))
             })
