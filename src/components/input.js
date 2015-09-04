@@ -12,6 +12,9 @@ const typeToEvents = {
         input: 0,
         change: 0,
     },
+    checkbox: {
+        change: 0,
+    },
 };
 
 const typeToConverter = {
@@ -37,6 +40,23 @@ function eventsByType(DOM, type) {
                 .let(maybeDebounce(events[event])));
 }
 
+function calculateProps(key, type, value, props) {
+    if (type === 'checkbox') {
+        return Object.assign({
+            key,
+            type,
+            value: key,
+            checked: value,
+        }, props || {});
+    } else {
+        return Object.assign({
+            key,
+            type,
+            value,
+        }, props || {});
+    }
+}
+
 export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null)}) {
     const selector = `input.${key}`;
 
@@ -52,11 +72,7 @@ export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.
     const vtree$ = Rx.Observable.combineLatest(value$, props$,
         (value, props) => h(
                 selector,
-                Object.assign({
-                    key,
-                    type,
-                    value,
-                }, props || {})));
+                calculateProps(key, type, value, props)));
 
     return {
         DOM: vtree$,

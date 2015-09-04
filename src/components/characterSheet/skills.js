@@ -5,36 +5,6 @@ import combineLatestObject from '../../combineLatestObject';
 import { SKILLS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 import localize from '../../localization';
 
-function makeInput(key, type, defaultValue, DOM, value$, props$) {
-    return input(key, type, {
-        DOM,
-        value$: value$.map(value => value[key] || defaultValue),
-        props$,
-    });
-}
-
-function primaryAttribute(attribute, {DOM, value$, racePrimary$}) {
-    const raceExtrema$ = racePrimary$
-        .map(primary => primary[attribute] || [1, 10])
-        .map(([min, max]) => ({
-                min,
-                max,
-        }))
-        .share();
-    const input = makeInput(attribute, 'number', 5, DOM, value$, raceExtrema$);
-    const extremaVTree$ = raceExtrema$
-        .map(({min, max}) => h('span', [min, '/', max]));
-
-    return {
-        DOM: combineLatestObject({
-            input: input.DOM,
-            extrema: extremaVTree$,
-        })
-            .map(({input, extrema}) => h(`div.${attribute}-attribute`, [attribute, input, extrema])),
-        value$: input.value$,
-    };
-}
-
 function toReadableAlgorithm(skill) {
     return [skill.base]
         .concat(PRIMARY_ATTRIBUTES.map(attribute => {
@@ -60,31 +30,7 @@ function calculateSkill(attributes, skill) {
         .reduce((x, y) => x + y, 0);
 }
 
-export default function primaryAttributeChart({DOM, value$, attributes$}) {
-    // const racePrimary$ = race$
-    //     .map(race => RACE_STATS[race || 'human'] || {})
-    //     .map(raceStats => raceStats.primary || {})
-    //     .share();
-    //
-    // const attributes = PRIMARY_ATTRIBUTES
-    //     .map(attribute => primaryAttribute(attribute, {
-    //             DOM,
-    //             value$,
-    //             racePrimary$,
-    //         }));
-    //
-    // const sum$ = Rx.Observable.combineLatest(attributes.map(a => a.value$))
-    //     .map(values => values.reduce((x, y) => x + y, 0));
-    //
-    // const primaryTotal$ = racePrimary$
-    //     .map(primary => primary.total || 40);
-    //
-    // const summaryVTree$ = Rx.Observable.combineLatest(sum$, primaryTotal$, (sum, primaryTotal) => {
-    //     return h('span', {
-    //         className: sum === primaryTotal ? 'same-total' : '',
-    //     }, [sum, '/', primaryTotal]);
-    // });
-
+export default function skills({DOM, value$, attributes$}) {
     return {
         DOM: attributes$
             .map(attributes => {
@@ -107,5 +53,6 @@ export default function primaryAttributeChart({DOM, value$, attributes$}) {
                     });
             })
             .map(vTrees => h('div.skills', vTrees)),
+        value$: Rx.Observable.return({}),
     };
 }

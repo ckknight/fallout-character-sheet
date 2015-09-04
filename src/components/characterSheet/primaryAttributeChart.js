@@ -7,7 +7,7 @@ import { RACE_STATS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
         DOM,
-        value$: value$.map(value => value[key] || defaultValue),
+        value$: value$.map(value => value[key] || defaultValue).startWith(defaultValue),
         props$,
     });
 }
