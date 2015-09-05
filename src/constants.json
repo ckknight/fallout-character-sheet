@@ -1,490 +1,4629 @@
 {
-    "COSMETIC": {
-        "age": 20,
-        "appearance": "",
-        "eyes": "",
-        "hair": "",
-        "name": "",
-        "sex": "",
-        "weight": 150
+    "BODY_PARTS": {
+        "arm": {
+            "count": 2,
+            "crippleEffect": {
+                "bigGuns": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "climb": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "doctor": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "firstAid": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "swim": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                }
+            },
+            "crippleHitPoints": {
+                "$add": [
+                    "endurance",
+                    {
+                        "$floor": {
+                            "$div": [
+                                "hitPoints",
+                                10
+                            ]
+                        }
+                    }
+                ]
+            },
+            "cripplePartCount": 2,
+            "meta": "-45% penalty to all skills if both arms are crippled",
+            "name": {
+                "en-US": "Arm"
+            },
+            "parts": {
+                "elbow": {
+                    "crippleEffect": {
+                        "climb": {
+                            "$sub": [
+                                "value",
+                                8
+                            ]
+                        },
+                        "strength": {
+                            "$dec": "value"
+                        },
+                        "swim": {
+                            "$sub": [
+                                "value",
+                                8
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            {
+                                "$ceil": {
+                                    "$half": "endurance"
+                                }
+                            },
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "name": {
+                        "en-US": "Elbow"
+                    },
+                    "targetPenalty": 17
+                },
+                "hand": {
+                    "crippleEffect": {
+                        "medicine": {
+                            "$sub": [
+                                10,
+                                "value"
+                            ]
+                        },
+                        "technical": {
+                            "$sub": [
+                                10,
+                                "value"
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            {
+                                "$ceil": {
+                                    "$half": "endurance"
+                                }
+                            },
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        40
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "-15% penalty to all skills involving that hand",
+                    "name": {
+                        "en-US": "Hand"
+                    },
+                    "targetPenalty": 25
+                },
+                "shoulder": {
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "-10% penalty to all attacks with that arm",
+                    "name": {
+                        "en-US": "Shoulder"
+                    },
+                    "targetPenalty": 15
+                }
+            },
+            "targetPenalty": 15
+        },
+        "head": {
+            "crippleEffect": {
+                "barter": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "gambling": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                },
+                "intelligence": {
+                    "$dec": "value"
+                },
+                "perception": {
+                    "$dec": "value"
+                },
+                "speech": {
+                    "$sub": [
+                        "value",
+                        15
+                    ]
+                }
+            },
+            "crippleHitPoints": {
+                "$add": [
+                    "endurance",
+                    {
+                        "$floor": {
+                            "$div": [
+                                "hitPoints",
+                                20
+                            ]
+                        }
+                    }
+                ]
+            },
+            "cripplePartCount": 1,
+            "damage": {
+                "$add": [
+                    "value",
+                    2
+                ]
+            },
+            "name": {
+                "en-US": "Head"
+            },
+            "parts": {
+                "eyes": {
+                    "crippleEffect": {
+                        "doctor": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "energyWeapons": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "explosives": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "lockpick": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "perception": {
+                            "$dec": "value"
+                        },
+                        "pilot": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "repair": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "science": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "smallGuns": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        },
+                        "throwing": {
+                            "$sub": [
+                                "value",
+                                25
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            {
+                                "$ceil": {
+                                    "$div": [
+                                        "endurance",
+                                        1.5
+                                    ]
+                                }
+                            },
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        40
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "effect is permanent without cybernetic replacement or critical success during surgery",
+                    "name": {
+                        "en-US": "Eyes"
+                    },
+                    "targetPenalty": 20
+                },
+                "forehead": {
+                    "crippleEffect": {
+                        "intelligence": {
+                            "$sub": [
+                                "value",
+                                3
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        40
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "a luck check must be rolled to see if they survive with permanent damage or simply die. Crits are always fatal.",
+                    "name": {
+                        "en-US": "Forehead"
+                    },
+                    "targetPenalty": 30
+                },
+                "neck": {
+                    "crippleEffect": {
+                        "damagePerTurn": {
+                            "$inc": "value"
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            {
+                                "$ceil": {
+                                    "$div": [
+                                        "endurance",
+                                        1.5
+                                    ]
+                                }
+                            },
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        40
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "When the neck is crippled, a luck check is made by the player. A successful luck check means they have a damaged artery, and will lose 1 HP each turn until it is treated with Medicine or the player dies. A failed luck check means the spinal cord has been severed, and the subject is paralyzed. Critical hits that cripple the neck ALWAYS sever the spinal cord.",
+                    "name": {
+                        "en-US": "Neck"
+                    },
+                    "targetPenalty": 20
+                }
+            },
+            "targetPenalty": 25
+        },
+        "leg": {
+            "count": 2,
+            "crippleHitPoints": {
+                "$add": [
+                    "endurance",
+                    {
+                        "$floor": {
+                            "$div": [
+                                "hitPoints",
+                                10
+                            ]
+                        }
+                    }
+                ]
+            },
+            "cripplePartCount": 2,
+            "meta": "Each leg is necessary to move properly, so having one crippled will make running and sprinting impossible. If both legs become crippled, the player will no longer be able to walk, and moving one hex will be treated as a ‘Run’ action (As they are crawling across the ground).",
+            "name": {
+                "en-US": "Leg"
+            },
+            "parts": {
+                "calf": {
+                    "crippleEffect": {
+                        "agility": {
+                            "$dec": "value"
+                        },
+                        "sneak": {
+                            "$sub": [
+                                "value",
+                                15
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            {
+                                "$ceil": {
+                                    "$half": "endurance"
+                                }
+                            },
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "name": {
+                        "en-US": "Calf"
+                    },
+                    "targetPenalty": 20
+                },
+                "hip": {
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "When a hip is crippled, whenever the player turns in that direction all their skills take a -5% penalty for the turn",
+                    "name": {
+                        "en-US": "Hip"
+                    },
+                    "targetPenalty": 15
+                },
+                "knee": {
+                    "crippleEffect": {
+                        "climb": {
+                            "$sub": [
+                                "value",
+                                15
+                            ]
+                        },
+                        "swim": {
+                            "$sub": [
+                                "value",
+                                15
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "Crippling a knee makes running impossible",
+                    "name": {
+                        "en-US": "Knee"
+                    },
+                    "targetPenalty": 17
+                }
+            },
+            "targetPenalty": 10
+        },
+        "torso": {
+            "crippleEffect": {
+                "carryWeight": {
+                    "$half": "value"
+                },
+                "skills": {
+                    "$sub": [
+                        "value",
+                        5
+                    ]
+                }
+            },
+            "crippleHitPoints": {
+                "$add": [
+                    {
+                        "$double": "endurance"
+                    },
+                    {
+                        "$floor": {
+                            "$div": [
+                                "hitPoints",
+                                10
+                            ]
+                        }
+                    }
+                ]
+            },
+            "cripplePartCount": 2,
+            "damage": {
+                "$sub": [
+                    "value",
+                    2
+                ]
+            },
+            "name": {
+                "en-US": "Torso"
+            },
+            "parts": {
+                "chest": {
+                    "crippleEffect": {
+                        "damagePerTurn": {
+                            "$inc": "value"
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        10
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "name": {
+                        "en-US": "Chest"
+                    },
+                    "targetPenalty": 25
+                },
+                "groin": {
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        20
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "damage": {
+                        "$add": [
+                            "value",
+                            2
+                        ]
+                    },
+                    "meta": "player is rendered unable to jog, walk, or sprint",
+                    "name": {
+                        "en-US": "Groin"
+                    },
+                    "targetPenalty": 35
+                },
+                "gut": {
+                    "crippleEffect": {
+                        "damagePerDay": {
+                            "$add": [
+                                "value",
+                                4
+                            ]
+                        },
+                        "resistPoison": {
+                            "$sub": [
+                                "value",
+                                10
+                            ]
+                        },
+                        "resistRadiation": {
+                            "$sub": [
+                                "value",
+                                10
+                            ]
+                        }
+                    },
+                    "crippleHitPoints": {
+                        "$add": [
+                            "endurance",
+                            {
+                                "$floor": {
+                                    "$div": [
+                                        "hitPoints",
+                                        10
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "meta": "if the player goes for one week without treatment, they die",
+                    "name": {
+                        "en-US": "Gut"
+                    },
+                    "targetPenalty": 20
+                }
+            },
+            "targetPenalty": 0
+        }
     },
-    "PRIMARY_ATTRIBUTES": [
-        "strength",
-        "perception",
-        "endurance",
-        "charisma",
-        "intelligence",
-        "agility",
-        "luck"
-    ],
-    "RACE_STATS": {
+    "PERKS": {
+        "actionChild": {
+            "effect": {
+                "actionPointRegeneration": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Action Boy (or Girl)"
+            },
+            "ranks": 2,
+            "requirements": {
+                "agility": 5,
+                "level": 12
+            }
+        },
+        "adrenalineRush": {
+            "effect": {
+                "$when": {
+                    "halfHealth": {
+                        "strength": {
+                            "$inc": "value"
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Adrenaline Rush"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 6,
+                "strength": {
+                    "max": 9,
+                    "min": 1
+                }
+            }
+        },
+        "animalFriend": {
+            "meta": "Your character spends a lot of time with animals. A LOT of time. Animals will not attack one of their friends, unless the animal is threatened or attacked first.",
+            "name": {
+                "en-US": "Animal Friend"
+            },
+            "ranks": 1,
+            "requirements": {
+                "intelligence": 5,
+                "level": 9,
+                "outdoorsman": 25
+            }
+        },
+        "awareness": {
+            "meta": "You know exactly what is going on in combat. This perk gives you more information when you examine a critter. You can see their exact number of hit points and the weapon they are armed with, if any.",
+            "name": {
+                "en-US": "Awareness"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 3,
+                "perception": 5
+            }
+        },
+        "bendTheRules": {
+            "meta": "With this perk, the next time your character gets to choose a perk, they can ignore all restrictions except for race. You rule!",
+            "name": {
+                "en-US": "Bend The Rules"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 16,
+                "luck": 6
+            }
+        },
+        "betterCriticals": {
+            "effect": {
+                "criticalDamage": {
+                    "$mul": [
+                        "value",
+                        1.5
+                    ]
+                },
+                "limbDamageChance": {
+                    "$mul": [
+                        "value",
+                        1.5
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Better Criticals"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 4,
+                "level": 9,
+                "luck": 6,
+                "perception": 6,
+                "race": {
+                    "$not": [
+                        "alphaMutant",
+                        "betaMutant"
+                    ]
+                }
+            }
+        },
+        "bluffMaster": {
+            "meta": "You are the king or queen of smooth talking. Whenever you are caught stealing, your character can automatically talk his or her way out of the situation.",
+            "name": {
+                "en-US": "Bluff Master"
+            },
+            "ranks": 1,
+            "requirements": {
+                "charisma": 7,
+                "level": 8,
+                "speech": 70
+            }
+        },
+        "boneHead": {
+            "meta": "You have a very thick skull, just like your mother always told you. With the first rank of this perk, you get a 50% chance to avoid being knocked unconscious. With the second rank, that chance increases to 75%.",
+            "name": {
+                "en-US": "Bone-Head"
+            },
+            "ranks": 2,
+            "requirements": {
+                "level": 7,
+                "strength": 7
+            }
+        },
+        "bonsai": {
+            "meta": "Through careful nurturing, you have a small fruit tree growing out of your head. Now you have a steady supply of fruit!",
+            "name": {
+                "en-US": "Bonsai"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12,
+                "outdoorsman": 50,
+                "race": "ghoul",
+                "science": 40
+            }
+        },
+        "bonusHandToHandAttacks": {
+            "effect": {
+                "$when": {
+                    "melee": {
+                        "actionPointCost": {
+                            "$dec": "value"
+                        }
+                    },
+                    "unarmed": {
+                        "actionPointCost": {
+                            "$dec": "value"
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Bonus Hand-to-Hand Attacks"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 6,
+                "level": 15
+            }
+        },
+        "bonusHandToHandDamage": {
+            "effect": {
+                "meleeDamage": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Bonus Hand-to-Hand Damage"
+            },
+            "ranks": 3,
+            "requirements": {
+                "agility": 6,
+                "level": 3,
+                "strength": 6
+            }
+        },
+        "bonusMove": {
+            "effect": {
+                "freeMovement": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Bonus Move"
+            },
+            "ranks": 2,
+            "requirements": {
+                "agility": 5,
+                "level": 6
+            }
+        },
+        "bonusRangedDamage": {
+            "effect": {
+                "rangedDamage": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Bonus Ranged Damage"
+            },
+            "ranks": 2,
+            "requirements": {
+                "agility": 6,
+                "level": 6,
+                "luck": 6,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "bonusRateOfFire": {
+            "effect": {
+                "$when": {
+                    "ranged": {
+                        "actionPointCost": {
+                            "$dec": "value"
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Bonus Rate of Fire"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 7,
+                "intelligence": 6,
+                "level": 15,
+                "perception": 6,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "bracing": {
+            "meta": "You know how to brace large weapons while you are standing. When applicable, you get a bonus for using a tripod just by holding a weapon in your hands.",
+            "name": {
+                "en-US": "Bracing"
+            },
+            "ranks": 1,
+            "requirements": {
+                "heavyWeapons": 80,
+                "level": 4,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                },
+                "strength": 7
+            }
+        },
+        "breakTheRules": {
+            "meta": "When you choose this perk, you may choose any perk next time, regardless of requirements or race.",
+            "name": {
+                "en-US": "Break the Rules"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 20,
+                "luck": 6
+            }
+        },
+        "brownNoser": {
+            "effect": {
+                "$when": {
+                    "talkingToAuthority": {
+                        "charisma": {
+                            "$inc": 1
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Brown-Noser"
+            },
+            "ranks": 2,
+            "requirements": {
+                "charisma": 5,
+                "intelligence": 6,
+                "level": 2,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "brutishHulk": {
+            "effect": {
+                "hitPoints": {
+                    "$add": [
+                        "value",
+                        {
+                            "$mul": [
+                                "level",
+                                [
+                                    {
+                                        "$floor": {
+                                            "$add": [
+                                                3,
+                                                {
+                                                    "$half": "endurance"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Brutish Hulk"
+            },
+            "ranks": 1,
+            "requirements": {
+                "endurance": 5,
+                "level": 8,
+                "race": "deathclaw",
+                "strength": 7
+            }
+        },
+        "cancerousGrowth": {
+            "effect": {
+                "healingRate": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "meta": "regenerate one crippled limb every 48 hours",
+            "name": {
+                "en-US": "Cancerous Growth"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 6,
+                "race": "ghoul",
+                "strength": {
+                    "max": 7,
+                    "min": 1
+                }
+            }
+        },
+        "cautiousNature": {
+            "effect": {
+                "$when": {
+                    "initiatingEncounter": {
+                        "perception": {
+                            "$add": [
+                                "value",
+                                3
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Cautious Nature"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 3,
+                "perception": 6
+            }
+        },
+        "comprehension": {
+            "effect": {
+                "skillPointsPerBook": {
+                    "$mul": [
+                        "value",
+                        1.5
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Comprehension"
+            },
+            "ranks": 1,
+            "requirements": {
+                "intelligence": 6,
+                "level": 3,
+                "race": {
+                    "$not": "dog"
+                }
+            }
+        },
+        "crazyBomber": {
+            "meta": "Your luck with explosives is legendary. Characters with this perk who fail to set an explosive properly will know immediately, and that explosive will not go off or detonate – it will be reset, so the Bomber can try again.",
+            "name": {
+                "en-US": "Crazy Bomber"
+            },
+            "ranks": 1,
+            "requirements": {
+                "explosives": 60,
+                "intelligence": 6,
+                "level": 9,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "cultOfPersonality": {
+            "effect": {
+                "likeability": {
+                    "$abs": "value"
+                }
+            },
+            "name": {
+                "en-US": "Cult of Personality"
+            },
+            "ranks": 1,
+            "requirements": {
+                "charisma": 10,
+                "level": 12
+            }
+        },
+        "deathSense": {
+            "effect": {
+                "$when": {
+                    "dark": {
+                        "perception": {
+                            "$add": [
+                                "value",
+                                2
+                            ]
+                        }
+                    }
+                },
+                "detectionClass": {
+                    "$add": 25
+                },
+                "lightLevelPenality": {
+                    "$half": "value"
+                }
+            },
+            "name": {
+                "en-US": "Death Sense"
+            },
+            "ranks": 1,
+            "requirements": {
+                "intelligence": 5,
+                "level": 4,
+                "race": "deathclaw"
+            }
+        },
+        "demolitionExpert": {
+            "effect": {
+                "explosiveDamage": {
+                    "$mul": [
+                        "value",
+                        1.5
+                    ]
+                }
+            },
+            "meta": "Explosives set by this character will always detonate on time.",
+            "name": {
+                "en-US": "Demolition Expert"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 4,
+                "explosives": 90,
+                "level": 9,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "dieHard": {
+            "effect": {
+                "$when": {
+                    "fifthHealth": {
+                        "damageThreshold": {
+                            "$add": [
+                                "value",
+                                5
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Die Hard"
+            },
+            "ranks": 1,
+            "requirements": {
+                "endurance": 6,
+                "firstAid": 40,
+                "level": 2
+            }
+        },
+        "divineFavor": {
+            "meta": "A higher power has taken a liking to you. Anytime a roll fails, you have the option of re-rolling, but you must accept the results of the re-roll (you cannot re-roll a re-roll). You can only invoke your higher power once in a 24-hour period.",
+            "name": {
+                "en-US": "Divine Favor"
+            },
+            "ranks": 1,
+            "requirements": {
+                "charisma": 8,
+                "level": 14
+            }
+        },
+        "dodger": {
+            "effect": {
+                "armorClass": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Dodger"
+            },
+            "ranks": 2,
+            "requirements": {
+                "agility": 6,
+                "level": 9
+            }
+        },
+        "dolphin": {
+            "effect": {
+                "swim": {
+                    "$add": [
+                        "value",
+                        30
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Dolphin"
+            },
+            "ranks": 2,
+            "requirements": {
+                "endurance": 8,
+                "level": 6,
+                "strength": 6
+            }
+        },
+        "drivingCityStyle": {
+            "effect": {
+                "pilot": {
+                    "$add": [
+                        "value",
+                        30
+                    ]
+                }
+            },
+            "meta": "any rolls against stats made while behind the wheel get a +2 bonus",
+            "name": {
+                "en-US": "Driving City Style"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 5,
+                "level": 9,
+                "perception": 6,
+                "race": {
+                    "$not": [
+                        "deathclaw",
+                        "dog"
+                    ]
+                }
+            }
+        },
+        "drunkenMaster": {
+            "effect": {
+                "$when": {
+                    "drunk": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Drunken Master"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 3,
+                "unarmed": 60
+            }
+        },
+        "earlierSequence": {
+            "effect": {
+                "sequence": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Earlier Sequence"
+            },
+            "ranks": 3,
+            "requirements": {
+                "level": 3,
+                "perception": 6
+            }
+        },
+        "educated": {
+            "effect": {
+                "skillPointsPerLevel": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Educated"
+            },
+            "ranks": 3,
+            "requirements": {
+                "intelligence": 6,
+                "level": 6
+            }
+        },
+        "empathy": {
+            "meta": "You get a better idea of what to say to an NPC with this perk. The GM must warn you when dialogue will be interpreted the wrong way.",
+            "name": {
+                "en-US": "Empathy"
+            },
+            "ranks": 1,
+            "requirements": {
+                "intelligence": 5,
+                "level": 6,
+                "perception": 7
+            }
+        },
+        "explorer": {
+            "meta": "This perk will make it more likely that your character will find those strange and interesting encounters and items. It is up to the GM to decide what those items and encounters are.",
+            "name": {
+                "en-US": "Explorer"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 9
+            }
+        },
+        "fasterHealing": {
+            "effect": {
+                "healingRate": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Faster Healing"
+            },
+            "ranks": 3,
+            "requirements": {
+                "endurance": 6,
+                "level": 3
+            }
+        },
+        "flexible": {
+            "effect": {
+                "changeStanceCost": 1
+            },
+            "name": {
+                "en-US": "Flexible"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 6,
+                "level": 4,
+                "sneak": 60
+            }
+        },
+        "flowerChild": {
+            "effect": {
+                "addictionChance": {
+                    "$half": "value"
+                },
+                "withdrawalTime": {
+                    "$half": "value"
+                }
+            },
+            "name": {
+                "en-US": "Flower Child"
+            },
+            "ranks": 1,
+            "requirements": {
+                "endurance": 5,
+                "level": 9
+            }
+        },
+        "fortuneFinder": {
+            "meta": "Random encounters yield more money. Of course, you have to take it off the cold, dead bodies of your opponents. How much money is up to the GM.",
+            "name": {
+                "en-US": "Fortune Finder"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 6,
+                "luck": 8
+            }
+        },
+        "gainAgility": {
+            "effect": {
+                "agility": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Agility"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainCharisma": {
+            "effect": {
+                "charisma": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Charisma"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainEndurance": {
+            "effect": {
+                "endurance": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Endurance"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainIntelligence": {
+            "effect": {
+                "intelligence": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Intelligence"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainLuck": {
+            "effect": {
+                "luck": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Luck"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainPerception": {
+            "effect": {
+                "perception": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Perception"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gainStrength": {
+            "effect": {
+                "strength": {
+                    "$inc": "value"
+                }
+            },
+            "name": {
+                "en-US": "Gain Strength"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12
+            }
+        },
+        "gambler": {
+            "effect": {
+                "gambling": {
+                    "$add": [
+                        "value",
+                        20
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Gambler"
+            },
+            "ranks": 1,
+            "requirements": {
+                "gambling": 50,
+                "level": 6
+            }
+        },
+        "ghost": {
+            "effect": {
+                "$when": {
+                    "dark": {
+                        "sneak": {
+                            "$add": [
+                                "value",
+                                20
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Ghost"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 6,
+                "sneak": 60
+            }
+        },
+        "gunner": {
+            "effect": {
+                "$when": {
+                    "inMovingVehicle": {
+                        "movingVehicleDamagePenalty": 0
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Gunner"
+            },
+            "ranks": 3,
+            "requirements": {
+                "$some": [
+                    {
+                        "unarmed": 40
+                    },
+                    {
+                        "melee": 40
+                    },
+                    {
+                        "throwing": 40
+                    },
+                    {
+                        "smallGuns": 40
+                    },
+                    {
+                        "bigGuns": 40
+                    },
+                    {
+                        "energyWeapons": 40
+                    }
+                ],
+                "agility": 6,
+                "level": 3
+            }
+        },
+        "handToHandEvade": {
+            "effect": {
+                "$when": {
+                    "unarmed": {
+                        "armorClassPerUnusedActionPoint": {
+                            "$add": [
+                                "value",
+                                2
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Hand-to-Hand Evade"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 12,
+                "unarmed": 75
+            }
+        },
+        "harmless": {
+            "effect": {
+                "steal": {
+                    "$add": [
+                        "value",
+                        20
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Harmless"
+            },
+            "race": {
+                "$not": [
+                    "deathclaw",
+                    "dog"
+                ]
+            },
+            "ranks": 1,
+            "requirements": {
+                "karma": 50,
+                "level": 6,
+                "steal": 50
+            }
+        },
+        "healer": {
+            "effect": {
+                "doctorHitPoints": {
+                    "$add": [
+                        "value",
+                        4,
+                        {
+                            "$rand": [
+                                1,
+                                6
+                            ]
+                        }
+                    ]
+                },
+                "firstAidHitPoints": {
+                    "$add": [
+                        "value",
+                        4,
+                        {
+                            "$rand": [
+                                1,
+                                6
+                            ]
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Healer"
+            },
+            "ranks": 2,
+            "requirements": {
+                "agility": 6,
+                "firstAid": 40,
+                "intelligence": 5,
+                "level": 3,
+                "perception": 7
+            }
+        },
+        "heaveHo": {
+            "meta": "For purposes of determining the maximum range of thrown weapons only, this perk will increase Strength by +2 for each rank.",
+            "name": {
+                "en-US": "Heave, Ho!"
+            },
+            "ranks": 3,
+            "requirements": {
+                "level": 6
+            }
+        },
+        "hereAndNow": {
+            "meta": "With this perk, your character immediately gains enough experience points to go up to the next level.",
+            "name": {
+                "en-US": "Here and Now"
+            },
+            "ranks": 1,
+            "requirements": {
+                "level": 9
+            }
+        },
+        "hideOfScars": {
+            "effect": {
+                "damageThreshold": {
+                    "$add": [
+                        "value",
+                        3
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Hide of Scars"
+            },
+            "ranks": 2,
+            "requirements": {
+                "endurance": 6,
+                "level": 10,
+                "race": "deathclaw"
+            }
+        },
+        "hitTheDeck": {
+            "effect": {
+                "receivedExplosiveDamage": {
+                    "$half": "value"
+                }
+            },
+            "name": {
+                "en-US": "Hit the Deck"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 6,
+                "level": 4
+            }
+        },
+        "jollyRoger": {
+            "effect": {
+                "pilot": {
+                    "$add": [
+                        "value",
+                        30
+                    ]
+                }
+            },
+            "meta": "you do not suffer penalties from using weapons on the water",
+            "name": {
+                "en-US": "Jolly Roger"
+            },
+            "ranks": 1,
+            "requirements": {
+                "endurance": 7,
+                "level": 9,
+                "pilot": 75
+            }
+        },
+        "kamaSutra": {
+            "effect": {
+                "$when": {
+                    "doingTheDirty": {
+                        "agility": {
+                            "$add": [
+                                "value",
+                                1
+                            ]
+                        },
+                        "charisma": {
+                            "$add": [
+                                "value",
+                                2
+                            ]
+                        },
+                        "endurance": {
+                            "$add": [
+                                "value",
+                                2
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Kama Sutra"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 5,
+                "endurance": 5,
+                "level": 3
+            }
+        },
+        "karmaBeacon": {
+            "effect": {
+                "karma": {
+                    "$double": "karma"
+                }
+            },
+            "name": {
+                "en-US": "Karma Beacon"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 5,
+                "endurance": 5,
+                "level": 3
+            }
+        },
+        "leader": {
+            "effect": {
+                "$nearby": {
+                    "agility": {
+                        "$inc": "value"
+                    },
+                    "armorClass": {
+                        "$add": [
+                            "value",
+                            5
+                        ]
+                    }
+                },
+                "requirements": {
+                    "charisma": 6,
+                    "level": 4
+                }
+            },
+            "lifegiver": {
+                "effect": {
+                    "hitPoints": {
+                        "$add": [
+                            "value",
+                            {
+                                "$mul": [
+                                    4,
+                                    "level"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Lifegiver"
+                },
+                "ranks": 2,
+                "requirements": {
+                    "endurance": 4,
+                    "level": 12
+                }
+            },
+            "lightStep": {
+                "meta": "Characters with this perk are much less likely to set off traps. For purposes of triggering a trap, they gain a +4 bonus to Agility.",
+                "name": {
+                    "en-US": "Light Step"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 5,
+                    "level": 9,
+                    "luck": 5
+                }
+            },
+            "livingAnatomy": {
+                "effect": {
+                    "$when": {
+                        "attackingBiological": {
+                            "damage": {
+                                "$add": [
+                                    "value",
+                                    5
+                                ]
+                            }
+                        }
+                    },
+                    "doctor": {
+                        "$add": [
+                            "doctor",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Living Anatomy"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "doctor": 60,
+                    "level": 12
+                }
+            },
+            "loner": {
+                "effect": {
+                    "$when": {
+                        "noNearbyParty": {
+                            "skills": {
+                                "$add": [
+                                    "value",
+                                    10
+                                ]
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Loner"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "charisma": {
+                        "max": 4,
+                        "min": 1
+                    },
+                    "level": 4,
+                    "outdoorsman": 50
+                }
+            },
+            "masterThief": {
+                "effect": {
+                    "lockpick": {
+                        "$add": [
+                            "value",
+                            15
+                        ]
+                    },
+                    "steal": {
+                        "$add": [
+                            "value",
+                            15
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Master Thief"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 12,
+                    "lockpick": 50,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    },
+                    "steal": 50
+                }
+            },
+            "masterTrader": {
+                "effect": {
+                    "barter": {
+                        "$add": [
+                            "value",
+                            30
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Master Trader"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "barter": 60,
+                    "charisma": 7,
+                    "level": 9,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    }
+                }
+            },
+            "medic": {
+                "effect": {
+                    "doctor": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "firstAid": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Medic"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "$some": [
+                        {
+                            "firstAid": 40
+                        },
+                        {
+                            "doctor": 40
+                        }
+                    ],
+                    "level": 12
+                }
+            },
+            "mentalBlock": {
+                "meta": "For purposes of determining range in combat AND finding traps ONLY, your character’s Perception is raised by 1, up to the racial maximum.",
+                "name": {
+                    "en-US": "Mental Block"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 15
+                }
+            },
+            "moreCriticals": {
+                "effect": {
+                    "criticalChance": {
+                        "$add": [
+                            "value",
+                            5
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "More Criticals"
+                },
+                "ranks": 3,
+                "requirements": {
+                    "level": 6,
+                    "luck": 6
+                }
+            },
+            "mrFixit": {
+                "effect": {
+                    "repair": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "science": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Mr. (or Ms.) Fixit"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "$some": [
+                        {
+                            "repair": 40
+                        },
+                        {
+                            "science": 40
+                        }
+                    ],
+                    "level": 12
+                }
+            },
+            "mutate": {
+                "meta": "Picking this perk will also make you select one of your current Traits to remove. You then get a chance to pick another Trait. Weird, eh?",
+                "name": {
+                    "en-US": "Mutate!"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 9
+                }
+            },
+            "mysteriousStranger": {
+                "meta": "When you select this perk, there is a chance (30% + (2 X LK)) that your character will gain a temporary ally, but only in random encounters. The GM will choose that ally.",
+                "name": {
+                    "en-US": "Mysterious Stranger"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 9,
+                    "luck": 4
+                }
+            },
+            "name": {
+                "en-US": "Leader"
+            },
+            "negotiator": {
+                "effect": {
+                    "barter": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "speech": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Negotiator"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "barter": 50,
+                    "level": 6,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    },
+                    "speech": 50
+                }
+            },
+            "nightVision": {
+                "meta": "Negative modifiers for dark conditions are reduced by 50%.",
+                "name": {
+                    "en-US": "Night Vision"
+                },
+                "requirements": {
+                    "level": 3,
+                    "perception": 6
+                }
+            },
+            "packRat": {
+                "effect": {
+                    "carryWeight": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Pack Rat"
+                },
+                "ranks": 2,
+                "requirements": {
+                    "level": 3,
+                    "perception": 6
+                }
+            },
+            "pathfinder": {
+                "effect": {
+                    "travelTime": {
+                        "$mul": [
+                            "value",
+                            0.75
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Pathfinder"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "endurance": 6,
+                    "level": 6,
+                    "outdoorsman": 60
+                }
+            },
+            "pickpocket": {
+                "effect": {
+                    "steal": {
+                        "$add": [
+                            "value",
+                            25
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Pickpocket"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 8,
+                    "level": 15,
+                    "steal": 80
+                }
+            },
+            "presence": {
+                "effect": {
+                    "$when": {
+                        "reactionRoll": {
+                            "charisma": {
+                                "$inc": "value"
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Presence"
+                },
+                "ranks": 3
+            },
+            "psychotic": {
+                "effect": {
+                    "psychoAddictionChance": {
+                        "$floor": {
+                            "$half": "value"
+                        }
+                    },
+                    "psychoEffects": {
+                        "$mul": [
+                            "value",
+                            2
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Psychotic"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "endurance": 5,
+                    "level": 8,
+                    "race": [
+                        "alphaMutant",
+                        "betaMutant"
+                    ]
+                }
+            },
+            "pyromaniac": {
+                "effect": {
+                    "$when": {
+                        "fireBasedWeapon": {
+                            "damage": {
+                                "$add": [
+                                    "value",
+                                    5
+                                ]
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Pyromaniac"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "bigGuns": 75,
+                    "level": 9
+                }
+            },
+            "quickPockets": {
+                "effect": {
+                    "inventoryActionPointCost": {
+                        "$ceil": {
+                            "$half": "value"
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Quick Pockets"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 5,
+                    "level": 3
+                }
+            },
+            "quickRecovery": {
+                "effect": {
+                    "standUpActionPointCost": 1
+                },
+                "name": {
+                    "en-US": "Quick Recovery"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 5,
+                    "level": 6
+                }
+            },
+            "radChild": {
+                "effect": {
+                    "$when": {
+                        "irradiated": {
+                            "healingRate": {
+                                "$add": [
+                                    "value",
+                                    5
+                                ]
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Rad Child"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "endurance": 6,
+                    "level": 3,
+                    "race": "ghoul"
+                }
+            },
+            "radResistance": {
+                "effect": {
+                    "resistRadiation": {
+                        "$add": [
+                            "value",
+                            15
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Rad Resistance"
+                },
+                "ranks": 2,
+                "requirements": {
+                    "endurance": 6,
+                    "intelligence": 4,
+                    "level": 6
+                }
+            },
+            "ranger": {
+                "effect": {
+                    "outdoorsman": {
+                        "$add": [
+                            "value",
+                            15
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Ranger"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 6,
+                    "perception": 6
+                }
+            },
+            "ranks": 1,
+            "redBaron": {
+                "effect": {
+                    "pilot": {
+                        "$add": [
+                            "value",
+                            25
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Red Baron"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 6,
+                    "level": 9,
+                    "perception": 7
+                }
+            },
+            "roadWarrior": {
+                "meta": "You do not suffer any penalties when driving vehicles and making attacks at the same time.",
+                "name": {
+                    "en-US": "Road Warrior"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "intelligence": 6,
+                    "level": 12,
+                    "pilot": 60,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    }
+                }
+            },
+            "salesman": {
+                "effect": {
+                    "barter": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Salesman"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "barter": 50,
+                    "level": 6,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    }
+                }
+            },
+            "scout": {
+                "meta": "Your character can see further in the wilderness. Maps are easier to read. It is up to the GM to determine exactly how this works. Special encounters and items are a little easier to find with this skill as well.",
+                "name": {
+                    "en-US": "Scout"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 3,
+                    "perception": 7
+                }
+            },
+            "scrounger": {
+                "meta": "You can find more ammo than the normal post-nuclear survivor. You always find double the normal ammunition in random encounters.",
+                "name": {
+                    "en-US": "Scrounger"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 9,
+                    "luck": 8
+                }
+            },
+            "sharpshooter": {
+                "meta": "With each rank of this perk, Perception increases by +2 for the purposes of determining the modifiers for range in combat.",
+                "name": {
+                    "en-US": "Sharpshooter"
+                },
+                "ranks": 2,
+                "requirements": {
+                    "intelligence": 6,
+                    "level": 9,
+                    "perception": 7
+                }
+            },
+            "silentDeath": {
+                "effect": {
+                    "$when": {
+                        "backstab": {
+                            "damage": {
+                                "$double": "value"
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Silent Death"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 10,
+                    "level": 18,
+                    "sneak": 80,
+                    "unarmed": 80
+                }
+            },
+            "silentRunning": {
+                "meta": "This perk allows characters to run and sneak at the same time.",
+                "name": {
+                    "en-US": "Silent Running"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 6,
+                    "level": 6,
+                    "sneak": 50
+                }
+            },
+            "slayer": {
+                "meta": "The slayer walks the earth! In HtH or melee combat, characters with this Perk do a critical hit with a successful roll against Luck!",
+                "name": {
+                    "en-US": "Slayer"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 8,
+                    "level": 24,
+                    "strength": 8,
+                    "unarmed": 80
+                }
+            },
+            "smoothTalker": {
+                "effect": {
+                    "$when": {
+                        "smoothtalking": {
+                            "intelligence": {
+                                "$inc": "value"
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Smooth Talker"
+                },
+                "ranks": 3,
+                "requirements": {
+                    "intelligence": 4,
+                    "level": 3,
+                    "race": {
+                        "$not": "dog"
+                    }
+                }
+            },
+            "snakeEater": {
+                "effect": {
+                    "resistPoison": {
+                        "$add": [
+                            "value",
+                            25
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Snake-Eater"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "endurance": 3,
+                    "level": 6
+                }
+            },
+            "sniper": {
+                "meta": "When using a ranged weapon, your character will do a critical hit with successful roll against Luck and this perk. ",
+                "name": {
+                    "en-US": "Sniper"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 8,
+                    "level": 24,
+                    "perception": 8,
+                    "smallGuns": 80
+                }
+            },
+            "speaker": {
+                "effect": {
+                    "speech": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Speaker"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 9,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    },
+                    "speech": 50
+                }
+            },
+            "stat": {
+                "effect": {
+                    "doctorActionPointCost": 5,
+                    "firstAidActionPointCost": 5
+                },
+                "name": {
+                    "en-US": "Stat!"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 6,
+                    "doctor": 50,
+                    "firstAid": 75,
+                    "level": 3
+                }
+            },
+            "steadyArm": {
+                "effect": {
+                    "burstAttackActionPointCost": {
+                        "$dec": "value"
+                    }
+                },
+                "name": {
+                    "en-US": "Steady Arm"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 4,
+                    "race": [
+                        "alphaMutant",
+                        "betaMutant"
+                    ],
+                    "strength": 6
+                }
+            },
+            "stoneWall": {
+                "meta": "If your character is about to be knocked down in combat, he can roll a percentile dice and has a 50% chance to avoid that fate.",
+                "name": {
+                    "en-US": "Stonewall"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 3,
+                    "strength": 6
+                }
+            },
+            "strongBack": {
+                "effect": {
+                    "carryWeight": {
+                        "$add": [
+                            "value",
+                            50
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Strong Back"
+                },
+                "ranks": 2,
+                "requirements": {
+                    "endurance": 6,
+                    "level": 3,
+                    "strength": 6
+                }
+            },
+            "stuntDevil": {
+                "effect": {
+                    "fallDamage": {
+                        "$mul": [
+                            "value",
+                            0.75
+                        ]
+                    },
+                    "pilot": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "vehicleWreckDamage": {
+                        "$mul": [
+                            "value",
+                            0.75
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Stunt Devil"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "agility": 6,
+                    "endurance": 6,
+                    "level": 6,
+                    "race": {
+                        "$not": "dog"
+                    },
+                    "strength": 6
+                }
+            },
+            "survivalist": {
+                "effect": {
+                    "outdoorsman": {
+                        "$add": [
+                            "value",
+                            25
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Survivalist"
+                },
+                "ranks": 3,
+                "requirements": {
+                    "endurance": 6,
+                    "intelligence": 6,
+                    "level": 3,
+                    "outdoorsman": 40
+                }
+            },
+            "swiftLearner": {
+                "effect": {
+                    "xpMultiplier": {
+                        "$add": [
+                            "value",
+                            5
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Swift Learner"
+                },
+                "ranks": 3,
+                "requirements": {
+                    "intelligence": 4,
+                    "level": 3
+                }
+            },
+            "tag": {
+                "meta": "Pick an additional tag skill",
+                "name": {
+                    "en-US": "Tag!"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 12
+                }
+            },
+            "talonOfFear": {
+                "meta": "Venom has seeped into your claws. All of your unarmed attacks carry a Type B poison.",
+                "name": {
+                    "en-US": "Talon of Fear"
+                },
+                "ranks": 1,
+                "requirements": {
+                    "level": 12,
+                    "strength": 6,
+                    "unarmed": 60
+                }
+            },
+            "teamPlayer": {
+                "effect": {
+                    "$nearby": {
+                        "skills": {
+                            "$add": [
+                                "value",
+                                10
+                            ]
+                        }
+                    }
+                },
+                "name": {
+                    "en-US": "Team Player"
+                },
+                "requirements": {
+                    "charisma": 4,
+                    "level": 12
+                }
+            },
+            "thief": {
+                "effect": {
+                    "explosives": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "lockpick": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "sneak": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    },
+                    "steal": {
+                        "$add": [
+                            "value",
+                            10
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Thief"
+                },
+                "requirements": {
+                    "level": 3,
+                    "race": {
+                        "$not": {
+                            "race": [
+                                "deathclaw",
+                                "dog"
+                            ]
+                        }
+                    }
+                }
+            },
+            "toughHide": {
+                "effect": {
+                    "armorClass": {
+                        "$add": [
+                            "value",
+                            15
+                        ]
+                    },
+                    "damageThreshold": {
+                        "$add": [
+                            "value",
+                            5
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Tough Hide"
+                },
+                "requirements": {
+                    "endurance": {
+                        "max": 8,
+                        "min": 1
+                    },
+                    "level": 12,
+                    "race": [
+                        "alphaMutant",
+                        "betaMutant"
+                    ]
+                }
+            },
+            "toughness": {
+                "effect": {
+                    "damageThreshold": {
+                        "$add": [
+                            "value",
+                            3
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Toughness"
+                },
+                "requirements": {
+                    "endurance": 6,
+                    "level": 3,
+                    "luck": 6
+                }
+            },
+            "tunnelRat": {
+                "meta": "You crawl like a baby. Well, you crawl like a very fast baby. You can move at your normal rate (1 AP per hex) while crouching or prone.",
+                "name": {
+                    "en-US": "Tunnel Rat"
+                },
+                "requirements": {
+                    "agility": 6,
+                    "level": 4,
+                    "sneak": 60
+                }
+            },
+            "wayOfTheFruit": {
+                "meta": "You have learned about the mystical healing effects of eating fruit. For 24 hours after eating a piece of fruit, your character gains +1 to Perception and Agility.",
+                "name": {
+                    "en-US": "Way of the Fruit"
+                },
+                "requirements": {
+                    "charisma": 6,
+                    "level": 6,
+                    "race": {
+                        "$not": [
+                            "deathclaw",
+                            "dog"
+                        ]
+                    }
+                }
+            },
+            "weaponHandling": {
+                "meta": "This perk adds +3 Strength for the purposes of strength requirements for handling and firing weapons.",
+                "name": {
+                    "en-US": "Weapon Handling"
+                },
+                "requirements": {
+                    "agility": 5,
+                    "level": 12
+                }
+            },
+            "webCrawler": {
+                "effect": {
+                    "climb": {
+                        "$add": [
+                            "value",
+                            30
+                        ]
+                    }
+                },
+                "name": {
+                    "en-US": "Web Crawler"
+                },
+                "requirements": {
+                    "endurance": 7,
+                    "level": 6,
+                    "strength": 6
+                }
+            }
+        },
+        "leadfoot": {
+            "effect": {
+                "$when": {
+                    "driving": {
+                        "vehicleMaximumSpeed": {
+                            "$mul": [
+                                "value",
+                                1.25
+                            ]
+                        }
+                    }
+                }
+            },
+            "name": {
+                "en-US": "Leadfoot"
+            },
+            "ranks": 1,
+            "requirements": {
+                "agility": 6,
+                "level": 3,
+                "perception": 6,
+                "pilot": 60
+            }
+        }
+    },
+    "PRIMARY_STATISTICS": {
+        "agility": {
+            "abbr": {
+                "en-US": "Agi"
+            },
+            "name": {
+                "en-US": "Agility"
+            }
+        },
+        "charisma": {
+            "abbr": {
+                "en-US": "Cha"
+            },
+            "name": {
+                "en-US": "Charisma"
+            }
+        },
+        "endurance": {
+            "abbr": {
+                "en-US": "End"
+            },
+            "name": {
+                "en-US": "Endurance"
+            }
+        },
+        "intelligence": {
+            "abbr": {
+                "en-US": "Int"
+            },
+            "name": {
+                "en-US": "Intelligence"
+            }
+        },
+        "luck": {
+            "abbr": {
+                "en-US": "Lck"
+            },
+            "name": {
+                "en-US": "Luck"
+            }
+        },
+        "perception": {
+            "abbr": {
+                "en-US": "Per"
+            },
+            "name": {
+                "en-US": "Perception"
+            }
+        },
+        "strength": {
+            "abbr": {
+                "en-US": "Str"
+            },
+            "name": {
+                "en-US": "Strength"
+            }
+        }
+    },
+    "RACES": {
         "alphaMutant": {
-            "height": [
-                2.8,
-                3
-            ],
+            "height": {
+                "max": 3,
+                "min": 2.8
+            },
             "levelsPerPerk": 4,
+            "name": {
+                "en-US": "Mutant (Alpha)"
+            },
             "primary": {
-                "agility": [
-                    1,
-                    8
-                ],
-                "charisma": [
-                    1,
-                    8
-                ],
-                "endurance": [
-                    3,
-                    12
-                ],
-                "intelligence": [
-                    1,
-                    11
-                ],
-                "luck": [
-                    1,
-                    10
-                ],
-                "perception": [
-                    1,
-                    10
-                ],
-                "strength": [
-                    4,
-                    13
-                ],
+                "agility": {
+                    "max": 8,
+                    "min": 1
+                },
+                "charisma": {
+                    "max": 8,
+                    "min": 1
+                },
+                "endurance": {
+                    "max": 12,
+                    "min": 3
+                },
+                "intelligence": {
+                    "max": 11,
+                    "min": 1
+                },
+                "luck": {
+                    "max": 10,
+                    "min": 1
+                },
+                "perception": {
+                    "max": 10,
+                    "min": 1
+                },
+                "strength": {
+                    "max": 13,
+                    "min": 4
+                },
                 "total": 40
             },
             "secondary": {
-                "resistGas": [
-                    0,
-                    35
-                ],
+                "resistGas": {
+                    "max": 35,
+                    "min": 0
+                },
                 "resistPoison": 20,
                 "resistRadiation": 10
             },
-            "weight": [
-                300,
-                400
-            ]
+            "weight": {
+                "max": 400,
+                "min": 300
+            }
         },
         "betaMutant": {
-            "height": [
-                2.8,
-                3
-            ],
+            "height": {
+                "max": 3,
+                "min": 2.8
+            },
             "levelsPerPerk": 4,
+            "name": {
+                "en-US": "Mutant (Beta)"
+            },
             "primary": {
-                "agility": [
-                    1,
-                    8
-                ],
-                "charisma": [
-                    1,
-                    8
-                ],
-                "endurance": [
-                    4,
-                    12
-                ],
-                "intelligence": [
-                    1,
-                    8
-                ],
-                "luck": [
-                    1,
-                    10
-                ],
-                "perception": [
-                    1,
-                    10
-                ],
-                "strength": [
-                    5,
-                    13
-                ],
+                "agility": {
+                    "max": 8,
+                    "min": 1
+                },
+                "charisma": {
+                    "max": 8,
+                    "min": 1
+                },
+                "endurance": {
+                    "max": 12,
+                    "min": 4
+                },
+                "intelligence": {
+                    "max": 8,
+                    "min": 1
+                },
+                "luck": {
+                    "max": 10,
+                    "min": 1
+                },
+                "perception": {
+                    "max": 10,
+                    "min": 1
+                },
+                "strength": {
+                    "max": 13,
+                    "min": 5
+                },
                 "total": 40
             },
             "secondary": {
-                "resistGas": [
-                    0,
-                    35
-                ],
+                "resistGas": {
+                    "max": 35,
+                    "min": 0
+                },
                 "resistPoison": 20,
                 "resistRadiation": 10
             },
-            "weight": [
-                300,
-                400
-            ]
+            "weight": {
+                "max": 400,
+                "min": 300
+            }
         },
         "ghoul": {
-            "height": [
-                1.5,
-                2.5
-            ],
-            "hp": -5,
+            "height": {
+                "max": 2.5,
+                "min": 1.5
+            },
+            "hitPoints": {
+                "$sub": [
+                    "value",
+                    5
+                ]
+            },
             "levelsPerPerk": 4,
+            "name": {
+                "en-US": "Ghoul"
+            },
             "primary": {
-                "agility": [
-                    1,
-                    8
-                ],
-                "charisma": [
-                    1,
-                    9
-                ],
-                "endurance": [
-                    1,
-                    10
-                ],
-                "intelligence": [
-                    2,
-                    13
-                ],
-                "luck": [
-                    5,
-                    10
-                ],
-                "perception": [
-                    4,
-                    14
-                ],
-                "strength": [
-                    1,
-                    6
-                ],
+                "agility": {
+                    "max": 8,
+                    "min": 1
+                },
+                "charisma": {
+                    "max": 9,
+                    "min": 1
+                },
+                "endurance": {
+                    "max": 10,
+                    "min": 1
+                },
+                "intelligence": {
+                    "max": 13,
+                    "min": 2
+                },
+                "luck": {
+                    "max": 10,
+                    "min": 5
+                },
+                "perception": {
+                    "max": 14,
+                    "min": 4
+                },
+                "strength": {
+                    "max": 6,
+                    "min": 1
+                },
                 "total": 42
             },
             "secondary": {
                 "resistPoison": 10,
                 "resistRadiation": 40
             },
-            "weight": [
-                80,
-                160
-            ]
+            "weight": {
+                "max": 160,
+                "min": 80
+            }
         },
         "human": {
-            "height": [
-                1.5,
-                2.5
-            ],
-            "hp": 0,
+            "height": {
+                "max": 2.5,
+                "min": 1.5
+            },
             "levelsPerPerk": 3,
+            "name": {
+                "en-US": "Human"
+            },
             "primary": {
-                "agility": [
-                    1,
-                    10
-                ],
-                "charisma": [
-                    1,
-                    10
-                ],
-                "endurance": [
-                    1,
-                    10
-                ],
-                "intelligence": [
-                    1,
-                    10
-                ],
-                "luck": [
-                    1,
-                    10
-                ],
-                "perception": [
-                    1,
-                    10
-                ],
-                "strength": [
-                    1,
-                    10
-                ],
+                "agility": {
+                    "max": 10,
+                    "min": 1
+                },
+                "charisma": {
+                    "max": 10,
+                    "min": 1
+                },
+                "endurance": {
+                    "max": 10,
+                    "min": 1
+                },
+                "intelligence": {
+                    "max": 10,
+                    "min": 1
+                },
+                "luck": {
+                    "max": 10,
+                    "min": 1
+                },
+                "perception": {
+                    "max": 10,
+                    "min": 1
+                },
+                "strength": {
+                    "max": 10,
+                    "min": 1
+                },
                 "total": 40
             },
             "secondary": {
                 "resistElectricity": 10
             },
-            "weight": [
-                110,
-                280
-            ]
+            "weight": {
+                "max": 280,
+                "min": 110
+            }
+        }
+    },
+    "SECONDARY_STATISTICS": {
+        "actionPointRegeneration": {
+            "name": {
+                "en-US": "Action Point Regeneration"
+            },
+            "value": {
+                "$when": {
+                    "jogging": {
+                        "$floor": {
+                            "$half": "agility"
+                        }
+                    },
+                    "running": 0,
+                    "sprinting": {
+                        "$mul": [
+                            -2,
+                            {
+                                "$sub": [
+                                    "travel",
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "still": {
+                        "$add": [
+                            3,
+                            "agility"
+                        ]
+                    },
+                    "walking": {
+                        "$add": [
+                            3,
+                            {
+                                "$floor": {
+                                    "$half": "agility"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "actionPoints": {
+            "name": {
+                "en-US": "Action Points"
+            },
+            "value": {
+                "$add": [
+                    5,
+                    {
+                        "$floor": {
+                            "$half": "agility"
+                        }
+                    },
+                    {
+                        "$floor": {
+                            "$half": "endurance"
+                        }
+                    }
+                ]
+            }
+        },
+        "armorClass": {
+            "name": {
+                "en-US": "Armor Class"
+            },
+            "percent": true,
+            "value": "agility"
+        },
+        "carryWeight": {
+            "name": {
+                "en-US": "Carry Weight"
+            },
+            "value": {
+                "$add": [
+                    25,
+                    {
+                        "$mul": [
+                            25,
+                            "strength"
+                        ]
+                    }
+                ]
+            }
+        },
+        "criticalChance": {
+            "name": {
+                "en-US": "Critical Chance"
+            },
+            "percent": true,
+            "value": "luck"
+        },
+        "criticalFailure": {
+            "name": {
+                "en-US": "Critical Failure"
+            },
+            "percent": true,
+            "value": {
+                "$add": [
+                    89,
+                    "luck"
+                ]
+            }
+        },
+        "damageThreshold": {
+            "name": {
+                "en-US": "Damage Threshold"
+            },
+            "value": 0
+        },
+        "detectionClass": {
+            "name": {
+                "en-US": "Detection Class"
+            },
+            "percent": true,
+            "value": "perception"
+        },
+        "healingRate": {
+            "name": {
+                "en-US": "Healing Rate"
+            },
+            "value": {
+                "$floor": {
+                    "$div": [
+                        "endurance",
+                        3
+                    ]
+                }
+            }
+        },
+        "hitPoints": {
+            "name": {
+                "en-US": "Hit Points"
+            },
+            "value": {
+                "$add": [
+                    15,
+                    "strength",
+                    {
+                        "$double": "endurance"
+                    },
+                    {
+                        "$mul": [
+                            "level",
+                            [
+                                {
+                                    "$floor": {
+                                        "$add": [
+                                            3,
+                                            {
+                                                "$half": "endurance"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            }
+        },
+        "judgementClass": {
+            "name": {
+                "en-US": "Judgement Class"
+            },
+            "percent": true,
+            "value": "charisma"
+        },
+        "level": {
+            "name": {
+                "en-US": "Level"
+            },
+            "value": {
+                "$floor": {
+                    "$add": [
+                        0.5,
+                        {
+                            "$div": [
+                                {
+                                    "$sqrt": {
+                                        "$add": [
+                                            {
+                                                "$div": [
+                                                    "experience",
+                                                    10
+                                                ]
+                                            },
+                                            25
+                                        ]
+                                    }
+                                },
+                                10
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "meleeDamage": {
+            "name": {
+                "en-US": "Melee Damage"
+            },
+            "value": {
+                "$sub": [
+                    "strength",
+                    5
+                ]
+            }
+        },
+        "resistContactGas": {
+            "name": {
+                "en-US": "Contact Gas Resistance"
+            },
+            "percent": true,
+            "value": 0
+        },
+        "resistElectricity": {
+            "name": {
+                "en-US": "Electricity Resistance"
+            },
+            "percent": true,
+            "value": 0
+        },
+        "resistInhaledGas": {
+            "name": {
+                "en-US": "Inhaled Gas Resistance"
+            },
+            "percent": true,
+            "value": 0
+        },
+        "resistPoison": {
+            "name": {
+                "en-US": "Poison Resistance"
+            },
+            "percent": true,
+            "value": {
+                "$mul": [
+                    5,
+                    "endurance"
+                ]
+            }
+        },
+        "resistRadiation": {
+            "name": {
+                "en-US": "Radiation Resistance"
+            },
+            "percent": true,
+            "value": {
+                "$double": "endurance"
+            }
+        },
+        "sequence": {
+            "name": {
+                "en-US": "Sequence"
+            },
+            "value": {
+                "$double": "perception"
+            }
         }
     },
     "SKILLS": {
         "medicine": {
             "chems": {
-                "base": 10,
-                "intelligence": 2
+                "name": {
+                    "en-US": "Chems"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "intelligence"
+                        }
+                    ]
+                }
             },
             "doctor": {
-                "base": 10,
-                "intelligence": 2
+                "name": {
+                    "en-US": "Doctor"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "intelligence"
+                        }
+                    ]
+                }
             },
             "firstAid": {
-                "base": 10,
-                "intelligence": 2
+                "name": {
+                    "en-US": "First Aid"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "intelligence"
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Medicine"
             }
         },
         "rangedWeapons": {
             "bigGuns": {
-                "endurance": 2,
-                "perception": 1,
-                "strength": 1
+                "name": {
+                    "en-US": "Big Guns"
+                },
+                "value": {
+                    "$add": [
+                        {
+                            "$double": "endurance"
+                        },
+                        "perception",
+                        "strength"
+                    ]
+                }
             },
             "energyWeapons": {
-                "base": 10,
-                "perception": 2
+                "name": {
+                    "en-US": "Energy Weapons"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "perception"
+                        }
+                    ]
+                }
             },
             "explosives": {
-                "base": 10,
-                "perception": 2
+                "name": {
+                    "en-US": "explosives"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "perception"
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Ranged Weapons"
             },
             "smallGuns": {
-                "agility": 1,
-                "base": 10,
-                "perception": 1
+                "name": {
+                    "en-US": "smallGuns"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "agility",
+                        "perception"
+                    ]
+                }
             }
         },
         "simpleWeapons": {
             "melee": {
-                "base": 10,
-                "strength": 2
+                "name": {
+                    "en-US": "Melee"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "strength"
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Simple Weapons"
             },
             "throwing": {
-                "agility": 4
+                "name": {
+                    "en-US": "Throwing"
+                },
+                "value": {
+                    "$mul": [
+                        4,
+                        "agility"
+                    ]
+                }
             },
             "unarmed": {
-                "agility": 2,
-                "base": 10,
-                "strength": 1
+                "name": {
+                    "en-US": "Unarmed"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "agility"
+                        },
+                        "strength"
+                    ]
+                }
             }
         },
         "social": {
             "barter": {
-                "base": 10,
-                "charisma": 2
+                "name": {
+                    "en-US": "Barter"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "charisma"
+                        }
+                    ]
+                }
             },
             "gambling": {
-                "base": 10,
-                "luck": 1,
-                "perception": 1
+                "name": {
+                    "en-US": "Gambling"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "luck",
+                        "perception"
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Social"
             },
             "speech": {
-                "base": 10,
-                "charisma": 2
+                "name": {
+                    "en-US": "Speech"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "charisma"
+                        }
+                    ]
+                }
             }
         },
         "survival": {
             "climb": {
-                "base": 10,
-                "endurance": 1,
-                "strength": 1
+                "name": {
+                    "en-US": "Climb"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "endurance",
+                        "strength"
+                    ]
+                }
             },
             "jump": {
-                "agility": 1,
-                "base": 10,
-                "strength": 1
+                "name": {
+                    "en-US": "Jump"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "agility",
+                        "strength"
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Survival"
             },
             "outdoorsman": {
-                "base": 10,
-                "endurance": 2
+                "name": {
+                    "en-US": "Outdoorsman"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "endurance"
+                    ]
+                }
             },
             "swim": {
-                "base": 10,
-                "endurance": 1,
-                "strength": 1
+                "name": {
+                    "en-US": "Swim"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "endurance",
+                        "strength"
+                    ]
+                }
             }
         },
         "technical": {
+            "name": {
+                "en-US": "Technical"
+            },
             "pilot": {
-                "agility": 2,
-                "base": 10
+                "name": {
+                    "en-US": "Pilot"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "agility"
+                        }
+                    ]
+                }
             },
             "repair": {
-                "base": 10,
-                "intelligence": 2
+                "name": {
+                    "en-US": "Repair"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "intelligence"
+                        }
+                    ]
+                }
             },
             "science": {
-                "base": 10,
-                "intelligence": 2
+                "name": {
+                    "en-US": "Science"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "intelligence"
+                        }
+                    ]
+                }
             }
         },
         "thieving": {
             "disguise": {
-                "base": 10,
-                "charisma": 1,
-                "perception": 1
+                "name": {
+                    "en-US": "Disguise"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "charisma",
+                        "perception"
+                    ]
+                }
             },
             "lockpick": {
-                "base": 10,
-                "perception": 2
+                "name": {
+                    "en-US": "Lockpick"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "perception"
+                        }
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Thieving"
             },
             "sneak": {
-                "agility": 2,
-                "base": 10
+                "name": {
+                    "en-US": "Sneak"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        {
+                            "$double": "agility"
+                        }
+                    ]
+                }
             },
             "steal": {
-                "agility": 1,
-                "base": 10,
-                "luck": 1
+                "name": {
+                    "en-US": "Steal"
+                },
+                "value": {
+                    "$add": [
+                        10,
+                        "agility",
+                        "luck"
+                    ]
+                }
             }
         }
     },
     "TRAITS": {
         "bloodyMess": {
+            "name": {
+                "en-US": "Bloody Mess"
+            }
         },
         "bruiser": {
-            "actionPoints": -2,
-            "raceBlacklist": [
-                "ghoul"
-            ],
-            "strength": 2
+            "actionPoints": {
+                "$sub": [
+                    "value",
+                    2
+                ]
+            },
+            "name": {
+                "en-US": "Bruiser"
+            },
+            "requirements": {
+                "race": {
+                    "$not": "ghoul"
+                }
+            },
+            "strength": {
+                "$add": [
+                    "value",
+                    2
+                ]
+            }
         },
         "chemReliant": {
-            "addictionChance": 2,
-            "addictionRecovery": 2
+            "addictionChance": {
+                "$double": "value"
+            },
+            "addictionRecovery": {
+                "$double": "value"
+            },
+            "name": {
+                "en-US": "Chem Reliant"
+            }
         },
         "chemResistant": {
-            "addictionChance": 0.5,
-            "chemDuration": 0.5
+            "addictionChance": {
+                "$half": "value"
+            },
+            "chemDuration": {
+                "$half": "value"
+            },
+            "name": {
+                "en-US": "Chem Resistant"
+            }
         },
         "fastMetabolism": {
-            "healingRate": 2,
-            "poisonResistance": 0,
-            "raceBlacklist": [
-                "ghoul"
-            ],
-            "radiationResistance": 0
+            "healingRate": {
+                "$double": "value"
+            },
+            "name": {
+                "en-US": "Fast Metabolism"
+            },
+            "resistPoison": 0,
+            "resistRadiation": 0,
+            "requirements": {
+                "race": {
+                    "$not": "ghoul"
+                }
+            }
         },
         "fastShot": {
             "actionBlacklist": [
                 "targetedShot"
             ],
-            "actionPointCost": -1
+            "actionPointCost": {
+                "$sub": [
+                    "value",
+                    1
+                ]
+            },
+            "name": {
+                "en-US": "Fast Shot"
+            }
         },
         "fearTheReaper": {
-            "levelsPerPerk": -1,
-            "raceWhitelist": [
-                "ghoul"
-            ]
+            "levelsPerPerk": {
+                "$sub": [
+                    "value",
+                    1
+                ]
+            },
+            "name": {
+                "en-US": "Fear The Reaper"
+            },
+            "requirements": {
+                "race": "ghoul"
+            }
         },
         "finesse": {
-            "criticalChance": 10,
-            "damage": -0.25
+            "criticalChance": {
+                "$add": [
+                    "value",
+                    10
+                ]
+            },
+            "damage": {
+                "$ceil": {
+                    "$mul": [
+                        "value",
+                        0.75
+                    ]
+                }
+            },
+            "name": {
+                "en-US": "Finesse"
+            }
         },
         "gifted": {
-            "primaryTotal": 5,
-            "skillPenalty": 10,
-            "skillPointsPerLevel": -5
+            "name": {
+                "en-US": "Gifted"
+            },
+            "primaryTotal": {
+                "$add": [
+                    "value",
+                    5
+                ]
+            },
+            "skillPoints": {
+                "$add": [
+                    "value",
+                    -10,
+                    {
+                        "$mul": [
+                            "level",
+                            -5
+                        ]
+                    }
+                ]
+            }
         },
         "glowingOne": {
+            "$nearby": {
+                "radsPerHour": {
+                    "$add": [
+                        "value",
+                        10
+                    ]
+                }
+            },
             "effectBlacklist": [
                 "light"
             ],
-            "nearby": {
-                "radsPerHour": 10
+            "name": {
+                "en-US": "Glowing One"
             },
-            "raceWhitelist": [
-                "ghoul"
-            ],
-            "radiationResistance": 50
+            "resistRadiation": {
+                "$add": [
+                    "value",
+                    50
+                ]
+            },
+            "requirements": {
+                "race": "ghoul"
+            }
         },
         "goodNatured": {
-            "barter": 20,
-            "bigGuns": -10,
-            "doctor": 20,
-            "energyWeapons": -10,
-            "explosives": -10,
-            "firstAid": 20,
-            "melee": -10,
-            "smallGuns": -10,
-            "speech": 20,
-            "throwing": -10,
-            "unarmed": -10
+            "barter": {
+                "$add": [
+                    "value",
+                    20
+                ]
+            },
+            "bigGuns": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "doctor": {
+                "$add": [
+                    "value",
+                    20
+                ]
+            },
+            "energyWeapons": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "explosives": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "firstAid": {
+                "$add": [
+                    "value",
+                    20
+                ]
+            },
+            "melee": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "name": {
+                "en-US": "Good Natured"
+            },
+            "smallGuns": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "speech": {
+                "$add": [
+                    "value",
+                    20
+                ]
+            },
+            "throwing": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "unarmed": {
+                "$sub": [
+                    "value",
+                    10
+                ]
+            }
         },
         "hamFisted": {
-            "bigGuns": -20,
-            "doctor": -20,
-            "energyWeapons": -20,
-            "firstAid": -20,
-            "lockpick": -20,
-            "raceWhitelist": [
-                "alphaMutant",
-                "betaMutant"
-            ],
-            "repair": -20,
-            "science": -20,
-            "smallGuns": -20,
+            "bigGuns": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "doctor": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "energyWeapons": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "firstAid": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "lockpick": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "name": {
+                "en-US": "Ham-Fisted"
+            },
+            "repair": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "requirements": {
+                "race": [
+                    "alphaMutant",
+                    "betaMutant"
+                ]
+            },
+            "science": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
+            "smallGuns": {
+                "$sub": [
+                    "value",
+                    20
+                ]
+            },
             "tag": "unarmed"
         },
         "jinxed": {
-            "criticalFailureChance": 50
+            "$nearby": {
+                "criticalFailureChance": {
+                    "$add": [
+                        "value",
+                        50
+                    ]
+                }
+            },
+            "criticalFailureChance": {
+                "$add": [
+                    "value",
+                    50
+                ]
+            },
+            "name": {
+                "en-US": "Jinxed"
+            }
         },
         "kamikaze": {
             "armorClass": 0,
-            "sequence": 5
+            "name": {
+                "en-US": "Kamikaze"
+            },
+            "sequence": {
+                "$value": [
+                    "add",
+                    5
+                ]
+            }
         },
         "nightPerson": {
-            "daytime": {
-                "intelligence": -1,
-                "perception": -1
+            "$when": {
+                "daytime": {
+                    "intelligence": {
+                        "$dec": "value"
+                    },
+                    "perception": {
+                        "$dec": "value"
+                    }
+                },
+                "nighttime": {
+                    "intelligence": {
+                        "$inc": "value"
+                    },
+                    "perception": {
+                        "$inc": "value"
+                    }
+                }
             },
-            "nighttime": {
-                "intelligence": 1,
-                "perception": 1
+            "name": {
+                "en-US": "Night Person"
             }
         },
         "oneHander": {
-            "oneHandedWeapons": 20,
-            "twoHandedWeapons": -40
+            "$when": {
+                "holdingOneHandedWeapon": {
+                    "energyWeapons": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    },
+                    "smallGuns": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    },
+                    "throwing": {
+                        "$add": [
+                            "value",
+                            20
+                        ]
+                    }
+                },
+                "holdingTwoHandedWeapon": {
+                    "bigGuns": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    },
+                    "energyWeapons": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    },
+                    "smallGuns": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    },
+                    "throwing": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    }
+                }
+            },
+            "name": {
+                "en-US": "One-Hander"
+            }
         },
         "sexAppeal": {
-            "attractedSex": {
-                "barter": 40,
-                "charisma": 1,
-                "speech": 40
+            "$when": {
+                "talkingToAttractedSex": {
+                    "barter": {
+                        "$add": [
+                            "value",
+                            40
+                        ]
+                    },
+                    "charisma": {
+                        "$inc": "value"
+                    },
+                    "speech": {
+                        "$add": [
+                            "value",
+                            40
+                        ]
+                    }
+                },
+                "talkingToUnattractedSex": {
+                    "barter": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    },
+                    "charisma": {
+                        "$dec": "value"
+                    },
+                    "speech": {
+                        "$sub": [
+                            "value",
+                            40
+                        ]
+                    }
+                }
             },
-            "raceWhitelist": [
-                "human"
-            ],
-            "unattractedSex": {
-                "barter": -40,
-                "charisma": -1,
-                "speech": -40
+            "name": {
+                "en-US": "Sex Appeal"
+            },
+            "requirements": {
+                "race": "human"
             }
         },
         "skilled": {
-            "levelsPerPerk": 1,
-            "skillPointsPerLevel": 5
+            "levelsPerPerk": {
+                "$inc": "value"
+            },
+            "name": {
+                "en-US": "Skilled"
+            },
+            "skillPointsPerLevel": {
+                "$add": [
+                    "value",
+                    5
+                ]
+            }
         },
         "smallFrame": {
-            "agility": 1,
-            "carryWeight": 0,
-            "raceBlacklist": [
-                "alphaMutant",
-                "betaMutant"
-            ]
+            "agility": {
+                "$inc": "value"
+            },
+            "carryWeight": {
+                "$add": [
+                    "value",
+                    -25,
+                    {
+                        "$mul": [
+                            -10,
+                            "level"
+                        ]
+                    }
+                ]
+            },
+            "name": {
+                "en-US": "Small Frame"
+            },
+            "requirements": {
+                "race": {
+                    "$not": [
+                        "alphaMutant",
+                        "betaMutant"
+                    ]
+                }
+            }
         },
         "techWizard": {
-            "lockpick": 15,
-            "perception": -1,
-            "raceBlacklist": [
-                "betaMutant"
-            ],
-            "repair": 15,
-            "science": 15
+            "lockpick": {
+                "$add": [
+                    "value",
+                    15
+                ]
+            },
+            "name": {
+                "en-US": "Tech Wizard"
+            },
+            "perception": {
+                "$dec": "value"
+            },
+            "repair": {
+                "$add": [
+                    "value",
+                    15
+                ]
+            },
+            "requirements": {
+                "race": {
+                    "$not": "betaMutant"
+                }
+            },
+            "science": {
+                "$add": [
+                    "value",
+                    15
+                ]
+            }
         },
         "vatSkin": {
-            "armorClass": 10,
-            "nearby": {
-                "perception": -1
+            "$nearby": {
+                "perception": {
+                    "$dec": "value"
+                }
             },
-            "raceWhitelist": [
-                "alphaMutant",
-                "betaMutant"
-            ]
+            "armorClass": {
+                "$add": [
+                    "value",
+                    10
+                ]
+            },
+            "name": {
+                "en-US": "Vat Skin"
+            },
+            "requirements": {
+                "race": [
+                    "alphaMutant",
+                    "betaMutant"
+                ]
+            }
+        }
+    },
+    "BESTIARY": {
+        "feralGhoul": {
+            "name": {
+                "en-US": "Feral Ghoul"
+            },
+            "hitPoints": 15,
+            "sequence": 8,
+            "actionPoints": 8,
+            "experienceValue": 50,
+            "criticalChance": 4,
+            "armorClass": 3,
+            "resistPoison": 40,
+            "resistRadiation": 100,
+            "attacks": {
+                "claw": {
+                    "skill": 60,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 6] }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 5,
+                    "damage": { "$rand": [1, 8] }
+                }
+            }
+        },
+        "feralGhoulRoamer": {
+            "name": {
+                "en-US": "Feral Ghoul Roamer"
+            },
+            "hitPoints": 15,
+            "sequence": 10,
+            "actionPoints": 8,
+            "experienceValue": 60,
+            "criticalChance": 4,
+            "armorClass": 4,
+            "resistPoison": 40,
+            "resistRadiation": 100,
+            "attacks": {
+                "claw": {
+                    "skill": 70,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 6] }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 5,
+                    "damage": { "$rand": [1, 8] }
+                }
+            }
+        },
+        "feralGhoulReaver": {
+            "name": {
+                "en-US": "Feral Ghoul Reaver"
+            },
+            "hitPoints": 30,
+            "sequence": 10,
+            "actionPoints": 10,
+            "experienceValue": 100,
+            "criticalChance": 5,
+            "armorClass": 8,
+            "resistNormalDamage": 1,
+            "resistNormalThreshold": 10,
+            "resistExplosionDamage": 1,
+            "resistExplosionThreshold": 10,
+            "resistPoison": 40,
+            "resistRadiation": 100,
+            "attacks": {
+                "claw": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 8] }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 5,
+                    "damage": { "$rand": [1, 10] }
+                }
+            }
+        },
+        "feralGlowingOne": {
+            "name": {
+                "en-US": "Feral Glowing One"
+            },
+            "hitPoints": 20,
+            "sequence": 8,
+            "actionPoints": 10,
+            "experienceValue": 150,
+            "criticalChance": 5,
+            "armorClass": 5,
+            "resistPoison": 40,
+            "resistRadiation": 120,
+            "attacks": {
+                "claw": {
+                    "skill": 70,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 6] },
+                    "effect": {
+                        "rads": {"$add": ["value", 10]}
+                    }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 5,
+                    "damage": { "$rand": [1, 8] },
+                    "effect": {
+                        "rads": {"$add": ["value", 10]}
+                    }
+                },
+                "radiationBurst": {
+                    "skill": 90,
+                    "actionPoints": 10,
+                    "damage": { "$rand": [1, 4] },
+                    "areaOfEffect": true,
+                    "effect": {
+                        "rads": {"$add": ["value", 20]}
+                    },
+                    "meta": "Acts as explosive for resistance purposes. Sends small objects flying."
+                }
+            }
+        },
+        "giantRat": {
+            "name": {
+                "en-US": "Giant Rat"
+            },
+            "hitPoints": 10,
+            "sequence": 6,
+            "actionPoints": 6,
+            "experienceValue": 25,
+            "criticalChance": 3,
+            "armorClass": 5,
+            "resistPoison": 50,
+            "resistRadiation": 20,
+            "attacks": {
+                "claw": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 4] }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 4] },
+                    "effect": {
+                        "poisonTypeA": 1
+                    }
+                }
+            }
+        },
+        "radRat": {
+            "name": {
+                "en-US": "Rad Rat"
+            },
+            "hitPoints": 10,
+            "sequence": 6,
+            "actionPoints": 6,
+            "experienceValue": 35,
+            "criticalChance": 3,
+            "armorClass": 5,
+            "resistPoison": 60,
+            "resistRadiation": 100,
+            "resistContactGas": 50,
+            "attacks": {
+                "claw": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 4] },
+                    "effect": {
+                        "rads": {"$add": ["value", 10]}
+                    }
+                },
+                "bite": {
+                    "skill": 70,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 4] },
+                    "effect": {
+                        "rads": {"$add": ["value", 10]}
+                    }
+                }
+            }
+        },
+        "lesserMolerat": {
+            "name": {
+                "en-US": "Lesser Molerat"
+            },
+            "hitPoints": 15,
+            "sequence": 7,
+            "actionPoints": 7,
+            "experienceValue": 100,
+            "criticalChance": 3,
+            "armorClass": 9,
+            "resistNormalThreshold": 1,
+            "resistNormalDamage": 5,
+            "resistExplosionThreshold": 1,
+            "resistExplosionDamage": 5,
+            "resistPoison": 50,
+            "resistRadiation": 25,
+            "attacks": {
+                "claw": {
+                    "skill": 80,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 8] }
+                },
+                "bite": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 8] },
+                    "effect": {
+                        "poisonTypeA": 1
+                    }
+                }
+            }
+        },
+        "greaterMolerat": {
+            "name": {
+                "en-US": "Greater Molerat"
+            },
+            "hitPoints": 30,
+            "sequence": 9,
+            "actionPoints": 9,
+            "experienceValue": 400,
+            "criticalChance": 5,
+            "armorClass": 12,
+            "resistNormalDamage": 20,
+            "resistLaserDamage": 15,
+            "resistExplosionDamage": 20,
+            "resistPoison": 60,
+            "resistRadiation": 25,
+            "resistContactGas": 25,
+            "attacks": {
+                "claw": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 10] }
+                },
+                "bite": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": { "$rand": [1, 10] },
+                    "effect": {
+                        "poisonTypeB": 1
+                    }
+                }
+            }
+        },
+        "lesserPigrat": {
+            "name": {
+                "en-US": "Lesser Pigrat"
+            },
+            "hitPoints": 20,
+            "sequence": 7,
+            "actionPoints": 7,
+            "experienceValue": 200,
+            "criticalChance": 4,
+            "armorClass": 10,
+            "resistNormalThreshold": 1,
+            "resistNormalDamage": 5,
+            "resistExplosionThreshold": 1,
+            "resistExplosionDamage": 5,
+            "resistPoison": 50,
+            "resistRadiation": 30,
+            "resistContactGas": 10,
+            "attacks": {
+                "claw": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": {"$add": [{ "$rand": [1, 4] }, {"$rand": [1, 4]}]}
+                },
+                "bite": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": {"$add": [{ "$rand": [1, 4] }, {"$rand": [1, 4]}]},
+                    "effect": {
+                        "poisonTypeA": 1
+                    }
+                }
+            }
+        },
+        "lesserPigrat": {
+            "name": {
+                "en-US": "Greater Pigrat"
+            },
+            "hitPoints": 30,
+            "sequence": 9,
+            "actionPoints": 9,
+            "experienceValue": 450,
+            "criticalChance": 6,
+            "armorClass": 14,
+            "resistNormalThreshold": 4,
+            "resistNormalDamage": 25,
+            "resistFireThreshold": 2,
+            "resistFireDamage": 10,
+            "resistExplosionThreshold": 4,
+            "resistExplosionDamage": 25,
+            "resistPoison": 70,
+            "resistRadiation": 45,
+            "resistContactGas": 20,
+            "attacks": {
+                "claw": {
+                    "skill": 90,
+                    "actionPoints": 3,
+                    "damage": {"$add": [{ "$rand": [1, 6] }, {"$rand": [1, 6]}]}
+                },
+                "bite": {
+                    "skill": 75,
+                    "actionPoints": 3,
+                    "damage": {"$add": [{ "$rand": [1, 6] }, {"$rand": [1, 6]}]},
+                    "effect": {
+                        "poisonTypeB": 1
+                    }
+                }
+            }
+        },
+        "radroach": {
+            "name": {
+                "en-US": "Radroach"
+            },
+            "hitPoints": 15,
+            "sequence": 6,
+            "actionPoints": 6,
+            "experienceValue": 50,
+            "criticalChance": 4,
+            "armorClass": 5,
+            "resistNormalThreshold": 3,
+            "resistNormalDamage": 30,
+            "resistPoison": 100,
+            "resistRadiation": 95,
+            "resistInhaledGas": 80,
+            "resistContactGas": 100,
+            "attacks": {
+                "mandible": {
+                    "skill": 60,
+                    "actionPoints": 3,
+                    "damage": {"$rand": [1, 4]},
+                    "effect": {
+                        "poisonTypeB": 1
+                    }
+                }
+            }
+        },
+        "giantAnt": {
+            "name": {
+                "en-US": "Giant Ant"
+            },
+            "hitPoints": 15,
+            "sequence": 6,
+            "actionPoints": 6,
+            "experienceValue": 50,
+            "criticalChance": 3,
+            "armorClass": 2,
+            "resistPoison": 100,
+            "resistRadiation": 60,
+            "resistInhaledGas": 60,
+            "resistContactGas": 90,
+            "attack": {
+                "mandibles": {
+                    "skill": 60,
+                    "actionPoints": 3,
+                    "damage": {"$rand": [1, 6]},
+                    "effect": {
+                        "poisonTypeA": 1
+                    }
+                }
+            }
+        },
+        "fireAnt": {
+            "name": {
+                "en-US": "Fire Ant"
+            },
+            "hitPoints": 15,
+            "sequence": 6,
+            "actionPoints": 6,
+            "experienceValue": 60,
+            "criticalChance": 3,
+            "armorClass": 2,
+            "resistFireDamage": 40,
+            "resistFireThreshold": 5,
+            "resistExplosionDamage": 10,
+            "resistExplosionThreshold": 1,
+            "resistPoison": 100,
+            "resistRadiation": 60,
+            "resistInhaledGas": 60,
+            "resistContactGas": 90,
+            "attack": {
+                "mandibles": {
+                    "skill": 60,
+                    "actionPoints": 3,
+                    "damage": {"$rand": [1, 6]},
+                    "effect": {
+                        "poisonTypeA": 1
+                    }
+                },
+                "fireBreath": {
+                    "skill": 60,
+                    "actionPoints": 4,
+                    "damage": {"$rand": [1, 6]},
+                    "effect": {
+                        "fire": 1
+                    }
+                }
+            }
         }
     }
 }

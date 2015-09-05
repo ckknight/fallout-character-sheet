@@ -15,7 +15,7 @@ function safeParseJSON(value) {
 }
 
 function coerceEmptyObject(obj) {
-    for (const key in obj) {
+    for (let key in obj) {
         return obj;
     }
     return null;
