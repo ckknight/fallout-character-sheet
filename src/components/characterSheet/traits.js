@@ -40,6 +40,7 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
                     className: 'trait-checkbox',
             })),
     });
+    const checked$ = chosenTraitInput.value$;
     const description$ = getTraitDescription(trait, calculations);
     return {
         key: trait.key,
@@ -59,8 +60,8 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
                         key: 'description',
                     }, description),
                 ])),
-        value$: chosenTraitInput.value$,
-        effect$: chosenTraitInput.value$
+        value$: checked$,
+        effect$: checked$
             .map(isChosen => {
                 if (isChosen) {
                     return trait.effect;
@@ -166,12 +167,15 @@ export default function traits({DOM, value$: inputValue$, calculations}) {
         .distinctUntilChanged()
         .map(x => x.toArray().sort())
         .share();
+    calculations.set('effects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$.startWith(null)))
+        .map(effects => Immutable.Set(effects.filter(effect => effect)))
+        .startWith(Immutable.Set())
+        .distinctUntilChanged(undefined, Immutable.is)
+        .map(effects => effects.toArray())
+        .shareReplay(1));
     return {
         DOM: Rx.Observable.combineLatest(allTraitViews.map(t => t.DOM))
             .map(vTrees => h('section.traits', vTrees)),
         value$,
-        effects$: Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$))
-            .map(effects => effects.filter(effect => effect))
-            .share(),
     };
 }

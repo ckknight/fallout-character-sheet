@@ -89,7 +89,7 @@ function calculateBinary(equation, calculations) {
         .distinctUntilChanged(undefined, Immutable.is)
         .shareReplay(1);
     return {
-        DOM: leftView.DOM.combineLatest(rightView.DOM, value$.startWith('(calculating)'), equation$,
+        DOM: leftView.DOM.combineLatest(rightView.DOM, value$.startWith('(calculating binary)'), equation$,
             (left, right, value, equation) => {
                 if (operator === '^' && equation.right === 0.5) {
                     return renderUnary(name, value, '√', left, equation);
@@ -135,7 +135,7 @@ function calculateUnary(equation, calculations) {
         .distinctUntilChanged(undefined, Immutable.is)
         .shareReplay(1);
     return {
-        DOM: operandView.DOM.combineLatest(value$.startWith('(calculating)'), equation$,
+        DOM: operandView.DOM.combineLatest(value$.startWith('(calculating unary)'), equation$,
             (operand, value, equation) => renderUnary(name, value, operator, operand, equation)),
         value$,
         equation$,
@@ -176,7 +176,7 @@ function calculateWhen(equation, calculations) {
                     };
                 })))
         .map(values => values.find(x => x))
-        .share();
+        .shareReplay(1);
     return {
         DOM: result.pluck('vTree'),
         value$: result.pluck('value')
@@ -251,15 +251,15 @@ export default function ({equation$, calculations}) {
         DOM: result
             .flatMapLatest(x => x.DOM)
             .distinctUntilChanged()
-            .startWith('(calculating)')
+            .startWith('(calculating algorithm)')
             .map(vTree => h('div.algorithm', [vTree])),
         value$: result
             .flatMapLatest(x => x.value$)
             .distinctUntilChanged()
-            .share(),
+            .shareReplay(1),
         equation$: result
             .flatMapLatest(x => x.equation$)
             .distinctUntilChanged(undefined, Immutable.is)
-            .share(),
+            .shareReplay(1),
     };
 }

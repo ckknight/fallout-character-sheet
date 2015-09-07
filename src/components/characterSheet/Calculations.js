@@ -1,39 +1,6 @@
 import { Rx } from '@cycle/core';
 const owns = Object.prototype.hasOwnProperty;
-
-class FutureObservable extends Rx.Observable {
-    constructor() {
-        super(subscriber => {
-            const subscribers = this._subscribers;
-            const subscriptions = this._subscriptions;
-            const index = subscribers.length;
-            subscribers[index] = subscriber;
-            subscriptions[index] = null;
-            return () => {
-                subscribers[index] = null;
-                const subscription = subscriptions[index];
-                subscriptions[index] = null;
-                if (subscription) {
-                    subscription();
-                }
-            };
-        });
-        this._subscribers = [];
-        this._subscriptions = [];
-    }
-
-    setRealObservable(observable) {
-        const subscribers = this._subscribers;
-        const subscriptions = this._subscriptions;
-        for (let i = 0; i < subscribers.length; ++i) {
-            const subscriber = subscribers[i];
-            if (subscriber) {
-                subscribers[i] = null;
-                subscriptions[i] = observable.subscribe(subscriber);
-            }
-        }
-    }
-}
+import InjectableObservable from 'rx-injectable-observable';
 
 export default class Calculations {
     constructor(values = {}) {
@@ -43,11 +10,11 @@ export default class Calculations {
     set(key, value) {
         if (owns.call(this.values, key)) {
             const observable = this.values[key];
-            if (!(observable instanceof FutureObservable)) {
+            if (!(observable instanceof InjectableObservable)) {
                 throw new Error(`Key already set: ${key}`);
             }
-            this.values[key] = value;
-            observable.setRealObservable(value);
+        // this.values[key] = value = value.share();
+        // observable.inject(value);
         }
         return this.values[key] = value;
     }
@@ -57,7 +24,30 @@ export default class Calculations {
             if (!future) {
                 throw new Error(`Unknown key: ${key}`);
             }
-            this.values[key] = new FutureObservable();
+            return Rx.Observable.create(subscriber => {
+                const values = this.values;
+                let unsubscribed = false;
+                let unsubscribe;
+                function check() {
+                    if (unsubscribed) {
+                        return;
+                    }
+                    if (!owns.call(values, key)) {
+                        return tick();
+                    }
+                    unsubscribe = values[key].subscribe(subscriber);
+                }
+                function tick() {
+                    setTimeout(check, 17);
+                }
+                tick();
+                return () => {
+                    unsubscribed = true;
+                    if (unsubscribe) {
+                        unsubscribe();
+                    }
+                };
+            });
         }
         return this.values[key];
     }

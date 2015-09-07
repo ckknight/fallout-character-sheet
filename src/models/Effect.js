@@ -57,6 +57,16 @@ function convertEffectValue(key, value, path) {
 }
 
 const Effect = withNiceToString(Immutable.Record(effectFields, 'Effect'), effectFields);
+Effect.prototype.mergeEffects = function (other) {
+    return Object.keys(effectFields)
+        .reduce((acc, key) => {
+            if (key.charAt(0) === '$') {
+                // TODO: do something
+                return acc;
+            }
+            return acc.set(key, toEquation.replace(acc[key], 'value', other[key]));
+        }, this);
+};
 Effect.from = function (object, path) {
     return new Effect().mergeDeep(Object.entries(object || {})
         .reduce((acc, [key, value]) => {

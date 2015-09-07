@@ -5,6 +5,8 @@ import combineLatestObject from '../../combineLatestObject';
 import SecondaryStatistic from '../../models/SecondaryStatistic';
 import algorithm from './algorithm';
 import renderRef from './renderRef';
+import { replace as equationReplace } from '../../models/Equation';
+import Effect from '../../models/Effect';
 
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
@@ -25,19 +27,19 @@ function applyEffects(equation, effects$) {
     return effects$
         .startWith(null)
         .map(effects => {
-            console.log(effects);
             return equation;
         });
 }
 
 function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
-    // calculations.get('effects', true)
-    //     .subscribe(console.log.bind(console, 'effects'));
     const valueView = algorithm({
-        equation$: stat.value,
+        equation$: calculations.get('effect')
+            .startWith(new Effect())
+            .map(x => x[stat.key])
+            .map(x => equationReplace(x, 'value', stat.value)),
         calculations,
     });
-    calculations.set(stat.key, valueView.value$);
+    calculations.set(stat.key, valueView.value$.startWith(0));
 
     return {
         DOM: Rx.Observable.combineLatest(valueView.DOM, valueView.value$.startWith('poo'),

@@ -71,6 +71,12 @@
 		  justify-content: space-between;
 	  }
 
+	  .primary-statistic > * {
+		  margin: 0 .5em;
+		  min-width: 1em;
+		  text-align: center;
+	  }
+
 	  .primary-total {
 		  text-align: center;
 	  }
@@ -78,7 +84,6 @@
 	  .stat-label {
 		  min-width: 3em;
 		  text-align: right;
-		  padding-right: 1em;
 	  }
 
 	  .stat-input {
@@ -88,7 +93,6 @@
 	  .stat-extrema {
 		  min-width: 2em;
 		  text-align: right;
-		  padding-left: 1em;
 	  }
 
 	  .secondary-statistic {
@@ -97,7 +101,6 @@
 
 	  .stat-value {
 		  min-width: 2em;
-		  padding-right: 1em;
 		  text-align: center;
 	  }
 
@@ -147,6 +150,10 @@
 
 	  .trait-label {
 		  min-width: 9em;
+	  }
+
+	  .number-diff.number-positive::before {
+		  content: "+";
 	  }
 	</style>
 </head>

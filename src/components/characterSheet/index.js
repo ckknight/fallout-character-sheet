@@ -11,6 +11,9 @@ import Condition from '../../models/Condition';
 import Calculations from './Calculations';
 import requestAnimationFrameScheduler from '../../requestAnimationFrameScheduler';
 import { MISCELLANEOUS } from '../../constants.json';
+import { replace as equationReplace } from '../../models/Equation';
+import Immutable from 'immutable';
+import Effect from '../../models/Effect';
 
 function safeParseJSON(value) {
     try {
@@ -53,6 +56,15 @@ export default function characterSheet({DOM, localStorageSource}) {
     const deserializedSavedData$ = localStorageSource
         .map(safeParseJSON)
         .shareReplay(1);
+
+    calculations.set('effect', calculations.get('effects', true)
+        .map(effects => effects
+                .reduce((left, right) => left.mergeEffects(right), new Effect()))
+        .startWith(new Effect())
+        .distinctUntilChanged(undefined, Immutable.is)
+        .do(console.log.bind(console, 'effect'))
+        .share());
+
     const raceView = race({
         DOM,
         value$: deserializedSavedData$
@@ -86,16 +98,14 @@ export default function characterSheet({DOM, localStorageSource}) {
         value$: deserializedSavedData$.map(x => x.traits || []),
         calculations,
     });
-    calculations.set('effects', traitsView.effects$);
     return {
         DOM: combineLatestObject({
             cosmetic: cosmeticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Cosmetic-'),
             primary: primaryStatisticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Primary-'),
-            secondary: secondaryStatisticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Secondary-'),
+            secondary: secondaryStatisticView.DOM.startWith('-Secondary-'),
             skills: skillsView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Skills-'),
             traits: traitsView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Traits-'),
         })
-            .do(console.log.bind(console))
             .map(({cosmetic, primary, secondary, skills, traits}) => h('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits]))
             .sample(0, requestAnimationFrameScheduler),
         localStorageSink: localStorageSource.first()

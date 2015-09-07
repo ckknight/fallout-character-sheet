@@ -3,6 +3,9 @@ import { h } from '@cycle/dom';
 import input from '../input';
 import combineLatestObject from '../../combineLatestObject';
 import PrimaryStatistic from '../../models/PrimaryStatistic';
+import { replace as equationReplace } from '../../models/Equation';
+import algorithm from './algorithm';
+import renderNumber from './renderNumber';
 
 function toExtrema(range) {
     return {
@@ -27,15 +30,26 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
     const extremaVTree$ = raceExtrema$
         .map(({min, max}) => h('span.stat-extrema', {
                 key: 'extrema',
-            }, [min, '/', max]));
-    calculations.set(stat.key, inputView.value$);
-
+            }, [renderNumber(min, 'value'), '/', renderNumber(max, 'value')]));
+    const statEffect$ = calculations.get('effect')
+        .pluck(stat.key);
+    const effectedValue$ = raceExtrema$.combineLatest(algorithm({
+        equation$: inputView.value$.combineLatest(statEffect$,
+            (value, effect) => equationReplace(effect, 'value', value)),
+        calculations,
+    }).value$,
+        ({min, max} , value) => Math.min(max, Math.min(max, value)))
+        .distinctUntilChanged()
+        .shareReplay(1);
     return {
         DOM: combineLatestObject({
             input: inputView.DOM,
             extrema: extremaVTree$,
+            inputValue: inputView.value$,
+            effectedValue: effectedValue$,
         })
-            .map(({input, extrema}) => h(`div.primary-statistic.primary-statistic-${stat.key}`, {
+            .map(({input, extrema, inputValue, effectedValue}) => {
+                return h(`div.primary-statistic.primary-statistic-${stat.key}`, {
                     key: stat.key,
                 }, [
                     h(`abbr.stat-label`, {
@@ -43,8 +57,16 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
                     }, [stat.abbr]),
                     input,
                     extrema,
-                ])),
+                    renderNumber(effectedValue - inputValue, 'diff', {
+                        className: 'stat-effect',
+                    }),
+                    renderNumber(effectedValue, 'value', {
+                        className: 'stat-total',
+                    }),
+                ]);
+            }),
         value$: inputView.value$,
+        effectedValue$,
     };
 }
 
@@ -52,11 +74,15 @@ export default function primaryStatisticChart({DOM, value$, calculations}) {
     const statistics = PrimaryStatistic.all()
         .toArray();
     const statisticEntries = statistics
-        .map(stat => primaryStatisticEntry(stat, {
+        .map(stat => {
+            const entry = primaryStatisticEntry(stat, {
                 DOM,
                 value$,
                 calculations,
-            }));
+            });
+            calculations.set(stat.key, entry.effectedValue$);
+            return entry;
+        });
 
     const sum$ = Rx.Observable.combineLatest(statisticEntries.map(a => a.value$))
         .map(values => values.reduce((x, y) => x + y, 0));

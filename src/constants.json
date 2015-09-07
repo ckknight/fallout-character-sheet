@@ -5267,8 +5267,9 @@
             },
             "carryWeight": {
                 "$add": [
-                    "value",
-                    -25,
+                    {
+                        "$sub": ["value", 25]
+                    },
                     {
                         "$mul": [
                             -10,
