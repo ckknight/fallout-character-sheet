@@ -21,7 +21,7 @@ const VALID_KEYS = [].concat(
         return acc;
     }, {});
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'SecondaryStatistic')), {
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'SecondaryStatistic')), {
     get(key) {
         let stats = SECONDARY_STATISTICS[key];
         if (!stats) {
@@ -34,7 +34,7 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         }).mergeDeep(stats);
     },
     all() {
-        return Immutable.Set(Object.keys(SECONDARY_STATISTICS)
+        return new Immutable.Set(Object.keys(SECONDARY_STATISTICS)
             .map(key => this.get(key)));
     },
 }), fields);

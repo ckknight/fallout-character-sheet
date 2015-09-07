@@ -23,7 +23,7 @@ const VALID_KEYS = [].concat()
             return acc;
         }, {}));
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Trait')), {
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'Trait')), {
     get(key) {
         let trait = TRAITS[key];
         if (!trait) {
@@ -45,7 +45,7 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         });
     },
     all() {
-        return Immutable.Set(Object.keys(TRAITS)
+        return new Immutable.Set(Object.keys(TRAITS)
             .map(key => this.get(key)));
     },
 }), fields);

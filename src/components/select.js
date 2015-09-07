@@ -24,15 +24,15 @@ function renderOptions(options, value, fallback) {
 }
 
 export default function select(key, {DOM, value$: inputValue$, options$, props$ = Rx.Observable.return(null)}) {
-    inputValue$ = inputValue$.shareReplay(1);
     const selector = `select.${key}`;
 
     const newValue$ = DOM.select(selector)
         .events('change')
         .map(ev => ev.target.value);
 
-    const value$ = inputValue$.first()
-        .concat(inputValue$.skip(1).merge(newValue$))
+    const sharedInputValue$ = inputValue$.shareReplay(1);
+    const value$ = sharedInputValue$.first()
+        .concat(sharedInputValue$.skip(1).merge(newValue$))
         .distinctUntilChanged()
         .shareReplay(1);
 

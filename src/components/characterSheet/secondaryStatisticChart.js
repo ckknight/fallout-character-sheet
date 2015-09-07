@@ -8,29 +8,6 @@ import renderRef from './renderRef';
 import { replace as equationReplace } from '../../models/Equation';
 import Effect from '../../models/Effect';
 
-function makeInput(key, type, defaultValue, DOM, value$, props$) {
-    return input(key, type, {
-        DOM,
-        value$: value$.map(value => value[key] || defaultValue).startWith(defaultValue),
-        props$,
-    });
-}
-
-function toExtrema(range) {
-    return {
-        min: range.min,
-        max: range.max,
-    };
-}
-
-function applyEffects(equation, effects$) {
-    return effects$
-        .startWith(null)
-        .map(effects => {
-            return equation;
-        });
-}
-
 function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
     const valueView = algorithm({
         equation$: calculations.get('effect')

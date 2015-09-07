@@ -7,11 +7,11 @@ import { SKILLS } from '../constants.json';
 
 const fields = {
     key: '',
-    skills: Immutable.Map(),
+    skills: new Immutable.Map(),
 };
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'SkillCategory')), {
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'SkillCategory')), {
     get(key) {
-        let category = SKILLS[key];
+        const category = SKILLS[key];
         if (!category) {
             return null;
         }
@@ -19,14 +19,13 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
             key,
         }).mergeDeep({
             skills: Object.keys(category)
-                .reduce((acc, key) => {
-                    acc[key] = Skill.get(key);
-                    return acc;
-                }, {}),
+                .reduce((acc, skillKey) => {
+                    return acc.set(skillKey, Skill.get(skillKey));
+                }, new Immutable.Map()),
         });
     },
     all() {
-        return Immutable.Set(Object.keys(SKILLS)
+        return new Immutable.Set(Object.keys(SKILLS)
             .map(key => this.get(key)));
     },
 }), fields);

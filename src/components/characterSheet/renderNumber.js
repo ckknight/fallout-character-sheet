@@ -11,9 +11,8 @@ function getNumberClasses(value, type) {
         return ['positive', 'nonnegative', type];
     } else if (value < 0) {
         return ['negative', 'nonpositive', type];
-    } else {
-        return ['nan', type];
     }
+    return ['nan', type];
 }
 
 export default function renderNumber(value, type, props = {}) {

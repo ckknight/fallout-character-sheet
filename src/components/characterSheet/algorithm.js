@@ -1,6 +1,6 @@
+import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import * as localize from '../../localize';
-import combineLatestObject from '../../combineLatestObject';
 import When from '../../models/When';
 import { BinaryOperation, UnaryOperation } from '../../models/Equation';
 import Immutable from 'immutable';
@@ -91,16 +91,16 @@ function calculateBinary(equation, calculations) {
     return {
         DOM: leftView.DOM.combineLatest(rightView.DOM, value$.startWith('(calculating binary)'), equation$,
             (left, right, value, equation) => {
-                if (operator === '^' && equation.right === 0.5) {
-                    return renderUnary(name, value, '√', left, equation);
-                }
-                if (rightIdentity[operator] === equation.right) {
-                    return left;
-                }
-                if (leftIdentity[operator] === equation.left) {
-                    return right;
-                }
-                return renderBinary(name, value, operator, left, right, equation);
+            if (operator === '^' && equation.right === 0.5) {
+                return renderUnary(name, value, '√', left, equation);
+            }
+            if (rightIdentity[operator] === equation.right) {
+                return left;
+            }
+            if (leftIdentity[operator] === equation.left) {
+                return right;
+            }
+            return renderBinary(name, value, operator, left, right, equation);
             }),
         value$,
         equation$,
@@ -147,13 +147,13 @@ function calculateWhen(equation, calculations) {
     const possibilities = equation.conditions
         .toKeyedSeq()
         .map((value, condition) => {
-            const operandView = calculateAlgorithm(value, calculations);
-            return {
-                condition$: calculations.get(condition),
-                DOM: operandView.DOM,
-                value$: operandView.value$,
-                equation$: operandView.equation$,
-            };
+        const operandView = calculateAlgorithm(value, calculations);
+        return {
+            condition$: calculations.get(condition),
+            DOM: operandView.DOM,
+            value$: operandView.value$,
+            equation$: operandView.equation$,
+        };
         })
         .toArray()
         .concat([{
@@ -165,16 +165,16 @@ function calculateWhen(equation, calculations) {
 
     const result = Rx.Observable.combineLatest(possibilities
         .map(({condition$, DOM, value$, equation$}) => Rx.Observable.combineLatest(
-                condition$, DOM, value$, equation$, (condition, vTree, value, equation) => {
-                    if (!condition) {
-                        return null;
-                    }
-                    return {
-                        vTree,
-                        value,
-                        equation,
-                    };
-                })))
+            condition$, DOM, value$, equation$, (condition, vTree, value, equation) => {
+            if (!condition) {
+                return null;
+            }
+            return {
+                vTree,
+                value,
+                equation,
+            };
+            })))
         .map(values => values.find(x => x))
         .shareReplay(1);
     return {
@@ -208,14 +208,14 @@ function calculateString(key, calculations) {
     return {
         DOM: Rx.Observable.return(null)
             .map(() => {
-                const name = localize.name(key);
-                const abbr = localize.abbr(key);
-                const vTree = name === abbr ?
-                    h(`span.ref-${key}`, [name]) :
-                    h(`abbr.ref-${key}`, {
-                        title: name,
-                    }, [abbr]);
-                return vTree;
+            const name = localize.name(key);
+            const abbr = localize.abbr(key);
+            const vTree = name === abbr ?
+                h(`span.ref-${key}`, [name]) :
+                h(`abbr.ref-${key}`, {
+                    title: name,
+                }, [abbr]);
+            return vTree;
             }),
         value$: calculations.get(key),
         equation$: Rx.Observable.return(key),

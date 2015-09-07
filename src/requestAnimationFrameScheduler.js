@@ -3,7 +3,7 @@ import { Rx } from '@cycle/core';
 // Get the right animation frame method
 let requestAnimFrame;
 let cancelAnimFrame;
-let root = window;
+const root = window;
 if (root.requestAnimationFrame) {
     requestAnimFrame = root.requestAnimationFrame;
     cancelAnimFrame = root.cancelAnimationFrame;
@@ -20,39 +20,37 @@ if (root.requestAnimationFrame) {
     requestAnimFrame = root.oRequestAnimationFrame;
     cancelAnimFrame = root.oCancelAnimationFrame;
 } else {
-    requestAnimFrame = function (cb) {
+    requestAnimFrame = cb => {
         root.setTimeout(cb, 1000 / 60);
     };
     cancelAnimFrame = root.clearTimeout;
 }
 
 export default (function () {
-
-    let currentTimer = null;
     function scheduleNow(state, action) {
-        var scheduler = this;
-        var disposable = new Rx.SingleAssignmentDisposable();
-        var id = requestAnimFrame(function () {
+        const scheduler = this;
+        const disposable = new Rx.SingleAssignmentDisposable();
+        const id = requestAnimFrame(function () {
             !disposable.isDisposed && (disposable.setDisposable(action(scheduler, state)));
         });
-        return new Rx.CompositeDisposable(disposable, Rx.Disposable.create(function () {
+        return new Rx.CompositeDisposable(disposable, Rx.Disposable.create(() => {
             cancelAnimFrame(id);
         }));
     }
 
     function scheduleRelative(state, dueTime, action) {
-        var scheduler = this;
-        var dt = Rx.Scheduler.normalize(dueTime);
+        const scheduler = this;
+        const dt = Rx.Scheduler.normalize(dueTime);
         if (dt === 0) {
             return scheduler.scheduleWithState(state, action);
         }
-        var disposable = new Rx.SingleAssignmentDisposable();
-        var id = root.setTimeout(function () {
+        const disposable = new Rx.SingleAssignmentDisposable();
+        const id = root.setTimeout(() => {
             if (!disposable.isDisposed) {
                 disposable.setDisposable(action(scheduler, state));
             }
         }, dt);
-        return new Rx.CompositeDisposable(disposable, Rx.Disposable.create(function () {
+        return new Rx.CompositeDisposable(disposable, Rx.Disposable.create(() => {
             root.clearTimeout(id);
         }));
     }
@@ -62,5 +60,4 @@ export default (function () {
     }
 
     return new Rx.Scheduler(Date.now, scheduleNow, scheduleRelative, scheduleAbsolute);
-
 }());

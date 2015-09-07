@@ -3,8 +3,8 @@
 	"preset": "default",
 	"indent": {
 		"value": "    ",
-		"ArrowExpression": 0,
-		"CallExpression": 1
+		"CallExpression": 1,
+		"ReturnStatement": 0
 	},
 	"whiteSpace": {
 		"after": {

@@ -1,14 +1,11 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
-import combineLatestObject from '../../combineLatestObject';
 import Trait from '../../models/Trait';
 import algorithm from './algorithm';
-import Race from '../../models/Race';
 import Immutable from 'immutable';
 import renderRef from './renderRef';
 import Calculations from './Calculations';
-import Effect from '../../models/Effect';
 // import { TRAITS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 // import localize from '../../localization';
 
@@ -28,16 +25,15 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
         value$: inputValue$.map(data => data.indexOf(trait.key) !== -1)
             .merge(isChoosable$
                 .flatMap(isChoosable => {
-                    if (isChoosable) {
-                        return Rx.Observable.of();
-                    } else {
-                        return Rx.Observable.return(false);
-                    }
+                if (!isChoosable) {
+                    return Rx.Observable.return(false);
+                }
+                return Rx.Observable.of();
                 })),
         props$: isChoosable$
             .map(enabled => ({
-                    disabled: !enabled,
-                    className: 'trait-checkbox',
+                disabled: !enabled,
+                className: 'trait-checkbox',
             })),
     });
     const checked$ = chosenTraitInput.value$;
@@ -46,28 +42,27 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
         key: trait.key,
         DOM: chosenTraitInput.DOM.combineLatest(description$,
             (inputVTree, description) => h(`section.trait.trait-${trait.key}`, {
-                    key: trait.key,
+                key: trait.key,
+            }, [
+                h('label.trait-label', {
+                    key: 'label',
                 }, [
-                    h('label.trait-label', {
-                        key: 'label',
-                    }, [
-                        inputVTree,
-                        h(`span.trait-name`, {
-                            key: 'name',
-                        }, [trait.name]),
-                    ]),
-                    h(`span.trait-description`, {
-                        key: 'description',
-                    }, description),
-                ])),
+                    inputVTree,
+                    h(`span.trait-name`, {
+                        key: 'name',
+                    }, [trait.name]),
+                ]),
+                h(`span.trait-description`, {
+                    key: 'description',
+                }, description),
+            ])),
         value$: checked$,
         effect$: checked$
             .map(isChosen => {
-                if (isChosen) {
-                    return trait.effect;
-                } else {
-                    return null;
-                }
+            if (!isChosen) {
+                return null;
+            }
+            return trait.effect;
             }),
     };
 }
@@ -119,25 +114,24 @@ function renderEffectEquation(key, equation, calculations) {
 function renderEffect(effect, calculations) {
     return Rx.Observable.combineLatest(effect.toKeyedSeq()
         .filter((value, key) => {
-            if (key.charAt(0) === '$') {
-                return value;
-            } else {
-                return value !== 'value';
-            }
+        if (key.charAt(0) === '$') {
+            return value;
+        }
+        return value !== 'value';
         })
         .filter((value, key) => {
-            return key.charAt(0) !== '$';
+        return key.charAt(0) !== '$';
         })
         .map((value, key) => {
-            return renderEffectEquation(key, value, new Calculations({
-                value: Rx.Observable.return('value'),
-                level: calculations.get('level'),
-            }))
-                .map(effect => h('span.effect', [
-                        renderRef(key),
-                        ': ',
-                        effect,
-                    ]));
+        return renderEffectEquation(key, value, new Calculations({
+            value: Rx.Observable.return('value'),
+            level: calculations.get('level'),
+        }))
+            .map(renderedEffect => h('span.effect', [
+                renderRef(key),
+                ': ',
+                renderedEffect,
+            ]));
         })
         .toArray());
 }
@@ -149,9 +143,9 @@ function getTraitDescription(trait, calculations) {
     });
     return Rx.Observable.combineLatest(renderEffect(trait.effect, calculations).startWith([]), requirementsView.DOM, requirementsView.equation$,
         (effect, requirements, equation) => [
-                h('span.trait-effect', effect),
-                trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
-                equation === true ? null : h('span.trait-requirements', [requirements]),
+            h('span.trait-effect', effect),
+            trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
+            equation === true ? null : h('span.trait-requirements', [requirements]),
         ]);
 }
 
@@ -160,16 +154,16 @@ export default function traits({DOM, value$: inputValue$, calculations}) {
         .toArray()
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
     const value$ = Rx.Observable.from(allTraitViews)
-        .flatMap(({key, value$}) => value$
-                .map(value => o => value ? o.add(key) : o.remove(key)))
-        .startWith(Immutable.Set())
+        .flatMap(({key, value$: traitValue$}) => traitValue$
+            .map(value => o => value ? o.add(key) : o.remove(key)))
+        .startWith(new Immutable.Set())
         .scan((acc, modifier) => modifier(acc))
         .distinctUntilChanged()
         .map(x => x.toArray().sort())
         .share();
     calculations.set('effects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$.startWith(null)))
-        .map(effects => Immutable.Set(effects.filter(effect => effect)))
-        .startWith(Immutable.Set())
+        .map(effects => new Immutable.Set(effects.filter(effect => effect)))
+        .startWith(new Immutable.Set())
         .distinctUntilChanged(undefined, Immutable.is)
         .map(effects => effects.toArray())
         .shareReplay(1));

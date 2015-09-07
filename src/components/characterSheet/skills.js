@@ -1,12 +1,9 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
-import combineLatestObject from '../../combineLatestObject';
-import PrimaryStatistic from '../../models/PrimaryStatistic';
 import SkillCategory from '../../models/SkillCategory';
 import algorithm from './algorithm';
 import { BinaryOperation } from '../../models/Equation';
-import When from '../../models/When';
 import Immutable from 'immutable';
 
 function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
@@ -73,9 +70,9 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
     };
 }
 
-function makeSkillCategoryView(category, input) {
+function makeSkillCategoryView(category, dependencies) {
     const skillViews = category.skills.valueSeq()
-        .map(skill => makeSkillView(skill, input))
+        .map(skill => makeSkillView(skill, dependencies))
         .toArray();
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
@@ -90,12 +87,12 @@ function makeSkillCategoryView(category, input) {
         tagged$: Rx.Observable.from(skillViews)
             .flatMap(({tagged$, skill: {key}}) => tagged$
                     .map(value => o => o.set(key, value)))
-            .startWith(Immutable.Map())
+            .startWith(new Immutable.Map())
             .scan((acc, modifier) => modifier(acc)),
         increase$: Rx.Observable.from(skillViews)
             .flatMap(({increase$, skill: {key}}) => increase$
                     .map(value => o => o.set(key, value)))
-            .startWith(Immutable.Map())
+            .startWith(new Immutable.Map())
             .scan((acc, modifier) => modifier(acc)),
     };
 }
@@ -133,8 +130,8 @@ export default function skills({DOM, value$: inputValue$, calculations}) {
                                     increase: o.increase.merge(increase),
                             }))))
             .startWith({
-                tag: Immutable.Map(),
-                increase: Immutable.Map(),
+                tag: new Immutable.Map(),
+                increase: new Immutable.Map(),
             })
             .scan((acc, modifier) => modifier(acc))
             .distinctUntilChanged(null, (x, y) => Immutable.is(x.tag, y.tag) && Immutable.is(x.increase, y.increase))

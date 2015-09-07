@@ -13,10 +13,8 @@ export default class Calculations {
             if (!(observable instanceof InjectableObservable)) {
                 throw new Error(`Key already set: ${key}`);
             }
-        // this.values[key] = value = value.share();
-        // observable.inject(value);
         }
-        return this.values[key] = value;
+        return (this.values[key] = value);
     }
 
     get(key, future) {
@@ -28,17 +26,18 @@ export default class Calculations {
                 const values = this.values;
                 let unsubscribed = false;
                 let unsubscribe;
+                function tick() {
+                    setTimeout(check, 17);
+                }
                 function check() {
                     if (unsubscribed) {
                         return;
                     }
                     if (!owns.call(values, key)) {
-                        return tick();
+                        tick(); // eslint-disable-line no-use-before-define
+                        return;
                     }
                     unsubscribe = values[key].subscribe(subscriber);
-                }
-                function tick() {
-                    setTimeout(check, 17);
                 }
                 tick();
                 return () => {

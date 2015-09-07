@@ -20,22 +20,23 @@ const VALID_KEYS = [].concat(
         return acc;
     }, {});
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Skill')), {
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'Skill')), {
     get(key) {
         return [].concat(...Object.values(SKILLS)
-                .map(category => Object.entries(category)))
-                .filter(([skillName]) => skillName === key)
-                .map(([skillName, skill]) => skill)
-                .map(skill => {
-                    skill = Object.assign({}, skill);
-                    skill.value = toEquation(skill.value, `SKILLS.${key}.value`, VALID_KEYS, 'number');
-                    return new this({
-                        key,
-                    }).mergeDeep(skill);
-                })[0] || null;
+            .map(category => Object.entries(category)))
+            .filter(([skillName]) => skillName === key)
+            .map(([skillName, skill]) => skill)
+            .map(skill => Object.assign({}, skill))
+            .map(skill => {
+                skill.value = toEquation(skill.value, `SKILLS.${key}.value`, VALID_KEYS, 'number');
+                return new this({
+                    key,
+                }).mergeDeep(skill);
+            })[0] || null;
     },
     all() {
-        return Immutable.Set([].concat(...Object.values(SKILLS).map(category => Object.keys(category)))
+        return new Immutable.Set([].concat(...Object.values(SKILLS)
+            .map(category => Object.keys(category)))
             .map(key => this.get(key)));
     },
 }), fields);
