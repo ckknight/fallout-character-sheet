@@ -25,7 +25,9 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
             })),
     });
     const extremaVTree$ = raceExtrema$
-        .map(({min, max}) => h('span.stat-extrema', [min, '/', max]));
+        .map(({min, max}) => h('span.stat-extrema', {
+                key: 'extrema',
+            }, [min, '/', max]));
     calculations.set(stat.key, inputView.value$);
 
     return {
@@ -33,7 +35,9 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
             input: inputView.DOM,
             extrema: extremaVTree$,
         })
-            .map(({input, extrema}) => h(`div.primary-statistic.primary-statistic-${stat.key}`, [
+            .map(({input, extrema}) => h(`div.primary-statistic.primary-statistic-${stat.key}`, {
+                    key: stat.key,
+                }, [
                     h(`abbr.stat-label`, {
                         title: stat.name,
                     }, [stat.abbr]),
@@ -63,12 +67,15 @@ export default function primaryStatisticChart({DOM, value$, calculations}) {
     const summaryVTree$ = Rx.Observable.combineLatest(sum$, primaryTotal$, (sum, primaryTotal) => {
         return h('div', {
             className: 'primary-total ' + (sum === primaryTotal ? 'primary-total--same' : ''),
+            key: 'primaryTotal',
         }, [sum, '/', primaryTotal]);
     });
 
     return {
         DOM: Rx.Observable.combineLatest(statisticEntries.map(a => a.DOM).concat([summaryVTree$]))
-            .map(inputVTrees => h('section.primary', inputVTrees)),
+            .map(inputVTrees => h('section.primary', {
+                    key: 'primary',
+                }, inputVTrees)),
         value$: combineLatestObject(statistics.reduce((acc, stat, i) => {
             acc[stat.key] = statisticEntries[i].value$;
             return acc;

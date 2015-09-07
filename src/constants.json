@@ -1807,6 +1807,18 @@
     },
     "LOCALIZATION": {
         "en-US": {
+            "value": "value",
+            "input": "input",
+            "primaryTotal": "Primary Total",
+            "skillPoints": "Skill Points",
+            "damage": "Damage",
+            "criticalFailureChance": "Critical Failure Chance",
+            "addictionRecovery": "Addiction Recovery",
+            "addictionChance": "Addiction Chance",
+            "chemDuration": "Chem Duration",
+            "levelsPerPerk": "Levels per Perk",
+            "skillPointsPerLevel": "Skill Points per Level",
+            "actionPointCost": "Action Point Cost",
             "name": "Name","age":"Age","hair":"Hair","eyes":"Eyes","appearance":"Appearance","sex":"Sex","weight":"Weight","height":"Height",
             "travel": "Travel",
             "experience": {
@@ -4947,8 +4959,7 @@
             },
             "skillPoints": {
                 "$add": [
-                    "value",
-                    -10,
+                    {"$sub":["value",10]},
                     {
                         "$mul": [
                             "level",

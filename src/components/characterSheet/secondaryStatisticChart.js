@@ -33,7 +33,9 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
 
     return {
         DOM: Rx.Observable.combineLatest(valueView.DOM, valueView.value$.startWith('poo'),
-            (vTree, value) => h(`div.secondary-statistic.secondary-statistic-${stat.key}` + (stat.percent ? '.secondary-statistic-percent' : ''), [
+            (vTree, value) => h(`div.secondary-statistic.secondary-statistic-${stat.key}` + (stat.percent ? '.secondary-statistic-percent' : ''), {
+                    key: stat.key,
+                }, [
                     renderRef(stat.key, 'stat-label'),
                     h(`span.stat-value`, [value]),
                     vTree,
@@ -54,7 +56,9 @@ export default function secondaryStatisticChart({DOM, value$, calculations}) {
 
     return {
         DOM: Rx.Observable.combineLatest(statisticEntries.map(a => a.DOM))
-            .map(inputVTrees => h('section.secondary', inputVTrees)),
+            .map(inputVTrees => h('section.secondary', {
+                    key: 'secondary',
+                }, inputVTrees)),
         value$: combineLatestObject(statistics.reduce((acc, stat, i) => {
             acc[stat.key] = statisticEntries[i].value$;
             return acc;

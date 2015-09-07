@@ -16,11 +16,17 @@ function renderUnary(name, value, operator, operand, equation) {
     ]);
 }
 function renderBinary(name, value, operator, left, right, equation) {
+    // if (operator === '*' && typeof equation.right === 'number' && typeof equation.left !== 'number') {
+    //     return renderBinary(name, value, operator, right, left, equation.merge({
+    //         left: equation.right,
+    //         right: equation.left,
+    //     }));
+    // }
     return h(`span.${name}.binary`, {
         title: (equation || '').toString() + ' = ' + value,
     }, [
         h(`span.${name}--left.binary--left.${name}--operand.binary--operand`, [left]),
-        h(`span.${name}--operator.binary--operator`, [operator]),
+        h(`span.${name}--operator.binary--operator`, [operator === '=' ? 'is' : operator]),
         h(`span.${name}--right.binary--right.${name}--operand.binary--operand`, [right]),
     ]);
 }
@@ -250,6 +256,10 @@ export default function ({equation$, calculations}) {
         value$: result
             .flatMapLatest(x => x.value$)
             .distinctUntilChanged()
+            .share(),
+        equation$: result
+            .flatMapLatest(x => x.equation$)
+            .distinctUntilChanged(undefined, Immutable.is)
             .share(),
     };
 }

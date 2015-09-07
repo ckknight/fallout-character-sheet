@@ -83,7 +83,7 @@ export default function characterSheet({DOM, localStorageSource}) {
     });
     const traitsView = traits({
         DOM,
-        value$: deserializedSavedData$.map(x => x.traits || {}),
+        value$: deserializedSavedData$.map(x => x.traits || []),
         calculations,
     });
     return {

@@ -56,10 +56,15 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
             tagInput.value$,
             (algorithmDOM, algorithmValue, increase, tag, tagValue) => h(`div.skill.skill-${skill.key}`, {
                     className: tagValue ? 'skill-tagged' : 'skill-untagged',
+                    key: skill.key,
                 }, [
                     tag,
-                    h(`span.skill-name`, [skill.name]),
-                    h(`span.skill-value`, [algorithmValue + '']),
+                    h(`span.skill-name`, {
+                        key: 'name',
+                    }, [skill.name]),
+                    h(`span.skill-value`, {
+                        key: 'value',
+                    }, [algorithmValue + '']),
                     increase,
                     algorithmDOM,
                 ])),
@@ -75,8 +80,12 @@ function makeSkillCategoryView(category, input) {
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
             .startWith([])
-            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, [
-                    h(`span.skill-category-title`, [category.name]),
+            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
+                    key: category.key,
+                }, [
+                    h(`span.skill-category-title`, {
+                        key: 'title',
+                    }, [category.name]),
                 ].concat(skillVTrees))),
         tagged$: Rx.Observable.from(skillViews)
             .flatMap(({tagged$, skill: {key}}) => tagged$
@@ -108,7 +117,9 @@ export default function skills({DOM, value$: inputValue$, calculations}) {
         .toArray();
     return {
         DOM: Rx.Observable.combineLatest(skillCategoryViews.map(o => o.DOM))
-            .map(vTrees => h('section.skills', vTrees)),
+            .map(vTrees => h('section.skills', {
+                    key: 'skills',
+                }, vTrees)),
         value$: Rx.Observable.from(skillCategoryViews)
             .flatMap(({tagged$, increase$}) => Rx.Observable.merge(
                     tagged$
@@ -126,6 +137,7 @@ export default function skills({DOM, value$: inputValue$, calculations}) {
                 increase: Immutable.Map(),
             })
             .scan((acc, modifier) => modifier(acc))
+            .distinctUntilChanged(null, (x, y) => Immutable.is(x.tag, y.tag) && Immutable.is(x.increase, y.increase))
             .map(({tag, increase}) => ({
                     tag: tag.toKeyedSeq()
                         .filter(value => value)

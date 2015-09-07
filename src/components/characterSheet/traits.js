@@ -5,6 +5,9 @@ import combineLatestObject from '../../combineLatestObject';
 import Trait from '../../models/Trait';
 import algorithm from './algorithm';
 import Race from '../../models/Race';
+import Immutable from 'immutable';
+import renderRef from './renderRef';
+import Calculations from './Calculations';
 // import { TRAITS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 // import localize from '../../localization';
 
@@ -17,26 +20,43 @@ function isTraitChoosable(trait, calculations) {
         .value$;
 }
 
-function makeTraitView(trait, value$, DOM, calculations) {
+function makeTraitView(trait, inputValue$, DOM, calculations) {
     const isChoosable$ = isTraitChoosable(trait, calculations);
     const chosenTraitInput = input(trait.key, 'checkbox', {
         DOM,
-        value$: value$.combineLatest(isChoosable$, (data, enabled) => {
-            return enabled && data[trait.key] || false;
-        }),
+        value$: inputValue$.map(data => data.indexOf(trait.key) !== -1)
+            .merge(isChoosable$
+                .flatMap(isChoosable => {
+                    if (isChoosable) {
+                        return Rx.Observable.of();
+                    } else {
+                        return Rx.Observable.return(false);
+                    }
+                })),
         props$: isChoosable$
             .map(enabled => ({
                     disabled: !enabled,
+                    className: 'trait-checkbox',
             })),
     });
+    const description$ = getTraitDescription(trait, calculations);
     return {
         key: trait.key,
-        DOM: chosenTraitInput.DOM
-            .map(inputVTree => h(`section.trait.trait-${trait.key}`, [
-                    inputVTree,
-                    trait.key,
-                    ' - ',
-                    getTraitDescription(trait),
+        DOM: chosenTraitInput.DOM.combineLatest(description$,
+            (inputVTree, description) => h(`section.trait.trait-${trait.key}`, {
+                    key: trait.key,
+                }, [
+                    h('label.trait-label', {
+                        key: 'label',
+                    }, [
+                        inputVTree,
+                        h(`span.trait-name`, {
+                            key: 'name',
+                        }, [trait.name]),
+                    ]),
+                    h(`span.trait-description`, {
+                        key: 'description',
+                    }, description),
                 ])),
         value$: chosenTraitInput.value$,
     };
@@ -78,12 +98,50 @@ function makeTraitView(trait, value$, DOM, calculations) {
 //     }
 // }
 //
-function getTraitDescription(trait) {
-    return trait.toString();
-    return Object.keys(trait)
-        .map(key => getTraitDescriptionPart(key, trait[key]))
-        .filter(x => x)
-        .join(', ');
+
+function renderEffectEquation(key, equation, calculations) {
+    return algorithm({
+        equation$: Rx.Observable.return(equation),
+        calculations: calculations,
+    }).DOM;
+}
+
+function renderEffect(effect, calculations) {
+    return effect.toKeyedSeq()
+        .filter((value, key) => {
+            if (key.charAt(0) === '$') {
+                return value;
+            } else {
+                return value !== 'value';
+            }
+        })
+        .filter((value, key) => {
+            return key.charAt(0) !== '$';
+        })
+        .map((value, key) => {
+            return h('span.effect', [
+                renderRef(key),
+                ': ',
+                renderEffectEquation(key, value, new Calculations({
+                    value: Rx.Observable.return('value'),
+                    level: calculations.get('level'),
+                })),
+            ]);
+        })
+        .toArray();
+}
+
+function getTraitDescription(trait, calculations) {
+    const requirementsView = algorithm({
+        equation$: Rx.Observable.return(trait.requirements),
+        calculations,
+    });
+    return Rx.Observable.combineLatest(requirementsView.DOM, requirementsView.equation$,
+        (requirements, equation) => [,
+                renderEffect(trait.effect, calculations),
+                trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
+                equation === true ? null : h('span.trait-requirements', [requirements]),
+        ]);
 }
 
 export default function traits({DOM, value$: inputValue$, calculations}) {
@@ -91,16 +149,16 @@ export default function traits({DOM, value$: inputValue$, calculations}) {
         .toArray()
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
     const value$ = Rx.Observable.from(allTraitViews)
-        .flatMap(traitView => traitView.value$
-                .map(value => ({
-                        [traitView.key]: !!value,
-                })))
-        .merge(inputValue$)
-        .scan((acc, modifier) => Object.assign({}, acc, modifier), {})
+        .flatMap(({key, value$}) => value$
+                .map(value => o => value ? o.add(key) : o.remove(key)))
+        .startWith(Immutable.Set())
+        .scan((acc, modifier) => modifier(acc))
+        .distinctUntilChanged()
+        .map(x => x.toArray().sort())
         .share();
     return {
         DOM: Rx.Observable.combineLatest(allTraitViews.map(t => t.DOM))
-            .map(vTrees => h('div.traits', vTrees)),
+            .map(vTrees => h('section.traits', vTrees)),
         value$: value$,
     };
 }

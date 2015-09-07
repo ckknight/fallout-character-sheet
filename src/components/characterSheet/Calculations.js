@@ -18,4 +18,8 @@ export default class Calculations {
         }
         return this.values[key];
     }
+
+    with(object) {
+        return new Calculations(Object.assign(Object.create(this.values), object));
+    }
 }
