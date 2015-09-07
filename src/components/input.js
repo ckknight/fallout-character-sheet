@@ -7,6 +7,11 @@ const typeToEvents = {
         input: 0,
         change: 0,
     },
+    textarea: {
+        keyup: 0,
+        input: 0,
+        change: 0,
+    },
     number: {
         keyup: 0,
         input: 0,
@@ -26,11 +31,10 @@ function identity(x) {
 }
 
 function maybeDebounce(time) {
-    if (time) {
-        return event$ => event$.debounce(time);
-    } else {
-        return event$ => event$;
+    if (!time) {
+        return identity;
     }
+    return event$ => event$.debounce(time);
 }
 
 function eventsByType(DOM, type) {
@@ -41,41 +45,71 @@ function eventsByType(DOM, type) {
 }
 
 function calculateProps(key, type, value, props) {
+    switch (type) {
+        case 'checkbox':
+            return Object.assign({
+                key,
+                type,
+                value: key,
+                checked: value,
+            }, props || {});
+        case 'textarea':
+            return Object.assign({
+                key,
+                value,
+            }, props || {});
+        default:
+            return Object.assign({
+                key,
+                type,
+                value,
+            }, props || {});
+    }
+}
+
+function getValueByType(type) {
     if (type === 'checkbox') {
-        return Object.assign({
-            key,
-            type,
-            value: key,
-            checked: value,
-        }, props || {});
+        return ev => ev.target.checked;
     } else {
-        return Object.assign({
-            key,
-            type,
-            value,
-        }, props || {});
+        return ev => ev.target.value;
     }
 }
 
 export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null)}) {
-    const selector = `input.${key}`;
+    const tag = type === 'textarea' ? type : 'input';
+    const selector = `${tag}.${key}`;
 
     const newValue$ = eventsByType(DOM.select(selector), type)
-        .map(ev => ev.target.value)
+        .map(getValueByType(type))
         .map(typeToConverter[type] || identity);
 
     const value$ = inputValue$
-        .merge(newValue$)
+        .merge(newValue$);
+
+    props$ = props$.shareReplay(1);
+    const boundValue$ = Rx.Observable.combineLatest(value$, props$,
+        (value, props) => {
+            if (!props) {
+                return value;
+            }
+            if ('min' in props && value < props.min) {
+                return props.min;
+            }
+            if ('max' in props && value > props.max) {
+                return props.max;
+            }
+            return value;
+        })
         .distinctUntilChanged()
         .shareReplay(1);
 
-    const vtree$ = Rx.Observable.combineLatest(value$, props$,
+    const vtree$ = Rx.Observable.combineLatest(boundValue$, props$,
         (value, props) => h(
                 selector,
                 calculateProps(key, type, value, props)));
 
     return {
         DOM: vtree$,
-        value$,
+        value$: boundValue$,
     };
 }

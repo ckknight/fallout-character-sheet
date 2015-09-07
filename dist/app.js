@@ -79,17 +79,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var _componentsCharacterSheet = __webpack_require__(142);
+	var _componentsCharacterSheet = __webpack_require__(170);
 	
 	var _componentsCharacterSheet2 = _interopRequireDefault(_componentsCharacterSheet);
 	
-	var _drivers = __webpack_require__(146);
+	var _drivers = __webpack_require__(176);
 	
 	(0, _cycleCore.run)(_componentsCharacterSheet2['default'], {
 	    DOM: (0, _cycleDom.makeDOMDriver)('.character-sheet'),
@@ -99,11 +99,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports["default"] = function (obj) {
+	  return obj && obj.__esModule ? obj : {
+	    "default": obj
+	  };
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var Rx = __webpack_require__(68);
+	var Rx = __webpack_require__(95);
 	
 	function makeRequestProxies(drivers) {
 	  var requestProxies = {};
@@ -245,114 +259,4967 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Cycle;
 
 /***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = function (value) {
-		if (value == null) throw new TypeError("Cannot use null or undefined");
-		return value;
-	};
-
-
-/***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = isWidget
-	
-	function isWidget(w) {
-	    return w && w.type === "Widget"
-	}
-
+	module.exports = { "default": __webpack_require__(200), __esModule: true };
 
 /***/ },
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
-	
-	var assign        = __webpack_require__(23)
-	  , normalizeOpts = __webpack_require__(93)
-	  , isCallable    = __webpack_require__(41)
-	  , contains      = __webpack_require__(44)
-	
-	  , d;
-	
-	d = module.exports = function (dscr, value/*, options*/) {
-		var c, e, w, options, desc;
-		if ((arguments.length < 2) || (typeof dscr !== 'string')) {
-			options = value;
-			value = dscr;
-			dscr = null;
-		} else {
-			options = arguments[2];
-		}
-		if (dscr == null) {
-			c = w = true;
-			e = false;
-		} else {
-			c = contains.call(dscr, 'c');
-			e = contains.call(dscr, 'e');
-			w = contains.call(dscr, 'w');
-		}
-	
-		desc = { value: value, configurable: c, enumerable: e, writable: w };
-		return !options ? desc : assign(normalizeOpts(options), desc);
-	};
-	
-	d.gs = function (dscr, get, set/*, options*/) {
-		var c, e, options, desc;
-		if (typeof dscr !== 'string') {
-			options = set;
-			set = get;
-			get = dscr;
-			dscr = null;
-		} else {
-			options = arguments[3];
-		}
-		if (get == null) {
-			get = undefined;
-		} else if (!isCallable(get)) {
-			options = get;
-			get = set = undefined;
-		} else if (set == null) {
-			set = undefined;
-		} else if (!isCallable(set)) {
-			options = set;
-			set = undefined;
-		}
-		if (dscr == null) {
-			c = true;
-			e = false;
-		} else {
-			c = contains.call(dscr, 'c');
-			e = contains.call(dscr, 'e');
-		}
-	
-		desc = { get: get, set: set, configurable: c, enumerable: e };
-		return !options ? desc : assign(normalizeOpts(options), desc);
-	};
-
+	var core = module.exports = {};
+	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/**
+	 *  Copyright (c) 2014-2015, Facebook, Inc.
+	 *  All rights reserved.
+	 *
+	 *  This source code is licensed under the BSD-style license found in the
+	 *  LICENSE file in the root directory of this source tree. An additional grant
+	 *  of patent rights can be found in the PATENTS file in the same directory.
+	 */
+	(function (global, factory) {
+	   true ? module.exports = factory() :
+	  typeof define === 'function' && define.amd ? define(factory) :
+	  global.Immutable = factory()
+	}(this, function () { 'use strict';var SLICE$0 = Array.prototype.slice;
+	
+	  function createClass(ctor, superClass) {
+	    if (superClass) {
+	      ctor.prototype = Object.create(superClass.prototype);
+	    }
+	    ctor.prototype.constructor = ctor;
+	  }
+	
+	  // Used for setting prototype methods that IE8 chokes on.
+	  var DELETE = 'delete';
+	
+	  // Constants describing the size of trie nodes.
+	  var SHIFT = 5; // Resulted in best performance after ______?
+	  var SIZE = 1 << SHIFT;
+	  var MASK = SIZE - 1;
+	
+	  // A consistent shared value representing "not set" which equals nothing other
+	  // than itself, and nothing that could be provided externally.
+	  var NOT_SET = {};
+	
+	  // Boolean references, Rough equivalent of `bool &`.
+	  var CHANGE_LENGTH = { value: false };
+	  var DID_ALTER = { value: false };
+	
+	  function MakeRef(ref) {
+	    ref.value = false;
+	    return ref;
+	  }
+	
+	  function SetRef(ref) {
+	    ref && (ref.value = true);
+	  }
+	
+	  // A function which returns a value representing an "owner" for transient writes
+	  // to tries. The return value will only ever equal itself, and will not equal
+	  // the return of any subsequent call of this function.
+	  function OwnerID() {}
+	
+	  // http://jsperf.com/copy-array-inline
+	  function arrCopy(arr, offset) {
+	    offset = offset || 0;
+	    var len = Math.max(0, arr.length - offset);
+	    var newArr = new Array(len);
+	    for (var ii = 0; ii < len; ii++) {
+	      newArr[ii] = arr[ii + offset];
+	    }
+	    return newArr;
+	  }
+	
+	  function ensureSize(iter) {
+	    if (iter.size === undefined) {
+	      iter.size = iter.__iterate(returnTrue);
+	    }
+	    return iter.size;
+	  }
+	
+	  function wrapIndex(iter, index) {
+	    return index >= 0 ? (+index) : ensureSize(iter) + (+index);
+	  }
+	
+	  function returnTrue() {
+	    return true;
+	  }
+	
+	  function wholeSlice(begin, end, size) {
+	    return (begin === 0 || (size !== undefined && begin <= -size)) &&
+	      (end === undefined || (size !== undefined && end >= size));
+	  }
+	
+	  function resolveBegin(begin, size) {
+	    return resolveIndex(begin, size, 0);
+	  }
+	
+	  function resolveEnd(end, size) {
+	    return resolveIndex(end, size, size);
+	  }
+	
+	  function resolveIndex(index, size, defaultIndex) {
+	    return index === undefined ?
+	      defaultIndex :
+	      index < 0 ?
+	        Math.max(0, size + index) :
+	        size === undefined ?
+	          index :
+	          Math.min(size, index);
+	  }
+	
+	  function Iterable(value) {
+	      return isIterable(value) ? value : Seq(value);
+	    }
+	
+	
+	  createClass(KeyedIterable, Iterable);
+	    function KeyedIterable(value) {
+	      return isKeyed(value) ? value : KeyedSeq(value);
+	    }
+	
+	
+	  createClass(IndexedIterable, Iterable);
+	    function IndexedIterable(value) {
+	      return isIndexed(value) ? value : IndexedSeq(value);
+	    }
+	
+	
+	  createClass(SetIterable, Iterable);
+	    function SetIterable(value) {
+	      return isIterable(value) && !isAssociative(value) ? value : SetSeq(value);
+	    }
+	
+	
+	
+	  function isIterable(maybeIterable) {
+	    return !!(maybeIterable && maybeIterable[IS_ITERABLE_SENTINEL]);
+	  }
+	
+	  function isKeyed(maybeKeyed) {
+	    return !!(maybeKeyed && maybeKeyed[IS_KEYED_SENTINEL]);
+	  }
+	
+	  function isIndexed(maybeIndexed) {
+	    return !!(maybeIndexed && maybeIndexed[IS_INDEXED_SENTINEL]);
+	  }
+	
+	  function isAssociative(maybeAssociative) {
+	    return isKeyed(maybeAssociative) || isIndexed(maybeAssociative);
+	  }
+	
+	  function isOrdered(maybeOrdered) {
+	    return !!(maybeOrdered && maybeOrdered[IS_ORDERED_SENTINEL]);
+	  }
+	
+	  Iterable.isIterable = isIterable;
+	  Iterable.isKeyed = isKeyed;
+	  Iterable.isIndexed = isIndexed;
+	  Iterable.isAssociative = isAssociative;
+	  Iterable.isOrdered = isOrdered;
+	
+	  Iterable.Keyed = KeyedIterable;
+	  Iterable.Indexed = IndexedIterable;
+	  Iterable.Set = SetIterable;
+	
+	
+	  var IS_ITERABLE_SENTINEL = '@@__IMMUTABLE_ITERABLE__@@';
+	  var IS_KEYED_SENTINEL = '@@__IMMUTABLE_KEYED__@@';
+	  var IS_INDEXED_SENTINEL = '@@__IMMUTABLE_INDEXED__@@';
+	  var IS_ORDERED_SENTINEL = '@@__IMMUTABLE_ORDERED__@@';
+	
+	  /* global Symbol */
+	
+	  var ITERATE_KEYS = 0;
+	  var ITERATE_VALUES = 1;
+	  var ITERATE_ENTRIES = 2;
+	
+	  var REAL_ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+	  var FAUX_ITERATOR_SYMBOL = '@@iterator';
+	
+	  var ITERATOR_SYMBOL = REAL_ITERATOR_SYMBOL || FAUX_ITERATOR_SYMBOL;
+	
+	
+	  function src_Iterator__Iterator(next) {
+	      this.next = next;
+	    }
+	
+	    src_Iterator__Iterator.prototype.toString = function() {
+	      return '[Iterator]';
+	    };
+	
+	
+	  src_Iterator__Iterator.KEYS = ITERATE_KEYS;
+	  src_Iterator__Iterator.VALUES = ITERATE_VALUES;
+	  src_Iterator__Iterator.ENTRIES = ITERATE_ENTRIES;
+	
+	  src_Iterator__Iterator.prototype.inspect =
+	  src_Iterator__Iterator.prototype.toSource = function () { return this.toString(); }
+	  src_Iterator__Iterator.prototype[ITERATOR_SYMBOL] = function () {
+	    return this;
+	  };
+	
+	
+	  function iteratorValue(type, k, v, iteratorResult) {
+	    var value = type === 0 ? k : type === 1 ? v : [k, v];
+	    iteratorResult ? (iteratorResult.value = value) : (iteratorResult = {
+	      value: value, done: false
+	    });
+	    return iteratorResult;
+	  }
+	
+	  function iteratorDone() {
+	    return { value: undefined, done: true };
+	  }
+	
+	  function hasIterator(maybeIterable) {
+	    return !!getIteratorFn(maybeIterable);
+	  }
+	
+	  function isIterator(maybeIterator) {
+	    return maybeIterator && typeof maybeIterator.next === 'function';
+	  }
+	
+	  function getIterator(iterable) {
+	    var iteratorFn = getIteratorFn(iterable);
+	    return iteratorFn && iteratorFn.call(iterable);
+	  }
+	
+	  function getIteratorFn(iterable) {
+	    var iteratorFn = iterable && (
+	      (REAL_ITERATOR_SYMBOL && iterable[REAL_ITERATOR_SYMBOL]) ||
+	      iterable[FAUX_ITERATOR_SYMBOL]
+	    );
+	    if (typeof iteratorFn === 'function') {
+	      return iteratorFn;
+	    }
+	  }
+	
+	  function isArrayLike(value) {
+	    return value && typeof value.length === 'number';
+	  }
+	
+	  createClass(Seq, Iterable);
+	    function Seq(value) {
+	      return value === null || value === undefined ? emptySequence() :
+	        isIterable(value) ? value.toSeq() : seqFromValue(value);
+	    }
+	
+	    Seq.of = function(/*...values*/) {
+	      return Seq(arguments);
+	    };
+	
+	    Seq.prototype.toSeq = function() {
+	      return this;
+	    };
+	
+	    Seq.prototype.toString = function() {
+	      return this.__toString('Seq {', '}');
+	    };
+	
+	    Seq.prototype.cacheResult = function() {
+	      if (!this._cache && this.__iterateUncached) {
+	        this._cache = this.entrySeq().toArray();
+	        this.size = this._cache.length;
+	      }
+	      return this;
+	    };
+	
+	    // abstract __iterateUncached(fn, reverse)
+	
+	    Seq.prototype.__iterate = function(fn, reverse) {
+	      return seqIterate(this, fn, reverse, true);
+	    };
+	
+	    // abstract __iteratorUncached(type, reverse)
+	
+	    Seq.prototype.__iterator = function(type, reverse) {
+	      return seqIterator(this, type, reverse, true);
+	    };
+	
+	
+	
+	  createClass(KeyedSeq, Seq);
+	    function KeyedSeq(value) {
+	      return value === null || value === undefined ?
+	        emptySequence().toKeyedSeq() :
+	        isIterable(value) ?
+	          (isKeyed(value) ? value.toSeq() : value.fromEntrySeq()) :
+	          keyedSeqFromValue(value);
+	    }
+	
+	    KeyedSeq.prototype.toKeyedSeq = function() {
+	      return this;
+	    };
+	
+	
+	
+	  createClass(IndexedSeq, Seq);
+	    function IndexedSeq(value) {
+	      return value === null || value === undefined ? emptySequence() :
+	        !isIterable(value) ? indexedSeqFromValue(value) :
+	        isKeyed(value) ? value.entrySeq() : value.toIndexedSeq();
+	    }
+	
+	    IndexedSeq.of = function(/*...values*/) {
+	      return IndexedSeq(arguments);
+	    };
+	
+	    IndexedSeq.prototype.toIndexedSeq = function() {
+	      return this;
+	    };
+	
+	    IndexedSeq.prototype.toString = function() {
+	      return this.__toString('Seq [', ']');
+	    };
+	
+	    IndexedSeq.prototype.__iterate = function(fn, reverse) {
+	      return seqIterate(this, fn, reverse, false);
+	    };
+	
+	    IndexedSeq.prototype.__iterator = function(type, reverse) {
+	      return seqIterator(this, type, reverse, false);
+	    };
+	
+	
+	
+	  createClass(SetSeq, Seq);
+	    function SetSeq(value) {
+	      return (
+	        value === null || value === undefined ? emptySequence() :
+	        !isIterable(value) ? indexedSeqFromValue(value) :
+	        isKeyed(value) ? value.entrySeq() : value
+	      ).toSetSeq();
+	    }
+	
+	    SetSeq.of = function(/*...values*/) {
+	      return SetSeq(arguments);
+	    };
+	
+	    SetSeq.prototype.toSetSeq = function() {
+	      return this;
+	    };
+	
+	
+	
+	  Seq.isSeq = isSeq;
+	  Seq.Keyed = KeyedSeq;
+	  Seq.Set = SetSeq;
+	  Seq.Indexed = IndexedSeq;
+	
+	  var IS_SEQ_SENTINEL = '@@__IMMUTABLE_SEQ__@@';
+	
+	  Seq.prototype[IS_SEQ_SENTINEL] = true;
+	
+	
+	
+	  // #pragma Root Sequences
+	
+	  createClass(ArraySeq, IndexedSeq);
+	    function ArraySeq(array) {
+	      this._array = array;
+	      this.size = array.length;
+	    }
+	
+	    ArraySeq.prototype.get = function(index, notSetValue) {
+	      return this.has(index) ? this._array[wrapIndex(this, index)] : notSetValue;
+	    };
+	
+	    ArraySeq.prototype.__iterate = function(fn, reverse) {
+	      var array = this._array;
+	      var maxIndex = array.length - 1;
+	      for (var ii = 0; ii <= maxIndex; ii++) {
+	        if (fn(array[reverse ? maxIndex - ii : ii], ii, this) === false) {
+	          return ii + 1;
+	        }
+	      }
+	      return ii;
+	    };
+	
+	    ArraySeq.prototype.__iterator = function(type, reverse) {
+	      var array = this._array;
+	      var maxIndex = array.length - 1;
+	      var ii = 0;
+	      return new src_Iterator__Iterator(function() 
+	        {return ii > maxIndex ?
+	          iteratorDone() :
+	          iteratorValue(type, ii, array[reverse ? maxIndex - ii++ : ii++])}
+	      );
+	    };
+	
+	
+	
+	  createClass(ObjectSeq, KeyedSeq);
+	    function ObjectSeq(object) {
+	      var keys = Object.keys(object);
+	      this._object = object;
+	      this._keys = keys;
+	      this.size = keys.length;
+	    }
+	
+	    ObjectSeq.prototype.get = function(key, notSetValue) {
+	      if (notSetValue !== undefined && !this.has(key)) {
+	        return notSetValue;
+	      }
+	      return this._object[key];
+	    };
+	
+	    ObjectSeq.prototype.has = function(key) {
+	      return this._object.hasOwnProperty(key);
+	    };
+	
+	    ObjectSeq.prototype.__iterate = function(fn, reverse) {
+	      var object = this._object;
+	      var keys = this._keys;
+	      var maxIndex = keys.length - 1;
+	      for (var ii = 0; ii <= maxIndex; ii++) {
+	        var key = keys[reverse ? maxIndex - ii : ii];
+	        if (fn(object[key], key, this) === false) {
+	          return ii + 1;
+	        }
+	      }
+	      return ii;
+	    };
+	
+	    ObjectSeq.prototype.__iterator = function(type, reverse) {
+	      var object = this._object;
+	      var keys = this._keys;
+	      var maxIndex = keys.length - 1;
+	      var ii = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var key = keys[reverse ? maxIndex - ii : ii];
+	        return ii++ > maxIndex ?
+	          iteratorDone() :
+	          iteratorValue(type, key, object[key]);
+	      });
+	    };
+	
+	  ObjectSeq.prototype[IS_ORDERED_SENTINEL] = true;
+	
+	
+	  createClass(IterableSeq, IndexedSeq);
+	    function IterableSeq(iterable) {
+	      this._iterable = iterable;
+	      this.size = iterable.length || iterable.size;
+	    }
+	
+	    IterableSeq.prototype.__iterateUncached = function(fn, reverse) {
+	      if (reverse) {
+	        return this.cacheResult().__iterate(fn, reverse);
+	      }
+	      var iterable = this._iterable;
+	      var iterator = getIterator(iterable);
+	      var iterations = 0;
+	      if (isIterator(iterator)) {
+	        var step;
+	        while (!(step = iterator.next()).done) {
+	          if (fn(step.value, iterations++, this) === false) {
+	            break;
+	          }
+	        }
+	      }
+	      return iterations;
+	    };
+	
+	    IterableSeq.prototype.__iteratorUncached = function(type, reverse) {
+	      if (reverse) {
+	        return this.cacheResult().__iterator(type, reverse);
+	      }
+	      var iterable = this._iterable;
+	      var iterator = getIterator(iterable);
+	      if (!isIterator(iterator)) {
+	        return new src_Iterator__Iterator(iteratorDone);
+	      }
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var step = iterator.next();
+	        return step.done ? step : iteratorValue(type, iterations++, step.value);
+	      });
+	    };
+	
+	
+	
+	  createClass(IteratorSeq, IndexedSeq);
+	    function IteratorSeq(iterator) {
+	      this._iterator = iterator;
+	      this._iteratorCache = [];
+	    }
+	
+	    IteratorSeq.prototype.__iterateUncached = function(fn, reverse) {
+	      if (reverse) {
+	        return this.cacheResult().__iterate(fn, reverse);
+	      }
+	      var iterator = this._iterator;
+	      var cache = this._iteratorCache;
+	      var iterations = 0;
+	      while (iterations < cache.length) {
+	        if (fn(cache[iterations], iterations++, this) === false) {
+	          return iterations;
+	        }
+	      }
+	      var step;
+	      while (!(step = iterator.next()).done) {
+	        var val = step.value;
+	        cache[iterations] = val;
+	        if (fn(val, iterations++, this) === false) {
+	          break;
+	        }
+	      }
+	      return iterations;
+	    };
+	
+	    IteratorSeq.prototype.__iteratorUncached = function(type, reverse) {
+	      if (reverse) {
+	        return this.cacheResult().__iterator(type, reverse);
+	      }
+	      var iterator = this._iterator;
+	      var cache = this._iteratorCache;
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        if (iterations >= cache.length) {
+	          var step = iterator.next();
+	          if (step.done) {
+	            return step;
+	          }
+	          cache[iterations] = step.value;
+	        }
+	        return iteratorValue(type, iterations, cache[iterations++]);
+	      });
+	    };
+	
+	
+	
+	
+	  // # pragma Helper functions
+	
+	  function isSeq(maybeSeq) {
+	    return !!(maybeSeq && maybeSeq[IS_SEQ_SENTINEL]);
+	  }
+	
+	  var EMPTY_SEQ;
+	
+	  function emptySequence() {
+	    return EMPTY_SEQ || (EMPTY_SEQ = new ArraySeq([]));
+	  }
+	
+	  function keyedSeqFromValue(value) {
+	    var seq =
+	      Array.isArray(value) ? new ArraySeq(value).fromEntrySeq() :
+	      isIterator(value) ? new IteratorSeq(value).fromEntrySeq() :
+	      hasIterator(value) ? new IterableSeq(value).fromEntrySeq() :
+	      typeof value === 'object' ? new ObjectSeq(value) :
+	      undefined;
+	    if (!seq) {
+	      throw new TypeError(
+	        'Expected Array or iterable object of [k, v] entries, '+
+	        'or keyed object: ' + value
+	      );
+	    }
+	    return seq;
+	  }
+	
+	  function indexedSeqFromValue(value) {
+	    var seq = maybeIndexedSeqFromValue(value);
+	    if (!seq) {
+	      throw new TypeError(
+	        'Expected Array or iterable object of values: ' + value
+	      );
+	    }
+	    return seq;
+	  }
+	
+	  function seqFromValue(value) {
+	    var seq = maybeIndexedSeqFromValue(value) ||
+	      (typeof value === 'object' && new ObjectSeq(value));
+	    if (!seq) {
+	      throw new TypeError(
+	        'Expected Array or iterable object of values, or keyed object: ' + value
+	      );
+	    }
+	    return seq;
+	  }
+	
+	  function maybeIndexedSeqFromValue(value) {
+	    return (
+	      isArrayLike(value) ? new ArraySeq(value) :
+	      isIterator(value) ? new IteratorSeq(value) :
+	      hasIterator(value) ? new IterableSeq(value) :
+	      undefined
+	    );
+	  }
+	
+	  function seqIterate(seq, fn, reverse, useKeys) {
+	    var cache = seq._cache;
+	    if (cache) {
+	      var maxIndex = cache.length - 1;
+	      for (var ii = 0; ii <= maxIndex; ii++) {
+	        var entry = cache[reverse ? maxIndex - ii : ii];
+	        if (fn(entry[1], useKeys ? entry[0] : ii, seq) === false) {
+	          return ii + 1;
+	        }
+	      }
+	      return ii;
+	    }
+	    return seq.__iterateUncached(fn, reverse);
+	  }
+	
+	  function seqIterator(seq, type, reverse, useKeys) {
+	    var cache = seq._cache;
+	    if (cache) {
+	      var maxIndex = cache.length - 1;
+	      var ii = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var entry = cache[reverse ? maxIndex - ii : ii];
+	        return ii++ > maxIndex ?
+	          iteratorDone() :
+	          iteratorValue(type, useKeys ? entry[0] : ii - 1, entry[1]);
+	      });
+	    }
+	    return seq.__iteratorUncached(type, reverse);
+	  }
+	
+	  createClass(Collection, Iterable);
+	    function Collection() {
+	      throw TypeError('Abstract');
+	    }
+	
+	
+	  createClass(KeyedCollection, Collection);function KeyedCollection() {}
+	
+	  createClass(IndexedCollection, Collection);function IndexedCollection() {}
+	
+	  createClass(SetCollection, Collection);function SetCollection() {}
+	
+	
+	  Collection.Keyed = KeyedCollection;
+	  Collection.Indexed = IndexedCollection;
+	  Collection.Set = SetCollection;
+	
+	  /**
+	   * An extension of the "same-value" algorithm as [described for use by ES6 Map
+	   * and Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Key_equality)
+	   *
+	   * NaN is considered the same as NaN, however -0 and 0 are considered the same
+	   * value, which is different from the algorithm described by
+	   * [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is).
+	   *
+	   * This is extended further to allow Objects to describe the values they
+	   * represent, by way of `valueOf` or `equals` (and `hashCode`).
+	   *
+	   * Note: because of this extension, the key equality of Immutable.Map and the
+	   * value equality of Immutable.Set will differ from ES6 Map and Set.
+	   *
+	   * ### Defining custom values
+	   *
+	   * The easiest way to describe the value an object represents is by implementing
+	   * `valueOf`. For example, `Date` represents a value by returning a unix
+	   * timestamp for `valueOf`:
+	   *
+	   *     var date1 = new Date(1234567890000); // Fri Feb 13 2009 ...
+	   *     var date2 = new Date(1234567890000);
+	   *     date1.valueOf(); // 1234567890000
+	   *     assert( date1 !== date2 );
+	   *     assert( Immutable.is( date1, date2 ) );
+	   *
+	   * Note: overriding `valueOf` may have other implications if you use this object
+	   * where JavaScript expects a primitive, such as implicit string coercion.
+	   *
+	   * For more complex types, especially collections, implementing `valueOf` may
+	   * not be performant. An alternative is to implement `equals` and `hashCode`.
+	   *
+	   * `equals` takes another object, presumably of similar type, and returns true
+	   * if the it is equal. Equality is symmetrical, so the same result should be
+	   * returned if this and the argument are flipped.
+	   *
+	   *     assert( a.equals(b) === b.equals(a) );
+	   *
+	   * `hashCode` returns a 32bit integer number representing the object which will
+	   * be used to determine how to store the value object in a Map or Set. You must
+	   * provide both or neither methods, one must not exist without the other.
+	   *
+	   * Also, an important relationship between these methods must be upheld: if two
+	   * values are equal, they *must* return the same hashCode. If the values are not
+	   * equal, they might have the same hashCode; this is called a hash collision,
+	   * and while undesirable for performance reasons, it is acceptable.
+	   *
+	   *     if (a.equals(b)) {
+	   *       assert( a.hashCode() === b.hashCode() );
+	   *     }
+	   *
+	   * All Immutable collections implement `equals` and `hashCode`.
+	   *
+	   */
+	  function is(valueA, valueB) {
+	    if (valueA === valueB || (valueA !== valueA && valueB !== valueB)) {
+	      return true;
+	    }
+	    if (!valueA || !valueB) {
+	      return false;
+	    }
+	    if (typeof valueA.valueOf === 'function' &&
+	        typeof valueB.valueOf === 'function') {
+	      valueA = valueA.valueOf();
+	      valueB = valueB.valueOf();
+	      if (valueA === valueB || (valueA !== valueA && valueB !== valueB)) {
+	        return true;
+	      }
+	      if (!valueA || !valueB) {
+	        return false;
+	      }
+	    }
+	    if (typeof valueA.equals === 'function' &&
+	        typeof valueB.equals === 'function' &&
+	        valueA.equals(valueB)) {
+	      return true;
+	    }
+	    return false;
+	  }
+	
+	  function fromJS(json, converter) {
+	    return converter ?
+	      fromJSWith(converter, json, '', {'': json}) :
+	      fromJSDefault(json);
+	  }
+	
+	  function fromJSWith(converter, json, key, parentJSON) {
+	    if (Array.isArray(json)) {
+	      return converter.call(parentJSON, key, IndexedSeq(json).map(function(v, k)  {return fromJSWith(converter, v, k, json)}));
+	    }
+	    if (isPlainObj(json)) {
+	      return converter.call(parentJSON, key, KeyedSeq(json).map(function(v, k)  {return fromJSWith(converter, v, k, json)}));
+	    }
+	    return json;
+	  }
+	
+	  function fromJSDefault(json) {
+	    if (Array.isArray(json)) {
+	      return IndexedSeq(json).map(fromJSDefault).toList();
+	    }
+	    if (isPlainObj(json)) {
+	      return KeyedSeq(json).map(fromJSDefault).toMap();
+	    }
+	    return json;
+	  }
+	
+	  function isPlainObj(value) {
+	    return value && (value.constructor === Object || value.constructor === undefined);
+	  }
+	
+	  var src_Math__imul =
+	    typeof Math.imul === 'function' && Math.imul(0xffffffff, 2) === -2 ?
+	    Math.imul :
+	    function src_Math__imul(a, b) {
+	      a = a | 0; // int
+	      b = b | 0; // int
+	      var c = a & 0xffff;
+	      var d = b & 0xffff;
+	      // Shift by 0 fixes the sign on the high part.
+	      return (c * d) + ((((a >>> 16) * d + c * (b >>> 16)) << 16) >>> 0) | 0; // int
+	    };
+	
+	  // v8 has an optimization for storing 31-bit signed numbers.
+	  // Values which have either 00 or 11 as the high order bits qualify.
+	  // This function drops the highest order bit in a signed number, maintaining
+	  // the sign bit.
+	  function smi(i32) {
+	    return ((i32 >>> 1) & 0x40000000) | (i32 & 0xBFFFFFFF);
+	  }
+	
+	  function hash(o) {
+	    if (o === false || o === null || o === undefined) {
+	      return 0;
+	    }
+	    if (typeof o.valueOf === 'function') {
+	      o = o.valueOf();
+	      if (o === false || o === null || o === undefined) {
+	        return 0;
+	      }
+	    }
+	    if (o === true) {
+	      return 1;
+	    }
+	    var type = typeof o;
+	    if (type === 'number') {
+	      var h = o | 0;
+	      if (h !== o) {
+	        h ^= o * 0xFFFFFFFF;
+	      }
+	      while (o > 0xFFFFFFFF) {
+	        o /= 0xFFFFFFFF;
+	        h ^= o;
+	      }
+	      return smi(h);
+	    }
+	    if (type === 'string') {
+	      return o.length > STRING_HASH_CACHE_MIN_STRLEN ? cachedHashString(o) : hashString(o);
+	    }
+	    if (typeof o.hashCode === 'function') {
+	      return o.hashCode();
+	    }
+	    return hashJSObj(o);
+	  }
+	
+	  function cachedHashString(string) {
+	    var hash = stringHashCache[string];
+	    if (hash === undefined) {
+	      hash = hashString(string);
+	      if (STRING_HASH_CACHE_SIZE === STRING_HASH_CACHE_MAX_SIZE) {
+	        STRING_HASH_CACHE_SIZE = 0;
+	        stringHashCache = {};
+	      }
+	      STRING_HASH_CACHE_SIZE++;
+	      stringHashCache[string] = hash;
+	    }
+	    return hash;
+	  }
+	
+	  // http://jsperf.com/hashing-strings
+	  function hashString(string) {
+	    // This is the hash from JVM
+	    // The hash code for a string is computed as
+	    // s[0] * 31 ^ (n - 1) + s[1] * 31 ^ (n - 2) + ... + s[n - 1],
+	    // where s[i] is the ith character of the string and n is the length of
+	    // the string. We "mod" the result to make it between 0 (inclusive) and 2^31
+	    // (exclusive) by dropping high bits.
+	    var hash = 0;
+	    for (var ii = 0; ii < string.length; ii++) {
+	      hash = 31 * hash + string.charCodeAt(ii) | 0;
+	    }
+	    return smi(hash);
+	  }
+	
+	  function hashJSObj(obj) {
+	    var hash;
+	    if (usingWeakMap) {
+	      hash = weakMap.get(obj);
+	      if (hash !== undefined) {
+	        return hash;
+	      }
+	    }
+	
+	    hash = obj[UID_HASH_KEY];
+	    if (hash !== undefined) {
+	      return hash;
+	    }
+	
+	    if (!canDefineProperty) {
+	      hash = obj.propertyIsEnumerable && obj.propertyIsEnumerable[UID_HASH_KEY];
+	      if (hash !== undefined) {
+	        return hash;
+	      }
+	
+	      hash = getIENodeHash(obj);
+	      if (hash !== undefined) {
+	        return hash;
+	      }
+	    }
+	
+	    hash = ++objHashUID;
+	    if (objHashUID & 0x40000000) {
+	      objHashUID = 0;
+	    }
+	
+	    if (usingWeakMap) {
+	      weakMap.set(obj, hash);
+	    } else if (isExtensible !== undefined && isExtensible(obj) === false) {
+	      throw new Error('Non-extensible objects are not allowed as keys.');
+	    } else if (canDefineProperty) {
+	      Object.defineProperty(obj, UID_HASH_KEY, {
+	        'enumerable': false,
+	        'configurable': false,
+	        'writable': false,
+	        'value': hash
+	      });
+	    } else if (obj.propertyIsEnumerable !== undefined &&
+	               obj.propertyIsEnumerable === obj.constructor.prototype.propertyIsEnumerable) {
+	      // Since we can't define a non-enumerable property on the object
+	      // we'll hijack one of the less-used non-enumerable properties to
+	      // save our hash on it. Since this is a function it will not show up in
+	      // `JSON.stringify` which is what we want.
+	      obj.propertyIsEnumerable = function() {
+	        return this.constructor.prototype.propertyIsEnumerable.apply(this, arguments);
+	      };
+	      obj.propertyIsEnumerable[UID_HASH_KEY] = hash;
+	    } else if (obj.nodeType !== undefined) {
+	      // At this point we couldn't get the IE `uniqueID` to use as a hash
+	      // and we couldn't use a non-enumerable property to exploit the
+	      // dontEnum bug so we simply add the `UID_HASH_KEY` on the node
+	      // itself.
+	      obj[UID_HASH_KEY] = hash;
+	    } else {
+	      throw new Error('Unable to set a non-enumerable property on object.');
+	    }
+	
+	    return hash;
+	  }
+	
+	  // Get references to ES5 object methods.
+	  var isExtensible = Object.isExtensible;
+	
+	  // True if Object.defineProperty works as expected. IE8 fails this test.
+	  var canDefineProperty = (function() {
+	    try {
+	      Object.defineProperty({}, '@', {});
+	      return true;
+	    } catch (e) {
+	      return false;
+	    }
+	  }());
+	
+	  // IE has a `uniqueID` property on DOM nodes. We can construct the hash from it
+	  // and avoid memory leaks from the IE cloneNode bug.
+	  function getIENodeHash(node) {
+	    if (node && node.nodeType > 0) {
+	      switch (node.nodeType) {
+	        case 1: // Element
+	          return node.uniqueID;
+	        case 9: // Document
+	          return node.documentElement && node.documentElement.uniqueID;
+	      }
+	    }
+	  }
+	
+	  // If possible, use a WeakMap.
+	  var usingWeakMap = typeof WeakMap === 'function';
+	  var weakMap;
+	  if (usingWeakMap) {
+	    weakMap = new WeakMap();
+	  }
+	
+	  var objHashUID = 0;
+	
+	  var UID_HASH_KEY = '__immutablehash__';
+	  if (typeof Symbol === 'function') {
+	    UID_HASH_KEY = Symbol(UID_HASH_KEY);
+	  }
+	
+	  var STRING_HASH_CACHE_MIN_STRLEN = 16;
+	  var STRING_HASH_CACHE_MAX_SIZE = 255;
+	  var STRING_HASH_CACHE_SIZE = 0;
+	  var stringHashCache = {};
+	
+	  function invariant(condition, error) {
+	    if (!condition) throw new Error(error);
+	  }
+	
+	  function assertNotInfinite(size) {
+	    invariant(
+	      size !== Infinity,
+	      'Cannot perform this action with an infinite size.'
+	    );
+	  }
+	
+	  createClass(ToKeyedSequence, KeyedSeq);
+	    function ToKeyedSequence(indexed, useKeys) {
+	      this._iter = indexed;
+	      this._useKeys = useKeys;
+	      this.size = indexed.size;
+	    }
+	
+	    ToKeyedSequence.prototype.get = function(key, notSetValue) {
+	      return this._iter.get(key, notSetValue);
+	    };
+	
+	    ToKeyedSequence.prototype.has = function(key) {
+	      return this._iter.has(key);
+	    };
+	
+	    ToKeyedSequence.prototype.valueSeq = function() {
+	      return this._iter.valueSeq();
+	    };
+	
+	    ToKeyedSequence.prototype.reverse = function() {var this$0 = this;
+	      var reversedSequence = reverseFactory(this, true);
+	      if (!this._useKeys) {
+	        reversedSequence.valueSeq = function()  {return this$0._iter.toSeq().reverse()};
+	      }
+	      return reversedSequence;
+	    };
+	
+	    ToKeyedSequence.prototype.map = function(mapper, context) {var this$0 = this;
+	      var mappedSequence = mapFactory(this, mapper, context);
+	      if (!this._useKeys) {
+	        mappedSequence.valueSeq = function()  {return this$0._iter.toSeq().map(mapper, context)};
+	      }
+	      return mappedSequence;
+	    };
+	
+	    ToKeyedSequence.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      var ii;
+	      return this._iter.__iterate(
+	        this._useKeys ?
+	          function(v, k)  {return fn(v, k, this$0)} :
+	          ((ii = reverse ? resolveSize(this) : 0),
+	            function(v ) {return fn(v, reverse ? --ii : ii++, this$0)}),
+	        reverse
+	      );
+	    };
+	
+	    ToKeyedSequence.prototype.__iterator = function(type, reverse) {
+	      if (this._useKeys) {
+	        return this._iter.__iterator(type, reverse);
+	      }
+	      var iterator = this._iter.__iterator(ITERATE_VALUES, reverse);
+	      var ii = reverse ? resolveSize(this) : 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var step = iterator.next();
+	        return step.done ? step :
+	          iteratorValue(type, reverse ? --ii : ii++, step.value, step);
+	      });
+	    };
+	
+	  ToKeyedSequence.prototype[IS_ORDERED_SENTINEL] = true;
+	
+	
+	  createClass(ToIndexedSequence, IndexedSeq);
+	    function ToIndexedSequence(iter) {
+	      this._iter = iter;
+	      this.size = iter.size;
+	    }
+	
+	    ToIndexedSequence.prototype.includes = function(value) {
+	      return this._iter.includes(value);
+	    };
+	
+	    ToIndexedSequence.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      var iterations = 0;
+	      return this._iter.__iterate(function(v ) {return fn(v, iterations++, this$0)}, reverse);
+	    };
+	
+	    ToIndexedSequence.prototype.__iterator = function(type, reverse) {
+	      var iterator = this._iter.__iterator(ITERATE_VALUES, reverse);
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var step = iterator.next();
+	        return step.done ? step :
+	          iteratorValue(type, iterations++, step.value, step)
+	      });
+	    };
+	
+	
+	
+	  createClass(ToSetSequence, SetSeq);
+	    function ToSetSequence(iter) {
+	      this._iter = iter;
+	      this.size = iter.size;
+	    }
+	
+	    ToSetSequence.prototype.has = function(key) {
+	      return this._iter.includes(key);
+	    };
+	
+	    ToSetSequence.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      return this._iter.__iterate(function(v ) {return fn(v, v, this$0)}, reverse);
+	    };
+	
+	    ToSetSequence.prototype.__iterator = function(type, reverse) {
+	      var iterator = this._iter.__iterator(ITERATE_VALUES, reverse);
+	      return new src_Iterator__Iterator(function()  {
+	        var step = iterator.next();
+	        return step.done ? step :
+	          iteratorValue(type, step.value, step.value, step);
+	      });
+	    };
+	
+	
+	
+	  createClass(FromEntriesSequence, KeyedSeq);
+	    function FromEntriesSequence(entries) {
+	      this._iter = entries;
+	      this.size = entries.size;
+	    }
+	
+	    FromEntriesSequence.prototype.entrySeq = function() {
+	      return this._iter.toSeq();
+	    };
+	
+	    FromEntriesSequence.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      return this._iter.__iterate(function(entry ) {
+	        // Check if entry exists first so array access doesn't throw for holes
+	        // in the parent iteration.
+	        if (entry) {
+	          validateEntry(entry);
+	          var indexedIterable = isIterable(entry);
+	          return fn(
+	            indexedIterable ? entry.get(1) : entry[1],
+	            indexedIterable ? entry.get(0) : entry[0],
+	            this$0
+	          );
+	        }
+	      }, reverse);
+	    };
+	
+	    FromEntriesSequence.prototype.__iterator = function(type, reverse) {
+	      var iterator = this._iter.__iterator(ITERATE_VALUES, reverse);
+	      return new src_Iterator__Iterator(function()  {
+	        while (true) {
+	          var step = iterator.next();
+	          if (step.done) {
+	            return step;
+	          }
+	          var entry = step.value;
+	          // Check if entry exists first so array access doesn't throw for holes
+	          // in the parent iteration.
+	          if (entry) {
+	            validateEntry(entry);
+	            var indexedIterable = isIterable(entry);
+	            return iteratorValue(
+	              type,
+	              indexedIterable ? entry.get(0) : entry[0],
+	              indexedIterable ? entry.get(1) : entry[1],
+	              step
+	            );
+	          }
+	        }
+	      });
+	    };
+	
+	
+	  ToIndexedSequence.prototype.cacheResult =
+	  ToKeyedSequence.prototype.cacheResult =
+	  ToSetSequence.prototype.cacheResult =
+	  FromEntriesSequence.prototype.cacheResult =
+	    cacheResultThrough;
+	
+	
+	  function flipFactory(iterable) {
+	    var flipSequence = makeSequence(iterable);
+	    flipSequence._iter = iterable;
+	    flipSequence.size = iterable.size;
+	    flipSequence.flip = function()  {return iterable};
+	    flipSequence.reverse = function () {
+	      var reversedSequence = iterable.reverse.apply(this); // super.reverse()
+	      reversedSequence.flip = function()  {return iterable.reverse()};
+	      return reversedSequence;
+	    };
+	    flipSequence.has = function(key ) {return iterable.includes(key)};
+	    flipSequence.includes = function(key ) {return iterable.has(key)};
+	    flipSequence.cacheResult = cacheResultThrough;
+	    flipSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;
+	      return iterable.__iterate(function(v, k)  {return fn(k, v, this$0) !== false}, reverse);
+	    }
+	    flipSequence.__iteratorUncached = function(type, reverse) {
+	      if (type === ITERATE_ENTRIES) {
+	        var iterator = iterable.__iterator(type, reverse);
+	        return new src_Iterator__Iterator(function()  {
+	          var step = iterator.next();
+	          if (!step.done) {
+	            var k = step.value[0];
+	            step.value[0] = step.value[1];
+	            step.value[1] = k;
+	          }
+	          return step;
+	        });
+	      }
+	      return iterable.__iterator(
+	        type === ITERATE_VALUES ? ITERATE_KEYS : ITERATE_VALUES,
+	        reverse
+	      );
+	    }
+	    return flipSequence;
+	  }
+	
+	
+	  function mapFactory(iterable, mapper, context) {
+	    var mappedSequence = makeSequence(iterable);
+	    mappedSequence.size = iterable.size;
+	    mappedSequence.has = function(key ) {return iterable.has(key)};
+	    mappedSequence.get = function(key, notSetValue)  {
+	      var v = iterable.get(key, NOT_SET);
+	      return v === NOT_SET ?
+	        notSetValue :
+	        mapper.call(context, v, key, iterable);
+	    };
+	    mappedSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;
+	      return iterable.__iterate(
+	        function(v, k, c)  {return fn(mapper.call(context, v, k, c), k, this$0) !== false},
+	        reverse
+	      );
+	    }
+	    mappedSequence.__iteratorUncached = function (type, reverse) {
+	      var iterator = iterable.__iterator(ITERATE_ENTRIES, reverse);
+	      return new src_Iterator__Iterator(function()  {
+	        var step = iterator.next();
+	        if (step.done) {
+	          return step;
+	        }
+	        var entry = step.value;
+	        var key = entry[0];
+	        return iteratorValue(
+	          type,
+	          key,
+	          mapper.call(context, entry[1], key, iterable),
+	          step
+	        );
+	      });
+	    }
+	    return mappedSequence;
+	  }
+	
+	
+	  function reverseFactory(iterable, useKeys) {
+	    var reversedSequence = makeSequence(iterable);
+	    reversedSequence._iter = iterable;
+	    reversedSequence.size = iterable.size;
+	    reversedSequence.reverse = function()  {return iterable};
+	    if (iterable.flip) {
+	      reversedSequence.flip = function () {
+	        var flipSequence = flipFactory(iterable);
+	        flipSequence.reverse = function()  {return iterable.flip()};
+	        return flipSequence;
+	      };
+	    }
+	    reversedSequence.get = function(key, notSetValue) 
+	      {return iterable.get(useKeys ? key : -1 - key, notSetValue)};
+	    reversedSequence.has = function(key )
+	      {return iterable.has(useKeys ? key : -1 - key)};
+	    reversedSequence.includes = function(value ) {return iterable.includes(value)};
+	    reversedSequence.cacheResult = cacheResultThrough;
+	    reversedSequence.__iterate = function (fn, reverse) {var this$0 = this;
+	      return iterable.__iterate(function(v, k)  {return fn(v, k, this$0)}, !reverse);
+	    };
+	    reversedSequence.__iterator =
+	      function(type, reverse)  {return iterable.__iterator(type, !reverse)};
+	    return reversedSequence;
+	  }
+	
+	
+	  function filterFactory(iterable, predicate, context, useKeys) {
+	    var filterSequence = makeSequence(iterable);
+	    if (useKeys) {
+	      filterSequence.has = function(key ) {
+	        var v = iterable.get(key, NOT_SET);
+	        return v !== NOT_SET && !!predicate.call(context, v, key, iterable);
+	      };
+	      filterSequence.get = function(key, notSetValue)  {
+	        var v = iterable.get(key, NOT_SET);
+	        return v !== NOT_SET && predicate.call(context, v, key, iterable) ?
+	          v : notSetValue;
+	      };
+	    }
+	    filterSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;
+	      var iterations = 0;
+	      iterable.__iterate(function(v, k, c)  {
+	        if (predicate.call(context, v, k, c)) {
+	          iterations++;
+	          return fn(v, useKeys ? k : iterations - 1, this$0);
+	        }
+	      }, reverse);
+	      return iterations;
+	    };
+	    filterSequence.__iteratorUncached = function (type, reverse) {
+	      var iterator = iterable.__iterator(ITERATE_ENTRIES, reverse);
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        while (true) {
+	          var step = iterator.next();
+	          if (step.done) {
+	            return step;
+	          }
+	          var entry = step.value;
+	          var key = entry[0];
+	          var value = entry[1];
+	          if (predicate.call(context, value, key, iterable)) {
+	            return iteratorValue(type, useKeys ? key : iterations++, value, step);
+	          }
+	        }
+	      });
+	    }
+	    return filterSequence;
+	  }
+	
+	
+	  function countByFactory(iterable, grouper, context) {
+	    var groups = src_Map__Map().asMutable();
+	    iterable.__iterate(function(v, k)  {
+	      groups.update(
+	        grouper.call(context, v, k, iterable),
+	        0,
+	        function(a ) {return a + 1}
+	      );
+	    });
+	    return groups.asImmutable();
+	  }
+	
+	
+	  function groupByFactory(iterable, grouper, context) {
+	    var isKeyedIter = isKeyed(iterable);
+	    var groups = (isOrdered(iterable) ? OrderedMap() : src_Map__Map()).asMutable();
+	    iterable.__iterate(function(v, k)  {
+	      groups.update(
+	        grouper.call(context, v, k, iterable),
+	        function(a ) {return (a = a || [], a.push(isKeyedIter ? [k, v] : v), a)}
+	      );
+	    });
+	    var coerce = iterableClass(iterable);
+	    return groups.map(function(arr ) {return reify(iterable, coerce(arr))});
+	  }
+	
+	
+	  function sliceFactory(iterable, begin, end, useKeys) {
+	    var originalSize = iterable.size;
+	
+	    if (wholeSlice(begin, end, originalSize)) {
+	      return iterable;
+	    }
+	
+	    var resolvedBegin = resolveBegin(begin, originalSize);
+	    var resolvedEnd = resolveEnd(end, originalSize);
+	
+	    // begin or end will be NaN if they were provided as negative numbers and
+	    // this iterable's size is unknown. In that case, cache first so there is
+	    // a known size and these do not resolve to NaN.
+	    if (resolvedBegin !== resolvedBegin || resolvedEnd !== resolvedEnd) {
+	      return sliceFactory(iterable.toSeq().cacheResult(), begin, end, useKeys);
+	    }
+	
+	    // Note: resolvedEnd is undefined when the original sequence's length is
+	    // unknown and this slice did not supply an end and should contain all
+	    // elements after resolvedBegin.
+	    // In that case, resolvedSize will be NaN and sliceSize will remain undefined.
+	    var resolvedSize = resolvedEnd - resolvedBegin;
+	    var sliceSize;
+	    if (resolvedSize === resolvedSize) {
+	      sliceSize = resolvedSize < 0 ? 0 : resolvedSize;
+	    }
+	
+	    var sliceSeq = makeSequence(iterable);
+	
+	    sliceSeq.size = sliceSize;
+	
+	    if (!useKeys && isSeq(iterable) && sliceSize >= 0) {
+	      sliceSeq.get = function (index, notSetValue) {
+	        index = wrapIndex(this, index);
+	        return index >= 0 && index < sliceSize ?
+	          iterable.get(index + resolvedBegin, notSetValue) :
+	          notSetValue;
+	      }
+	    }
+	
+	    sliceSeq.__iterateUncached = function(fn, reverse) {var this$0 = this;
+	      if (sliceSize === 0) {
+	        return 0;
+	      }
+	      if (reverse) {
+	        return this.cacheResult().__iterate(fn, reverse);
+	      }
+	      var skipped = 0;
+	      var isSkipping = true;
+	      var iterations = 0;
+	      iterable.__iterate(function(v, k)  {
+	        if (!(isSkipping && (isSkipping = skipped++ < resolvedBegin))) {
+	          iterations++;
+	          return fn(v, useKeys ? k : iterations - 1, this$0) !== false &&
+	                 iterations !== sliceSize;
+	        }
+	      });
+	      return iterations;
+	    };
+	
+	    sliceSeq.__iteratorUncached = function(type, reverse) {
+	      if (sliceSize !== 0 && reverse) {
+	        return this.cacheResult().__iterator(type, reverse);
+	      }
+	      // Don't bother instantiating parent iterator if taking 0.
+	      var iterator = sliceSize !== 0 && iterable.__iterator(type, reverse);
+	      var skipped = 0;
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        while (skipped++ < resolvedBegin) {
+	          iterator.next();
+	        }
+	        if (++iterations > sliceSize) {
+	          return iteratorDone();
+	        }
+	        var step = iterator.next();
+	        if (useKeys || type === ITERATE_VALUES) {
+	          return step;
+	        } else if (type === ITERATE_KEYS) {
+	          return iteratorValue(type, iterations - 1, undefined, step);
+	        } else {
+	          return iteratorValue(type, iterations - 1, step.value[1], step);
+	        }
+	      });
+	    }
+	
+	    return sliceSeq;
+	  }
+	
+	
+	  function takeWhileFactory(iterable, predicate, context) {
+	    var takeSequence = makeSequence(iterable);
+	    takeSequence.__iterateUncached = function(fn, reverse) {var this$0 = this;
+	      if (reverse) {
+	        return this.cacheResult().__iterate(fn, reverse);
+	      }
+	      var iterations = 0;
+	      iterable.__iterate(function(v, k, c) 
+	        {return predicate.call(context, v, k, c) && ++iterations && fn(v, k, this$0)}
+	      );
+	      return iterations;
+	    };
+	    takeSequence.__iteratorUncached = function(type, reverse) {var this$0 = this;
+	      if (reverse) {
+	        return this.cacheResult().__iterator(type, reverse);
+	      }
+	      var iterator = iterable.__iterator(ITERATE_ENTRIES, reverse);
+	      var iterating = true;
+	      return new src_Iterator__Iterator(function()  {
+	        if (!iterating) {
+	          return iteratorDone();
+	        }
+	        var step = iterator.next();
+	        if (step.done) {
+	          return step;
+	        }
+	        var entry = step.value;
+	        var k = entry[0];
+	        var v = entry[1];
+	        if (!predicate.call(context, v, k, this$0)) {
+	          iterating = false;
+	          return iteratorDone();
+	        }
+	        return type === ITERATE_ENTRIES ? step :
+	          iteratorValue(type, k, v, step);
+	      });
+	    };
+	    return takeSequence;
+	  }
+	
+	
+	  function skipWhileFactory(iterable, predicate, context, useKeys) {
+	    var skipSequence = makeSequence(iterable);
+	    skipSequence.__iterateUncached = function (fn, reverse) {var this$0 = this;
+	      if (reverse) {
+	        return this.cacheResult().__iterate(fn, reverse);
+	      }
+	      var isSkipping = true;
+	      var iterations = 0;
+	      iterable.__iterate(function(v, k, c)  {
+	        if (!(isSkipping && (isSkipping = predicate.call(context, v, k, c)))) {
+	          iterations++;
+	          return fn(v, useKeys ? k : iterations - 1, this$0);
+	        }
+	      });
+	      return iterations;
+	    };
+	    skipSequence.__iteratorUncached = function(type, reverse) {var this$0 = this;
+	      if (reverse) {
+	        return this.cacheResult().__iterator(type, reverse);
+	      }
+	      var iterator = iterable.__iterator(ITERATE_ENTRIES, reverse);
+	      var skipping = true;
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var step, k, v;
+	        do {
+	          step = iterator.next();
+	          if (step.done) {
+	            if (useKeys || type === ITERATE_VALUES) {
+	              return step;
+	            } else if (type === ITERATE_KEYS) {
+	              return iteratorValue(type, iterations++, undefined, step);
+	            } else {
+	              return iteratorValue(type, iterations++, step.value[1], step);
+	            }
+	          }
+	          var entry = step.value;
+	          k = entry[0];
+	          v = entry[1];
+	          skipping && (skipping = predicate.call(context, v, k, this$0));
+	        } while (skipping);
+	        return type === ITERATE_ENTRIES ? step :
+	          iteratorValue(type, k, v, step);
+	      });
+	    };
+	    return skipSequence;
+	  }
+	
+	
+	  function concatFactory(iterable, values) {
+	    var isKeyedIterable = isKeyed(iterable);
+	    var iters = [iterable].concat(values).map(function(v ) {
+	      if (!isIterable(v)) {
+	        v = isKeyedIterable ?
+	          keyedSeqFromValue(v) :
+	          indexedSeqFromValue(Array.isArray(v) ? v : [v]);
+	      } else if (isKeyedIterable) {
+	        v = KeyedIterable(v);
+	      }
+	      return v;
+	    }).filter(function(v ) {return v.size !== 0});
+	
+	    if (iters.length === 0) {
+	      return iterable;
+	    }
+	
+	    if (iters.length === 1) {
+	      var singleton = iters[0];
+	      if (singleton === iterable ||
+	          isKeyedIterable && isKeyed(singleton) ||
+	          isIndexed(iterable) && isIndexed(singleton)) {
+	        return singleton;
+	      }
+	    }
+	
+	    var concatSeq = new ArraySeq(iters);
+	    if (isKeyedIterable) {
+	      concatSeq = concatSeq.toKeyedSeq();
+	    } else if (!isIndexed(iterable)) {
+	      concatSeq = concatSeq.toSetSeq();
+	    }
+	    concatSeq = concatSeq.flatten(true);
+	    concatSeq.size = iters.reduce(
+	      function(sum, seq)  {
+	        if (sum !== undefined) {
+	          var size = seq.size;
+	          if (size !== undefined) {
+	            return sum + size;
+	          }
+	        }
+	      },
+	      0
+	    );
+	    return concatSeq;
+	  }
+	
+	
+	  function flattenFactory(iterable, depth, useKeys) {
+	    var flatSequence = makeSequence(iterable);
+	    flatSequence.__iterateUncached = function(fn, reverse) {
+	      var iterations = 0;
+	      var stopped = false;
+	      function flatDeep(iter, currentDepth) {var this$0 = this;
+	        iter.__iterate(function(v, k)  {
+	          if ((!depth || currentDepth < depth) && isIterable(v)) {
+	            flatDeep(v, currentDepth + 1);
+	          } else if (fn(v, useKeys ? k : iterations++, this$0) === false) {
+	            stopped = true;
+	          }
+	          return !stopped;
+	        }, reverse);
+	      }
+	      flatDeep(iterable, 0);
+	      return iterations;
+	    }
+	    flatSequence.__iteratorUncached = function(type, reverse) {
+	      var iterator = iterable.__iterator(type, reverse);
+	      var stack = [];
+	      var iterations = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        while (iterator) {
+	          var step = iterator.next();
+	          if (step.done !== false) {
+	            iterator = stack.pop();
+	            continue;
+	          }
+	          var v = step.value;
+	          if (type === ITERATE_ENTRIES) {
+	            v = v[1];
+	          }
+	          if ((!depth || stack.length < depth) && isIterable(v)) {
+	            stack.push(iterator);
+	            iterator = v.__iterator(type, reverse);
+	          } else {
+	            return useKeys ? step : iteratorValue(type, iterations++, v, step);
+	          }
+	        }
+	        return iteratorDone();
+	      });
+	    }
+	    return flatSequence;
+	  }
+	
+	
+	  function flatMapFactory(iterable, mapper, context) {
+	    var coerce = iterableClass(iterable);
+	    return iterable.toSeq().map(
+	      function(v, k)  {return coerce(mapper.call(context, v, k, iterable))}
+	    ).flatten(true);
+	  }
+	
+	
+	  function interposeFactory(iterable, separator) {
+	    var interposedSequence = makeSequence(iterable);
+	    interposedSequence.size = iterable.size && iterable.size * 2 -1;
+	    interposedSequence.__iterateUncached = function(fn, reverse) {var this$0 = this;
+	      var iterations = 0;
+	      iterable.__iterate(function(v, k) 
+	        {return (!iterations || fn(separator, iterations++, this$0) !== false) &&
+	        fn(v, iterations++, this$0) !== false},
+	        reverse
+	      );
+	      return iterations;
+	    };
+	    interposedSequence.__iteratorUncached = function(type, reverse) {
+	      var iterator = iterable.__iterator(ITERATE_VALUES, reverse);
+	      var iterations = 0;
+	      var step;
+	      return new src_Iterator__Iterator(function()  {
+	        if (!step || iterations % 2) {
+	          step = iterator.next();
+	          if (step.done) {
+	            return step;
+	          }
+	        }
+	        return iterations % 2 ?
+	          iteratorValue(type, iterations++, separator) :
+	          iteratorValue(type, iterations++, step.value, step);
+	      });
+	    };
+	    return interposedSequence;
+	  }
+	
+	
+	  function sortFactory(iterable, comparator, mapper) {
+	    if (!comparator) {
+	      comparator = defaultComparator;
+	    }
+	    var isKeyedIterable = isKeyed(iterable);
+	    var index = 0;
+	    var entries = iterable.toSeq().map(
+	      function(v, k)  {return [k, v, index++, mapper ? mapper(v, k, iterable) : v]}
+	    ).toArray();
+	    entries.sort(function(a, b)  {return comparator(a[3], b[3]) || a[2] - b[2]}).forEach(
+	      isKeyedIterable ?
+	      function(v, i)  { entries[i].length = 2; } :
+	      function(v, i)  { entries[i] = v[1]; }
+	    );
+	    return isKeyedIterable ? KeyedSeq(entries) :
+	      isIndexed(iterable) ? IndexedSeq(entries) :
+	      SetSeq(entries);
+	  }
+	
+	
+	  function maxFactory(iterable, comparator, mapper) {
+	    if (!comparator) {
+	      comparator = defaultComparator;
+	    }
+	    if (mapper) {
+	      var entry = iterable.toSeq()
+	        .map(function(v, k)  {return [v, mapper(v, k, iterable)]})
+	        .reduce(function(a, b)  {return maxCompare(comparator, a[1], b[1]) ? b : a});
+	      return entry && entry[0];
+	    } else {
+	      return iterable.reduce(function(a, b)  {return maxCompare(comparator, a, b) ? b : a});
+	    }
+	  }
+	
+	  function maxCompare(comparator, a, b) {
+	    var comp = comparator(b, a);
+	    // b is considered the new max if the comparator declares them equal, but
+	    // they are not equal and b is in fact a nullish value.
+	    return (comp === 0 && b !== a && (b === undefined || b === null || b !== b)) || comp > 0;
+	  }
+	
+	
+	  function zipWithFactory(keyIter, zipper, iters) {
+	    var zipSequence = makeSequence(keyIter);
+	    zipSequence.size = new ArraySeq(iters).map(function(i ) {return i.size}).min();
+	    // Note: this a generic base implementation of __iterate in terms of
+	    // __iterator which may be more generically useful in the future.
+	    zipSequence.__iterate = function(fn, reverse) {
+	      /* generic:
+	      var iterator = this.__iterator(ITERATE_ENTRIES, reverse);
+	      var step;
+	      var iterations = 0;
+	      while (!(step = iterator.next()).done) {
+	        iterations++;
+	        if (fn(step.value[1], step.value[0], this) === false) {
+	          break;
+	        }
+	      }
+	      return iterations;
+	      */
+	      // indexed:
+	      var iterator = this.__iterator(ITERATE_VALUES, reverse);
+	      var step;
+	      var iterations = 0;
+	      while (!(step = iterator.next()).done) {
+	        if (fn(step.value, iterations++, this) === false) {
+	          break;
+	        }
+	      }
+	      return iterations;
+	    };
+	    zipSequence.__iteratorUncached = function(type, reverse) {
+	      var iterators = iters.map(function(i )
+	        {return (i = Iterable(i), getIterator(reverse ? i.reverse() : i))}
+	      );
+	      var iterations = 0;
+	      var isDone = false;
+	      return new src_Iterator__Iterator(function()  {
+	        var steps;
+	        if (!isDone) {
+	          steps = iterators.map(function(i ) {return i.next()});
+	          isDone = steps.some(function(s ) {return s.done});
+	        }
+	        if (isDone) {
+	          return iteratorDone();
+	        }
+	        return iteratorValue(
+	          type,
+	          iterations++,
+	          zipper.apply(null, steps.map(function(s ) {return s.value}))
+	        );
+	      });
+	    };
+	    return zipSequence
+	  }
+	
+	
+	  // #pragma Helper Functions
+	
+	  function reify(iter, seq) {
+	    return isSeq(iter) ? seq : iter.constructor(seq);
+	  }
+	
+	  function validateEntry(entry) {
+	    if (entry !== Object(entry)) {
+	      throw new TypeError('Expected [K, V] tuple: ' + entry);
+	    }
+	  }
+	
+	  function resolveSize(iter) {
+	    assertNotInfinite(iter.size);
+	    return ensureSize(iter);
+	  }
+	
+	  function iterableClass(iterable) {
+	    return isKeyed(iterable) ? KeyedIterable :
+	      isIndexed(iterable) ? IndexedIterable :
+	      SetIterable;
+	  }
+	
+	  function makeSequence(iterable) {
+	    return Object.create(
+	      (
+	        isKeyed(iterable) ? KeyedSeq :
+	        isIndexed(iterable) ? IndexedSeq :
+	        SetSeq
+	      ).prototype
+	    );
+	  }
+	
+	  function cacheResultThrough() {
+	    if (this._iter.cacheResult) {
+	      this._iter.cacheResult();
+	      this.size = this._iter.size;
+	      return this;
+	    } else {
+	      return Seq.prototype.cacheResult.call(this);
+	    }
+	  }
+	
+	  function defaultComparator(a, b) {
+	    return a > b ? 1 : a < b ? -1 : 0;
+	  }
+	
+	  function forceIterator(keyPath) {
+	    var iter = getIterator(keyPath);
+	    if (!iter) {
+	      // Array might not be iterable in this environment, so we need a fallback
+	      // to our wrapped type.
+	      if (!isArrayLike(keyPath)) {
+	        throw new TypeError('Expected iterable or array-like: ' + keyPath);
+	      }
+	      iter = getIterator(Iterable(keyPath));
+	    }
+	    return iter;
+	  }
+	
+	  createClass(src_Map__Map, KeyedCollection);
+	
+	    // @pragma Construction
+	
+	    function src_Map__Map(value) {
+	      return value === null || value === undefined ? emptyMap() :
+	        isMap(value) ? value :
+	        emptyMap().withMutations(function(map ) {
+	          var iter = KeyedIterable(value);
+	          assertNotInfinite(iter.size);
+	          iter.forEach(function(v, k)  {return map.set(k, v)});
+	        });
+	    }
+	
+	    src_Map__Map.prototype.toString = function() {
+	      return this.__toString('Map {', '}');
+	    };
+	
+	    // @pragma Access
+	
+	    src_Map__Map.prototype.get = function(k, notSetValue) {
+	      return this._root ?
+	        this._root.get(0, undefined, k, notSetValue) :
+	        notSetValue;
+	    };
+	
+	    // @pragma Modification
+	
+	    src_Map__Map.prototype.set = function(k, v) {
+	      return updateMap(this, k, v);
+	    };
+	
+	    src_Map__Map.prototype.setIn = function(keyPath, v) {
+	      return this.updateIn(keyPath, NOT_SET, function()  {return v});
+	    };
+	
+	    src_Map__Map.prototype.remove = function(k) {
+	      return updateMap(this, k, NOT_SET);
+	    };
+	
+	    src_Map__Map.prototype.deleteIn = function(keyPath) {
+	      return this.updateIn(keyPath, function()  {return NOT_SET});
+	    };
+	
+	    src_Map__Map.prototype.update = function(k, notSetValue, updater) {
+	      return arguments.length === 1 ?
+	        k(this) :
+	        this.updateIn([k], notSetValue, updater);
+	    };
+	
+	    src_Map__Map.prototype.updateIn = function(keyPath, notSetValue, updater) {
+	      if (!updater) {
+	        updater = notSetValue;
+	        notSetValue = undefined;
+	      }
+	      var updatedValue = updateInDeepMap(
+	        this,
+	        forceIterator(keyPath),
+	        notSetValue,
+	        updater
+	      );
+	      return updatedValue === NOT_SET ? undefined : updatedValue;
+	    };
+	
+	    src_Map__Map.prototype.clear = function() {
+	      if (this.size === 0) {
+	        return this;
+	      }
+	      if (this.__ownerID) {
+	        this.size = 0;
+	        this._root = null;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return emptyMap();
+	    };
+	
+	    // @pragma Composition
+	
+	    src_Map__Map.prototype.merge = function(/*...iters*/) {
+	      return mergeIntoMapWith(this, undefined, arguments);
+	    };
+	
+	    src_Map__Map.prototype.mergeWith = function(merger) {var iters = SLICE$0.call(arguments, 1);
+	      return mergeIntoMapWith(this, merger, iters);
+	    };
+	
+	    src_Map__Map.prototype.mergeIn = function(keyPath) {var iters = SLICE$0.call(arguments, 1);
+	      return this.updateIn(
+	        keyPath,
+	        emptyMap(),
+	        function(m ) {return typeof m.merge === 'function' ?
+	          m.merge.apply(m, iters) :
+	          iters[iters.length - 1]}
+	      );
+	    };
+	
+	    src_Map__Map.prototype.mergeDeep = function(/*...iters*/) {
+	      return mergeIntoMapWith(this, deepMerger(undefined), arguments);
+	    };
+	
+	    src_Map__Map.prototype.mergeDeepWith = function(merger) {var iters = SLICE$0.call(arguments, 1);
+	      return mergeIntoMapWith(this, deepMerger(merger), iters);
+	    };
+	
+	    src_Map__Map.prototype.mergeDeepIn = function(keyPath) {var iters = SLICE$0.call(arguments, 1);
+	      return this.updateIn(
+	        keyPath,
+	        emptyMap(),
+	        function(m ) {return typeof m.mergeDeep === 'function' ?
+	          m.mergeDeep.apply(m, iters) :
+	          iters[iters.length - 1]}
+	      );
+	    };
+	
+	    src_Map__Map.prototype.sort = function(comparator) {
+	      // Late binding
+	      return OrderedMap(sortFactory(this, comparator));
+	    };
+	
+	    src_Map__Map.prototype.sortBy = function(mapper, comparator) {
+	      // Late binding
+	      return OrderedMap(sortFactory(this, comparator, mapper));
+	    };
+	
+	    // @pragma Mutability
+	
+	    src_Map__Map.prototype.withMutations = function(fn) {
+	      var mutable = this.asMutable();
+	      fn(mutable);
+	      return mutable.wasAltered() ? mutable.__ensureOwner(this.__ownerID) : this;
+	    };
+	
+	    src_Map__Map.prototype.asMutable = function() {
+	      return this.__ownerID ? this : this.__ensureOwner(new OwnerID());
+	    };
+	
+	    src_Map__Map.prototype.asImmutable = function() {
+	      return this.__ensureOwner();
+	    };
+	
+	    src_Map__Map.prototype.wasAltered = function() {
+	      return this.__altered;
+	    };
+	
+	    src_Map__Map.prototype.__iterator = function(type, reverse) {
+	      return new MapIterator(this, type, reverse);
+	    };
+	
+	    src_Map__Map.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      var iterations = 0;
+	      this._root && this._root.iterate(function(entry ) {
+	        iterations++;
+	        return fn(entry[1], entry[0], this$0);
+	      }, reverse);
+	      return iterations;
+	    };
+	
+	    src_Map__Map.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        this.__altered = false;
+	        return this;
+	      }
+	      return makeMap(this.size, this._root, ownerID, this.__hash);
+	    };
+	
+	
+	  function isMap(maybeMap) {
+	    return !!(maybeMap && maybeMap[IS_MAP_SENTINEL]);
+	  }
+	
+	  src_Map__Map.isMap = isMap;
+	
+	  var IS_MAP_SENTINEL = '@@__IMMUTABLE_MAP__@@';
+	
+	  var MapPrototype = src_Map__Map.prototype;
+	  MapPrototype[IS_MAP_SENTINEL] = true;
+	  MapPrototype[DELETE] = MapPrototype.remove;
+	  MapPrototype.removeIn = MapPrototype.deleteIn;
+	
+	
+	  // #pragma Trie Nodes
+	
+	
+	
+	    function ArrayMapNode(ownerID, entries) {
+	      this.ownerID = ownerID;
+	      this.entries = entries;
+	    }
+	
+	    ArrayMapNode.prototype.get = function(shift, keyHash, key, notSetValue) {
+	      var entries = this.entries;
+	      for (var ii = 0, len = entries.length; ii < len; ii++) {
+	        if (is(key, entries[ii][0])) {
+	          return entries[ii][1];
+	        }
+	      }
+	      return notSetValue;
+	    };
+	
+	    ArrayMapNode.prototype.update = function(ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	      var removed = value === NOT_SET;
+	
+	      var entries = this.entries;
+	      var idx = 0;
+	      for (var len = entries.length; idx < len; idx++) {
+	        if (is(key, entries[idx][0])) {
+	          break;
+	        }
+	      }
+	      var exists = idx < len;
+	
+	      if (exists ? entries[idx][1] === value : removed) {
+	        return this;
+	      }
+	
+	      SetRef(didAlter);
+	      (removed || !exists) && SetRef(didChangeSize);
+	
+	      if (removed && entries.length === 1) {
+	        return; // undefined
+	      }
+	
+	      if (!exists && !removed && entries.length >= MAX_ARRAY_MAP_SIZE) {
+	        return createNodes(ownerID, entries, key, value);
+	      }
+	
+	      var isEditable = ownerID && ownerID === this.ownerID;
+	      var newEntries = isEditable ? entries : arrCopy(entries);
+	
+	      if (exists) {
+	        if (removed) {
+	          idx === len - 1 ? newEntries.pop() : (newEntries[idx] = newEntries.pop());
+	        } else {
+	          newEntries[idx] = [key, value];
+	        }
+	      } else {
+	        newEntries.push([key, value]);
+	      }
+	
+	      if (isEditable) {
+	        this.entries = newEntries;
+	        return this;
+	      }
+	
+	      return new ArrayMapNode(ownerID, newEntries);
+	    };
+	
+	
+	
+	
+	    function BitmapIndexedNode(ownerID, bitmap, nodes) {
+	      this.ownerID = ownerID;
+	      this.bitmap = bitmap;
+	      this.nodes = nodes;
+	    }
+	
+	    BitmapIndexedNode.prototype.get = function(shift, keyHash, key, notSetValue) {
+	      if (keyHash === undefined) {
+	        keyHash = hash(key);
+	      }
+	      var bit = (1 << ((shift === 0 ? keyHash : keyHash >>> shift) & MASK));
+	      var bitmap = this.bitmap;
+	      return (bitmap & bit) === 0 ? notSetValue :
+	        this.nodes[popCount(bitmap & (bit - 1))].get(shift + SHIFT, keyHash, key, notSetValue);
+	    };
+	
+	    BitmapIndexedNode.prototype.update = function(ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	      if (keyHash === undefined) {
+	        keyHash = hash(key);
+	      }
+	      var keyHashFrag = (shift === 0 ? keyHash : keyHash >>> shift) & MASK;
+	      var bit = 1 << keyHashFrag;
+	      var bitmap = this.bitmap;
+	      var exists = (bitmap & bit) !== 0;
+	
+	      if (!exists && value === NOT_SET) {
+	        return this;
+	      }
+	
+	      var idx = popCount(bitmap & (bit - 1));
+	      var nodes = this.nodes;
+	      var node = exists ? nodes[idx] : undefined;
+	      var newNode = updateNode(node, ownerID, shift + SHIFT, keyHash, key, value, didChangeSize, didAlter);
+	
+	      if (newNode === node) {
+	        return this;
+	      }
+	
+	      if (!exists && newNode && nodes.length >= MAX_BITMAP_INDEXED_SIZE) {
+	        return expandNodes(ownerID, nodes, bitmap, keyHashFrag, newNode);
+	      }
+	
+	      if (exists && !newNode && nodes.length === 2 && isLeafNode(nodes[idx ^ 1])) {
+	        return nodes[idx ^ 1];
+	      }
+	
+	      if (exists && newNode && nodes.length === 1 && isLeafNode(newNode)) {
+	        return newNode;
+	      }
+	
+	      var isEditable = ownerID && ownerID === this.ownerID;
+	      var newBitmap = exists ? newNode ? bitmap : bitmap ^ bit : bitmap | bit;
+	      var newNodes = exists ? newNode ?
+	        setIn(nodes, idx, newNode, isEditable) :
+	        spliceOut(nodes, idx, isEditable) :
+	        spliceIn(nodes, idx, newNode, isEditable);
+	
+	      if (isEditable) {
+	        this.bitmap = newBitmap;
+	        this.nodes = newNodes;
+	        return this;
+	      }
+	
+	      return new BitmapIndexedNode(ownerID, newBitmap, newNodes);
+	    };
+	
+	
+	
+	
+	    function HashArrayMapNode(ownerID, count, nodes) {
+	      this.ownerID = ownerID;
+	      this.count = count;
+	      this.nodes = nodes;
+	    }
+	
+	    HashArrayMapNode.prototype.get = function(shift, keyHash, key, notSetValue) {
+	      if (keyHash === undefined) {
+	        keyHash = hash(key);
+	      }
+	      var idx = (shift === 0 ? keyHash : keyHash >>> shift) & MASK;
+	      var node = this.nodes[idx];
+	      return node ? node.get(shift + SHIFT, keyHash, key, notSetValue) : notSetValue;
+	    };
+	
+	    HashArrayMapNode.prototype.update = function(ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	      if (keyHash === undefined) {
+	        keyHash = hash(key);
+	      }
+	      var idx = (shift === 0 ? keyHash : keyHash >>> shift) & MASK;
+	      var removed = value === NOT_SET;
+	      var nodes = this.nodes;
+	      var node = nodes[idx];
+	
+	      if (removed && !node) {
+	        return this;
+	      }
+	
+	      var newNode = updateNode(node, ownerID, shift + SHIFT, keyHash, key, value, didChangeSize, didAlter);
+	      if (newNode === node) {
+	        return this;
+	      }
+	
+	      var newCount = this.count;
+	      if (!node) {
+	        newCount++;
+	      } else if (!newNode) {
+	        newCount--;
+	        if (newCount < MIN_HASH_ARRAY_MAP_SIZE) {
+	          return packNodes(ownerID, nodes, newCount, idx);
+	        }
+	      }
+	
+	      var isEditable = ownerID && ownerID === this.ownerID;
+	      var newNodes = setIn(nodes, idx, newNode, isEditable);
+	
+	      if (isEditable) {
+	        this.count = newCount;
+	        this.nodes = newNodes;
+	        return this;
+	      }
+	
+	      return new HashArrayMapNode(ownerID, newCount, newNodes);
+	    };
+	
+	
+	
+	
+	    function HashCollisionNode(ownerID, keyHash, entries) {
+	      this.ownerID = ownerID;
+	      this.keyHash = keyHash;
+	      this.entries = entries;
+	    }
+	
+	    HashCollisionNode.prototype.get = function(shift, keyHash, key, notSetValue) {
+	      var entries = this.entries;
+	      for (var ii = 0, len = entries.length; ii < len; ii++) {
+	        if (is(key, entries[ii][0])) {
+	          return entries[ii][1];
+	        }
+	      }
+	      return notSetValue;
+	    };
+	
+	    HashCollisionNode.prototype.update = function(ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	      if (keyHash === undefined) {
+	        keyHash = hash(key);
+	      }
+	
+	      var removed = value === NOT_SET;
+	
+	      if (keyHash !== this.keyHash) {
+	        if (removed) {
+	          return this;
+	        }
+	        SetRef(didAlter);
+	        SetRef(didChangeSize);
+	        return mergeIntoNode(this, ownerID, shift, keyHash, [key, value]);
+	      }
+	
+	      var entries = this.entries;
+	      var idx = 0;
+	      for (var len = entries.length; idx < len; idx++) {
+	        if (is(key, entries[idx][0])) {
+	          break;
+	        }
+	      }
+	      var exists = idx < len;
+	
+	      if (exists ? entries[idx][1] === value : removed) {
+	        return this;
+	      }
+	
+	      SetRef(didAlter);
+	      (removed || !exists) && SetRef(didChangeSize);
+	
+	      if (removed && len === 2) {
+	        return new ValueNode(ownerID, this.keyHash, entries[idx ^ 1]);
+	      }
+	
+	      var isEditable = ownerID && ownerID === this.ownerID;
+	      var newEntries = isEditable ? entries : arrCopy(entries);
+	
+	      if (exists) {
+	        if (removed) {
+	          idx === len - 1 ? newEntries.pop() : (newEntries[idx] = newEntries.pop());
+	        } else {
+	          newEntries[idx] = [key, value];
+	        }
+	      } else {
+	        newEntries.push([key, value]);
+	      }
+	
+	      if (isEditable) {
+	        this.entries = newEntries;
+	        return this;
+	      }
+	
+	      return new HashCollisionNode(ownerID, this.keyHash, newEntries);
+	    };
+	
+	
+	
+	
+	    function ValueNode(ownerID, keyHash, entry) {
+	      this.ownerID = ownerID;
+	      this.keyHash = keyHash;
+	      this.entry = entry;
+	    }
+	
+	    ValueNode.prototype.get = function(shift, keyHash, key, notSetValue) {
+	      return is(key, this.entry[0]) ? this.entry[1] : notSetValue;
+	    };
+	
+	    ValueNode.prototype.update = function(ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	      var removed = value === NOT_SET;
+	      var keyMatch = is(key, this.entry[0]);
+	      if (keyMatch ? value === this.entry[1] : removed) {
+	        return this;
+	      }
+	
+	      SetRef(didAlter);
+	
+	      if (removed) {
+	        SetRef(didChangeSize);
+	        return; // undefined
+	      }
+	
+	      if (keyMatch) {
+	        if (ownerID && ownerID === this.ownerID) {
+	          this.entry[1] = value;
+	          return this;
+	        }
+	        return new ValueNode(ownerID, this.keyHash, [key, value]);
+	      }
+	
+	      SetRef(didChangeSize);
+	      return mergeIntoNode(this, ownerID, shift, hash(key), [key, value]);
+	    };
+	
+	
+	
+	  // #pragma Iterators
+	
+	  ArrayMapNode.prototype.iterate =
+	  HashCollisionNode.prototype.iterate = function (fn, reverse) {
+	    var entries = this.entries;
+	    for (var ii = 0, maxIndex = entries.length - 1; ii <= maxIndex; ii++) {
+	      if (fn(entries[reverse ? maxIndex - ii : ii]) === false) {
+	        return false;
+	      }
+	    }
+	  }
+	
+	  BitmapIndexedNode.prototype.iterate =
+	  HashArrayMapNode.prototype.iterate = function (fn, reverse) {
+	    var nodes = this.nodes;
+	    for (var ii = 0, maxIndex = nodes.length - 1; ii <= maxIndex; ii++) {
+	      var node = nodes[reverse ? maxIndex - ii : ii];
+	      if (node && node.iterate(fn, reverse) === false) {
+	        return false;
+	      }
+	    }
+	  }
+	
+	  ValueNode.prototype.iterate = function (fn, reverse) {
+	    return fn(this.entry);
+	  }
+	
+	  createClass(MapIterator, src_Iterator__Iterator);
+	
+	    function MapIterator(map, type, reverse) {
+	      this._type = type;
+	      this._reverse = reverse;
+	      this._stack = map._root && mapIteratorFrame(map._root);
+	    }
+	
+	    MapIterator.prototype.next = function() {
+	      var type = this._type;
+	      var stack = this._stack;
+	      while (stack) {
+	        var node = stack.node;
+	        var index = stack.index++;
+	        var maxIndex;
+	        if (node.entry) {
+	          if (index === 0) {
+	            return mapIteratorValue(type, node.entry);
+	          }
+	        } else if (node.entries) {
+	          maxIndex = node.entries.length - 1;
+	          if (index <= maxIndex) {
+	            return mapIteratorValue(type, node.entries[this._reverse ? maxIndex - index : index]);
+	          }
+	        } else {
+	          maxIndex = node.nodes.length - 1;
+	          if (index <= maxIndex) {
+	            var subNode = node.nodes[this._reverse ? maxIndex - index : index];
+	            if (subNode) {
+	              if (subNode.entry) {
+	                return mapIteratorValue(type, subNode.entry);
+	              }
+	              stack = this._stack = mapIteratorFrame(subNode, stack);
+	            }
+	            continue;
+	          }
+	        }
+	        stack = this._stack = this._stack.__prev;
+	      }
+	      return iteratorDone();
+	    };
+	
+	
+	  function mapIteratorValue(type, entry) {
+	    return iteratorValue(type, entry[0], entry[1]);
+	  }
+	
+	  function mapIteratorFrame(node, prev) {
+	    return {
+	      node: node,
+	      index: 0,
+	      __prev: prev
+	    };
+	  }
+	
+	  function makeMap(size, root, ownerID, hash) {
+	    var map = Object.create(MapPrototype);
+	    map.size = size;
+	    map._root = root;
+	    map.__ownerID = ownerID;
+	    map.__hash = hash;
+	    map.__altered = false;
+	    return map;
+	  }
+	
+	  var EMPTY_MAP;
+	  function emptyMap() {
+	    return EMPTY_MAP || (EMPTY_MAP = makeMap(0));
+	  }
+	
+	  function updateMap(map, k, v) {
+	    var newRoot;
+	    var newSize;
+	    if (!map._root) {
+	      if (v === NOT_SET) {
+	        return map;
+	      }
+	      newSize = 1;
+	      newRoot = new ArrayMapNode(map.__ownerID, [[k, v]]);
+	    } else {
+	      var didChangeSize = MakeRef(CHANGE_LENGTH);
+	      var didAlter = MakeRef(DID_ALTER);
+	      newRoot = updateNode(map._root, map.__ownerID, 0, undefined, k, v, didChangeSize, didAlter);
+	      if (!didAlter.value) {
+	        return map;
+	      }
+	      newSize = map.size + (didChangeSize.value ? v === NOT_SET ? -1 : 1 : 0);
+	    }
+	    if (map.__ownerID) {
+	      map.size = newSize;
+	      map._root = newRoot;
+	      map.__hash = undefined;
+	      map.__altered = true;
+	      return map;
+	    }
+	    return newRoot ? makeMap(newSize, newRoot) : emptyMap();
+	  }
+	
+	  function updateNode(node, ownerID, shift, keyHash, key, value, didChangeSize, didAlter) {
+	    if (!node) {
+	      if (value === NOT_SET) {
+	        return node;
+	      }
+	      SetRef(didAlter);
+	      SetRef(didChangeSize);
+	      return new ValueNode(ownerID, keyHash, [key, value]);
+	    }
+	    return node.update(ownerID, shift, keyHash, key, value, didChangeSize, didAlter);
+	  }
+	
+	  function isLeafNode(node) {
+	    return node.constructor === ValueNode || node.constructor === HashCollisionNode;
+	  }
+	
+	  function mergeIntoNode(node, ownerID, shift, keyHash, entry) {
+	    if (node.keyHash === keyHash) {
+	      return new HashCollisionNode(ownerID, keyHash, [node.entry, entry]);
+	    }
+	
+	    var idx1 = (shift === 0 ? node.keyHash : node.keyHash >>> shift) & MASK;
+	    var idx2 = (shift === 0 ? keyHash : keyHash >>> shift) & MASK;
+	
+	    var newNode;
+	    var nodes = idx1 === idx2 ?
+	      [mergeIntoNode(node, ownerID, shift + SHIFT, keyHash, entry)] :
+	      ((newNode = new ValueNode(ownerID, keyHash, entry)), idx1 < idx2 ? [node, newNode] : [newNode, node]);
+	
+	    return new BitmapIndexedNode(ownerID, (1 << idx1) | (1 << idx2), nodes);
+	  }
+	
+	  function createNodes(ownerID, entries, key, value) {
+	    if (!ownerID) {
+	      ownerID = new OwnerID();
+	    }
+	    var node = new ValueNode(ownerID, hash(key), [key, value]);
+	    for (var ii = 0; ii < entries.length; ii++) {
+	      var entry = entries[ii];
+	      node = node.update(ownerID, 0, undefined, entry[0], entry[1]);
+	    }
+	    return node;
+	  }
+	
+	  function packNodes(ownerID, nodes, count, excluding) {
+	    var bitmap = 0;
+	    var packedII = 0;
+	    var packedNodes = new Array(count);
+	    for (var ii = 0, bit = 1, len = nodes.length; ii < len; ii++, bit <<= 1) {
+	      var node = nodes[ii];
+	      if (node !== undefined && ii !== excluding) {
+	        bitmap |= bit;
+	        packedNodes[packedII++] = node;
+	      }
+	    }
+	    return new BitmapIndexedNode(ownerID, bitmap, packedNodes);
+	  }
+	
+	  function expandNodes(ownerID, nodes, bitmap, including, node) {
+	    var count = 0;
+	    var expandedNodes = new Array(SIZE);
+	    for (var ii = 0; bitmap !== 0; ii++, bitmap >>>= 1) {
+	      expandedNodes[ii] = bitmap & 1 ? nodes[count++] : undefined;
+	    }
+	    expandedNodes[including] = node;
+	    return new HashArrayMapNode(ownerID, count + 1, expandedNodes);
+	  }
+	
+	  function mergeIntoMapWith(map, merger, iterables) {
+	    var iters = [];
+	    for (var ii = 0; ii < iterables.length; ii++) {
+	      var value = iterables[ii];
+	      var iter = KeyedIterable(value);
+	      if (!isIterable(value)) {
+	        iter = iter.map(function(v ) {return fromJS(v)});
+	      }
+	      iters.push(iter);
+	    }
+	    return mergeIntoCollectionWith(map, merger, iters);
+	  }
+	
+	  function deepMerger(merger) {
+	    return function(existing, value, key) 
+	      {return existing && existing.mergeDeepWith && isIterable(value) ?
+	        existing.mergeDeepWith(merger, value) :
+	        merger ? merger(existing, value, key) : value};
+	  }
+	
+	  function mergeIntoCollectionWith(collection, merger, iters) {
+	    iters = iters.filter(function(x ) {return x.size !== 0});
+	    if (iters.length === 0) {
+	      return collection;
+	    }
+	    if (collection.size === 0 && !collection.__ownerID && iters.length === 1) {
+	      return collection.constructor(iters[0]);
+	    }
+	    return collection.withMutations(function(collection ) {
+	      var mergeIntoMap = merger ?
+	        function(value, key)  {
+	          collection.update(key, NOT_SET, function(existing )
+	            {return existing === NOT_SET ? value : merger(existing, value, key)}
+	          );
+	        } :
+	        function(value, key)  {
+	          collection.set(key, value);
+	        }
+	      for (var ii = 0; ii < iters.length; ii++) {
+	        iters[ii].forEach(mergeIntoMap);
+	      }
+	    });
+	  }
+	
+	  function updateInDeepMap(existing, keyPathIter, notSetValue, updater) {
+	    var isNotSet = existing === NOT_SET;
+	    var step = keyPathIter.next();
+	    if (step.done) {
+	      var existingValue = isNotSet ? notSetValue : existing;
+	      var newValue = updater(existingValue);
+	      return newValue === existingValue ? existing : newValue;
+	    }
+	    invariant(
+	      isNotSet || (existing && existing.set),
+	      'invalid keyPath'
+	    );
+	    var key = step.value;
+	    var nextExisting = isNotSet ? NOT_SET : existing.get(key, NOT_SET);
+	    var nextUpdated = updateInDeepMap(
+	      nextExisting,
+	      keyPathIter,
+	      notSetValue,
+	      updater
+	    );
+	    return nextUpdated === nextExisting ? existing :
+	      nextUpdated === NOT_SET ? existing.remove(key) :
+	      (isNotSet ? emptyMap() : existing).set(key, nextUpdated);
+	  }
+	
+	  function popCount(x) {
+	    x = x - ((x >> 1) & 0x55555555);
+	    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+	    x = (x + (x >> 4)) & 0x0f0f0f0f;
+	    x = x + (x >> 8);
+	    x = x + (x >> 16);
+	    return x & 0x7f;
+	  }
+	
+	  function setIn(array, idx, val, canEdit) {
+	    var newArray = canEdit ? array : arrCopy(array);
+	    newArray[idx] = val;
+	    return newArray;
+	  }
+	
+	  function spliceIn(array, idx, val, canEdit) {
+	    var newLen = array.length + 1;
+	    if (canEdit && idx + 1 === newLen) {
+	      array[idx] = val;
+	      return array;
+	    }
+	    var newArray = new Array(newLen);
+	    var after = 0;
+	    for (var ii = 0; ii < newLen; ii++) {
+	      if (ii === idx) {
+	        newArray[ii] = val;
+	        after = -1;
+	      } else {
+	        newArray[ii] = array[ii + after];
+	      }
+	    }
+	    return newArray;
+	  }
+	
+	  function spliceOut(array, idx, canEdit) {
+	    var newLen = array.length - 1;
+	    if (canEdit && idx === newLen) {
+	      array.pop();
+	      return array;
+	    }
+	    var newArray = new Array(newLen);
+	    var after = 0;
+	    for (var ii = 0; ii < newLen; ii++) {
+	      if (ii === idx) {
+	        after = 1;
+	      }
+	      newArray[ii] = array[ii + after];
+	    }
+	    return newArray;
+	  }
+	
+	  var MAX_ARRAY_MAP_SIZE = SIZE / 4;
+	  var MAX_BITMAP_INDEXED_SIZE = SIZE / 2;
+	  var MIN_HASH_ARRAY_MAP_SIZE = SIZE / 4;
+	
+	  createClass(List, IndexedCollection);
+	
+	    // @pragma Construction
+	
+	    function List(value) {
+	      var empty = emptyList();
+	      if (value === null || value === undefined) {
+	        return empty;
+	      }
+	      if (isList(value)) {
+	        return value;
+	      }
+	      var iter = IndexedIterable(value);
+	      var size = iter.size;
+	      if (size === 0) {
+	        return empty;
+	      }
+	      assertNotInfinite(size);
+	      if (size > 0 && size < SIZE) {
+	        return makeList(0, size, SHIFT, null, new VNode(iter.toArray()));
+	      }
+	      return empty.withMutations(function(list ) {
+	        list.setSize(size);
+	        iter.forEach(function(v, i)  {return list.set(i, v)});
+	      });
+	    }
+	
+	    List.of = function(/*...values*/) {
+	      return this(arguments);
+	    };
+	
+	    List.prototype.toString = function() {
+	      return this.__toString('List [', ']');
+	    };
+	
+	    // @pragma Access
+	
+	    List.prototype.get = function(index, notSetValue) {
+	      index = wrapIndex(this, index);
+	      if (index < 0 || index >= this.size) {
+	        return notSetValue;
+	      }
+	      index += this._origin;
+	      var node = listNodeFor(this, index);
+	      return node && node.array[index & MASK];
+	    };
+	
+	    // @pragma Modification
+	
+	    List.prototype.set = function(index, value) {
+	      return updateList(this, index, value);
+	    };
+	
+	    List.prototype.remove = function(index) {
+	      return !this.has(index) ? this :
+	        index === 0 ? this.shift() :
+	        index === this.size - 1 ? this.pop() :
+	        this.splice(index, 1);
+	    };
+	
+	    List.prototype.clear = function() {
+	      if (this.size === 0) {
+	        return this;
+	      }
+	      if (this.__ownerID) {
+	        this.size = this._origin = this._capacity = 0;
+	        this._level = SHIFT;
+	        this._root = this._tail = null;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return emptyList();
+	    };
+	
+	    List.prototype.push = function(/*...values*/) {
+	      var values = arguments;
+	      var oldSize = this.size;
+	      return this.withMutations(function(list ) {
+	        setListBounds(list, 0, oldSize + values.length);
+	        for (var ii = 0; ii < values.length; ii++) {
+	          list.set(oldSize + ii, values[ii]);
+	        }
+	      });
+	    };
+	
+	    List.prototype.pop = function() {
+	      return setListBounds(this, 0, -1);
+	    };
+	
+	    List.prototype.unshift = function(/*...values*/) {
+	      var values = arguments;
+	      return this.withMutations(function(list ) {
+	        setListBounds(list, -values.length);
+	        for (var ii = 0; ii < values.length; ii++) {
+	          list.set(ii, values[ii]);
+	        }
+	      });
+	    };
+	
+	    List.prototype.shift = function() {
+	      return setListBounds(this, 1);
+	    };
+	
+	    // @pragma Composition
+	
+	    List.prototype.merge = function(/*...iters*/) {
+	      return mergeIntoListWith(this, undefined, arguments);
+	    };
+	
+	    List.prototype.mergeWith = function(merger) {var iters = SLICE$0.call(arguments, 1);
+	      return mergeIntoListWith(this, merger, iters);
+	    };
+	
+	    List.prototype.mergeDeep = function(/*...iters*/) {
+	      return mergeIntoListWith(this, deepMerger(undefined), arguments);
+	    };
+	
+	    List.prototype.mergeDeepWith = function(merger) {var iters = SLICE$0.call(arguments, 1);
+	      return mergeIntoListWith(this, deepMerger(merger), iters);
+	    };
+	
+	    List.prototype.setSize = function(size) {
+	      return setListBounds(this, 0, size);
+	    };
+	
+	    // @pragma Iteration
+	
+	    List.prototype.slice = function(begin, end) {
+	      var size = this.size;
+	      if (wholeSlice(begin, end, size)) {
+	        return this;
+	      }
+	      return setListBounds(
+	        this,
+	        resolveBegin(begin, size),
+	        resolveEnd(end, size)
+	      );
+	    };
+	
+	    List.prototype.__iterator = function(type, reverse) {
+	      var index = 0;
+	      var values = iterateList(this, reverse);
+	      return new src_Iterator__Iterator(function()  {
+	        var value = values();
+	        return value === DONE ?
+	          iteratorDone() :
+	          iteratorValue(type, index++, value);
+	      });
+	    };
+	
+	    List.prototype.__iterate = function(fn, reverse) {
+	      var index = 0;
+	      var values = iterateList(this, reverse);
+	      var value;
+	      while ((value = values()) !== DONE) {
+	        if (fn(value, index++, this) === false) {
+	          break;
+	        }
+	      }
+	      return index;
+	    };
+	
+	    List.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        return this;
+	      }
+	      return makeList(this._origin, this._capacity, this._level, this._root, this._tail, ownerID, this.__hash);
+	    };
+	
+	
+	  function isList(maybeList) {
+	    return !!(maybeList && maybeList[IS_LIST_SENTINEL]);
+	  }
+	
+	  List.isList = isList;
+	
+	  var IS_LIST_SENTINEL = '@@__IMMUTABLE_LIST__@@';
+	
+	  var ListPrototype = List.prototype;
+	  ListPrototype[IS_LIST_SENTINEL] = true;
+	  ListPrototype[DELETE] = ListPrototype.remove;
+	  ListPrototype.setIn = MapPrototype.setIn;
+	  ListPrototype.deleteIn =
+	  ListPrototype.removeIn = MapPrototype.removeIn;
+	  ListPrototype.update = MapPrototype.update;
+	  ListPrototype.updateIn = MapPrototype.updateIn;
+	  ListPrototype.mergeIn = MapPrototype.mergeIn;
+	  ListPrototype.mergeDeepIn = MapPrototype.mergeDeepIn;
+	  ListPrototype.withMutations = MapPrototype.withMutations;
+	  ListPrototype.asMutable = MapPrototype.asMutable;
+	  ListPrototype.asImmutable = MapPrototype.asImmutable;
+	  ListPrototype.wasAltered = MapPrototype.wasAltered;
+	
+	
+	
+	    function VNode(array, ownerID) {
+	      this.array = array;
+	      this.ownerID = ownerID;
+	    }
+	
+	    // TODO: seems like these methods are very similar
+	
+	    VNode.prototype.removeBefore = function(ownerID, level, index) {
+	      if (index === level ? 1 << level : 0 || this.array.length === 0) {
+	        return this;
+	      }
+	      var originIndex = (index >>> level) & MASK;
+	      if (originIndex >= this.array.length) {
+	        return new VNode([], ownerID);
+	      }
+	      var removingFirst = originIndex === 0;
+	      var newChild;
+	      if (level > 0) {
+	        var oldChild = this.array[originIndex];
+	        newChild = oldChild && oldChild.removeBefore(ownerID, level - SHIFT, index);
+	        if (newChild === oldChild && removingFirst) {
+	          return this;
+	        }
+	      }
+	      if (removingFirst && !newChild) {
+	        return this;
+	      }
+	      var editable = editableVNode(this, ownerID);
+	      if (!removingFirst) {
+	        for (var ii = 0; ii < originIndex; ii++) {
+	          editable.array[ii] = undefined;
+	        }
+	      }
+	      if (newChild) {
+	        editable.array[originIndex] = newChild;
+	      }
+	      return editable;
+	    };
+	
+	    VNode.prototype.removeAfter = function(ownerID, level, index) {
+	      if (index === level ? 1 << level : 0 || this.array.length === 0) {
+	        return this;
+	      }
+	      var sizeIndex = ((index - 1) >>> level) & MASK;
+	      if (sizeIndex >= this.array.length) {
+	        return this;
+	      }
+	      var removingLast = sizeIndex === this.array.length - 1;
+	      var newChild;
+	      if (level > 0) {
+	        var oldChild = this.array[sizeIndex];
+	        newChild = oldChild && oldChild.removeAfter(ownerID, level - SHIFT, index);
+	        if (newChild === oldChild && removingLast) {
+	          return this;
+	        }
+	      }
+	      if (removingLast && !newChild) {
+	        return this;
+	      }
+	      var editable = editableVNode(this, ownerID);
+	      if (!removingLast) {
+	        editable.array.pop();
+	      }
+	      if (newChild) {
+	        editable.array[sizeIndex] = newChild;
+	      }
+	      return editable;
+	    };
+	
+	
+	
+	  var DONE = {};
+	
+	  function iterateList(list, reverse) {
+	    var left = list._origin;
+	    var right = list._capacity;
+	    var tailPos = getTailOffset(right);
+	    var tail = list._tail;
+	
+	    return iterateNodeOrLeaf(list._root, list._level, 0);
+	
+	    function iterateNodeOrLeaf(node, level, offset) {
+	      return level === 0 ?
+	        iterateLeaf(node, offset) :
+	        iterateNode(node, level, offset);
+	    }
+	
+	    function iterateLeaf(node, offset) {
+	      var array = offset === tailPos ? tail && tail.array : node && node.array;
+	      var from = offset > left ? 0 : left - offset;
+	      var to = right - offset;
+	      if (to > SIZE) {
+	        to = SIZE;
+	      }
+	      return function()  {
+	        if (from === to) {
+	          return DONE;
+	        }
+	        var idx = reverse ? --to : from++;
+	        return array && array[idx];
+	      };
+	    }
+	
+	    function iterateNode(node, level, offset) {
+	      var values;
+	      var array = node && node.array;
+	      var from = offset > left ? 0 : (left - offset) >> level;
+	      var to = ((right - offset) >> level) + 1;
+	      if (to > SIZE) {
+	        to = SIZE;
+	      }
+	      return function()  {
+	        do {
+	          if (values) {
+	            var value = values();
+	            if (value !== DONE) {
+	              return value;
+	            }
+	            values = null;
+	          }
+	          if (from === to) {
+	            return DONE;
+	          }
+	          var idx = reverse ? --to : from++;
+	          values = iterateNodeOrLeaf(
+	            array && array[idx], level - SHIFT, offset + (idx << level)
+	          );
+	        } while (true);
+	      };
+	    }
+	  }
+	
+	  function makeList(origin, capacity, level, root, tail, ownerID, hash) {
+	    var list = Object.create(ListPrototype);
+	    list.size = capacity - origin;
+	    list._origin = origin;
+	    list._capacity = capacity;
+	    list._level = level;
+	    list._root = root;
+	    list._tail = tail;
+	    list.__ownerID = ownerID;
+	    list.__hash = hash;
+	    list.__altered = false;
+	    return list;
+	  }
+	
+	  var EMPTY_LIST;
+	  function emptyList() {
+	    return EMPTY_LIST || (EMPTY_LIST = makeList(0, 0, SHIFT));
+	  }
+	
+	  function updateList(list, index, value) {
+	    index = wrapIndex(list, index);
+	
+	    if (index >= list.size || index < 0) {
+	      return list.withMutations(function(list ) {
+	        index < 0 ?
+	          setListBounds(list, index).set(0, value) :
+	          setListBounds(list, 0, index + 1).set(index, value)
+	      });
+	    }
+	
+	    index += list._origin;
+	
+	    var newTail = list._tail;
+	    var newRoot = list._root;
+	    var didAlter = MakeRef(DID_ALTER);
+	    if (index >= getTailOffset(list._capacity)) {
+	      newTail = updateVNode(newTail, list.__ownerID, 0, index, value, didAlter);
+	    } else {
+	      newRoot = updateVNode(newRoot, list.__ownerID, list._level, index, value, didAlter);
+	    }
+	
+	    if (!didAlter.value) {
+	      return list;
+	    }
+	
+	    if (list.__ownerID) {
+	      list._root = newRoot;
+	      list._tail = newTail;
+	      list.__hash = undefined;
+	      list.__altered = true;
+	      return list;
+	    }
+	    return makeList(list._origin, list._capacity, list._level, newRoot, newTail);
+	  }
+	
+	  function updateVNode(node, ownerID, level, index, value, didAlter) {
+	    var idx = (index >>> level) & MASK;
+	    var nodeHas = node && idx < node.array.length;
+	    if (!nodeHas && value === undefined) {
+	      return node;
+	    }
+	
+	    var newNode;
+	
+	    if (level > 0) {
+	      var lowerNode = node && node.array[idx];
+	      var newLowerNode = updateVNode(lowerNode, ownerID, level - SHIFT, index, value, didAlter);
+	      if (newLowerNode === lowerNode) {
+	        return node;
+	      }
+	      newNode = editableVNode(node, ownerID);
+	      newNode.array[idx] = newLowerNode;
+	      return newNode;
+	    }
+	
+	    if (nodeHas && node.array[idx] === value) {
+	      return node;
+	    }
+	
+	    SetRef(didAlter);
+	
+	    newNode = editableVNode(node, ownerID);
+	    if (value === undefined && idx === newNode.array.length - 1) {
+	      newNode.array.pop();
+	    } else {
+	      newNode.array[idx] = value;
+	    }
+	    return newNode;
+	  }
+	
+	  function editableVNode(node, ownerID) {
+	    if (ownerID && node && ownerID === node.ownerID) {
+	      return node;
+	    }
+	    return new VNode(node ? node.array.slice() : [], ownerID);
+	  }
+	
+	  function listNodeFor(list, rawIndex) {
+	    if (rawIndex >= getTailOffset(list._capacity)) {
+	      return list._tail;
+	    }
+	    if (rawIndex < 1 << (list._level + SHIFT)) {
+	      var node = list._root;
+	      var level = list._level;
+	      while (node && level > 0) {
+	        node = node.array[(rawIndex >>> level) & MASK];
+	        level -= SHIFT;
+	      }
+	      return node;
+	    }
+	  }
+	
+	  function setListBounds(list, begin, end) {
+	    var owner = list.__ownerID || new OwnerID();
+	    var oldOrigin = list._origin;
+	    var oldCapacity = list._capacity;
+	    var newOrigin = oldOrigin + begin;
+	    var newCapacity = end === undefined ? oldCapacity : end < 0 ? oldCapacity + end : oldOrigin + end;
+	    if (newOrigin === oldOrigin && newCapacity === oldCapacity) {
+	      return list;
+	    }
+	
+	    // If it's going to end after it starts, it's empty.
+	    if (newOrigin >= newCapacity) {
+	      return list.clear();
+	    }
+	
+	    var newLevel = list._level;
+	    var newRoot = list._root;
+	
+	    // New origin might need creating a higher root.
+	    var offsetShift = 0;
+	    while (newOrigin + offsetShift < 0) {
+	      newRoot = new VNode(newRoot && newRoot.array.length ? [undefined, newRoot] : [], owner);
+	      newLevel += SHIFT;
+	      offsetShift += 1 << newLevel;
+	    }
+	    if (offsetShift) {
+	      newOrigin += offsetShift;
+	      oldOrigin += offsetShift;
+	      newCapacity += offsetShift;
+	      oldCapacity += offsetShift;
+	    }
+	
+	    var oldTailOffset = getTailOffset(oldCapacity);
+	    var newTailOffset = getTailOffset(newCapacity);
+	
+	    // New size might need creating a higher root.
+	    while (newTailOffset >= 1 << (newLevel + SHIFT)) {
+	      newRoot = new VNode(newRoot && newRoot.array.length ? [newRoot] : [], owner);
+	      newLevel += SHIFT;
+	    }
+	
+	    // Locate or create the new tail.
+	    var oldTail = list._tail;
+	    var newTail = newTailOffset < oldTailOffset ?
+	      listNodeFor(list, newCapacity - 1) :
+	      newTailOffset > oldTailOffset ? new VNode([], owner) : oldTail;
+	
+	    // Merge Tail into tree.
+	    if (oldTail && newTailOffset > oldTailOffset && newOrigin < oldCapacity && oldTail.array.length) {
+	      newRoot = editableVNode(newRoot, owner);
+	      var node = newRoot;
+	      for (var level = newLevel; level > SHIFT; level -= SHIFT) {
+	        var idx = (oldTailOffset >>> level) & MASK;
+	        node = node.array[idx] = editableVNode(node.array[idx], owner);
+	      }
+	      node.array[(oldTailOffset >>> SHIFT) & MASK] = oldTail;
+	    }
+	
+	    // If the size has been reduced, there's a chance the tail needs to be trimmed.
+	    if (newCapacity < oldCapacity) {
+	      newTail = newTail && newTail.removeAfter(owner, 0, newCapacity);
+	    }
+	
+	    // If the new origin is within the tail, then we do not need a root.
+	    if (newOrigin >= newTailOffset) {
+	      newOrigin -= newTailOffset;
+	      newCapacity -= newTailOffset;
+	      newLevel = SHIFT;
+	      newRoot = null;
+	      newTail = newTail && newTail.removeBefore(owner, 0, newOrigin);
+	
+	    // Otherwise, if the root has been trimmed, garbage collect.
+	    } else if (newOrigin > oldOrigin || newTailOffset < oldTailOffset) {
+	      offsetShift = 0;
+	
+	      // Identify the new top root node of the subtree of the old root.
+	      while (newRoot) {
+	        var beginIndex = (newOrigin >>> newLevel) & MASK;
+	        if (beginIndex !== (newTailOffset >>> newLevel) & MASK) {
+	          break;
+	        }
+	        if (beginIndex) {
+	          offsetShift += (1 << newLevel) * beginIndex;
+	        }
+	        newLevel -= SHIFT;
+	        newRoot = newRoot.array[beginIndex];
+	      }
+	
+	      // Trim the new sides of the new root.
+	      if (newRoot && newOrigin > oldOrigin) {
+	        newRoot = newRoot.removeBefore(owner, newLevel, newOrigin - offsetShift);
+	      }
+	      if (newRoot && newTailOffset < oldTailOffset) {
+	        newRoot = newRoot.removeAfter(owner, newLevel, newTailOffset - offsetShift);
+	      }
+	      if (offsetShift) {
+	        newOrigin -= offsetShift;
+	        newCapacity -= offsetShift;
+	      }
+	    }
+	
+	    if (list.__ownerID) {
+	      list.size = newCapacity - newOrigin;
+	      list._origin = newOrigin;
+	      list._capacity = newCapacity;
+	      list._level = newLevel;
+	      list._root = newRoot;
+	      list._tail = newTail;
+	      list.__hash = undefined;
+	      list.__altered = true;
+	      return list;
+	    }
+	    return makeList(newOrigin, newCapacity, newLevel, newRoot, newTail);
+	  }
+	
+	  function mergeIntoListWith(list, merger, iterables) {
+	    var iters = [];
+	    var maxSize = 0;
+	    for (var ii = 0; ii < iterables.length; ii++) {
+	      var value = iterables[ii];
+	      var iter = IndexedIterable(value);
+	      if (iter.size > maxSize) {
+	        maxSize = iter.size;
+	      }
+	      if (!isIterable(value)) {
+	        iter = iter.map(function(v ) {return fromJS(v)});
+	      }
+	      iters.push(iter);
+	    }
+	    if (maxSize > list.size) {
+	      list = list.setSize(maxSize);
+	    }
+	    return mergeIntoCollectionWith(list, merger, iters);
+	  }
+	
+	  function getTailOffset(size) {
+	    return size < SIZE ? 0 : (((size - 1) >>> SHIFT) << SHIFT);
+	  }
+	
+	  createClass(OrderedMap, src_Map__Map);
+	
+	    // @pragma Construction
+	
+	    function OrderedMap(value) {
+	      return value === null || value === undefined ? emptyOrderedMap() :
+	        isOrderedMap(value) ? value :
+	        emptyOrderedMap().withMutations(function(map ) {
+	          var iter = KeyedIterable(value);
+	          assertNotInfinite(iter.size);
+	          iter.forEach(function(v, k)  {return map.set(k, v)});
+	        });
+	    }
+	
+	    OrderedMap.of = function(/*...values*/) {
+	      return this(arguments);
+	    };
+	
+	    OrderedMap.prototype.toString = function() {
+	      return this.__toString('OrderedMap {', '}');
+	    };
+	
+	    // @pragma Access
+	
+	    OrderedMap.prototype.get = function(k, notSetValue) {
+	      var index = this._map.get(k);
+	      return index !== undefined ? this._list.get(index)[1] : notSetValue;
+	    };
+	
+	    // @pragma Modification
+	
+	    OrderedMap.prototype.clear = function() {
+	      if (this.size === 0) {
+	        return this;
+	      }
+	      if (this.__ownerID) {
+	        this.size = 0;
+	        this._map.clear();
+	        this._list.clear();
+	        return this;
+	      }
+	      return emptyOrderedMap();
+	    };
+	
+	    OrderedMap.prototype.set = function(k, v) {
+	      return updateOrderedMap(this, k, v);
+	    };
+	
+	    OrderedMap.prototype.remove = function(k) {
+	      return updateOrderedMap(this, k, NOT_SET);
+	    };
+	
+	    OrderedMap.prototype.wasAltered = function() {
+	      return this._map.wasAltered() || this._list.wasAltered();
+	    };
+	
+	    OrderedMap.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      return this._list.__iterate(
+	        function(entry ) {return entry && fn(entry[1], entry[0], this$0)},
+	        reverse
+	      );
+	    };
+	
+	    OrderedMap.prototype.__iterator = function(type, reverse) {
+	      return this._list.fromEntrySeq().__iterator(type, reverse);
+	    };
+	
+	    OrderedMap.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      var newMap = this._map.__ensureOwner(ownerID);
+	      var newList = this._list.__ensureOwner(ownerID);
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        this._map = newMap;
+	        this._list = newList;
+	        return this;
+	      }
+	      return makeOrderedMap(newMap, newList, ownerID, this.__hash);
+	    };
+	
+	
+	  function isOrderedMap(maybeOrderedMap) {
+	    return isMap(maybeOrderedMap) && isOrdered(maybeOrderedMap);
+	  }
+	
+	  OrderedMap.isOrderedMap = isOrderedMap;
+	
+	  OrderedMap.prototype[IS_ORDERED_SENTINEL] = true;
+	  OrderedMap.prototype[DELETE] = OrderedMap.prototype.remove;
+	
+	
+	
+	  function makeOrderedMap(map, list, ownerID, hash) {
+	    var omap = Object.create(OrderedMap.prototype);
+	    omap.size = map ? map.size : 0;
+	    omap._map = map;
+	    omap._list = list;
+	    omap.__ownerID = ownerID;
+	    omap.__hash = hash;
+	    return omap;
+	  }
+	
+	  var EMPTY_ORDERED_MAP;
+	  function emptyOrderedMap() {
+	    return EMPTY_ORDERED_MAP || (EMPTY_ORDERED_MAP = makeOrderedMap(emptyMap(), emptyList()));
+	  }
+	
+	  function updateOrderedMap(omap, k, v) {
+	    var map = omap._map;
+	    var list = omap._list;
+	    var i = map.get(k);
+	    var has = i !== undefined;
+	    var newMap;
+	    var newList;
+	    if (v === NOT_SET) { // removed
+	      if (!has) {
+	        return omap;
+	      }
+	      if (list.size >= SIZE && list.size >= map.size * 2) {
+	        newList = list.filter(function(entry, idx)  {return entry !== undefined && i !== idx});
+	        newMap = newList.toKeyedSeq().map(function(entry ) {return entry[0]}).flip().toMap();
+	        if (omap.__ownerID) {
+	          newMap.__ownerID = newList.__ownerID = omap.__ownerID;
+	        }
+	      } else {
+	        newMap = map.remove(k);
+	        newList = i === list.size - 1 ? list.pop() : list.set(i, undefined);
+	      }
+	    } else {
+	      if (has) {
+	        if (v === list.get(i)[1]) {
+	          return omap;
+	        }
+	        newMap = map;
+	        newList = list.set(i, [k, v]);
+	      } else {
+	        newMap = map.set(k, list.size);
+	        newList = list.set(list.size, [k, v]);
+	      }
+	    }
+	    if (omap.__ownerID) {
+	      omap.size = newMap.size;
+	      omap._map = newMap;
+	      omap._list = newList;
+	      omap.__hash = undefined;
+	      return omap;
+	    }
+	    return makeOrderedMap(newMap, newList);
+	  }
+	
+	  createClass(Stack, IndexedCollection);
+	
+	    // @pragma Construction
+	
+	    function Stack(value) {
+	      return value === null || value === undefined ? emptyStack() :
+	        isStack(value) ? value :
+	        emptyStack().unshiftAll(value);
+	    }
+	
+	    Stack.of = function(/*...values*/) {
+	      return this(arguments);
+	    };
+	
+	    Stack.prototype.toString = function() {
+	      return this.__toString('Stack [', ']');
+	    };
+	
+	    // @pragma Access
+	
+	    Stack.prototype.get = function(index, notSetValue) {
+	      var head = this._head;
+	      index = wrapIndex(this, index);
+	      while (head && index--) {
+	        head = head.next;
+	      }
+	      return head ? head.value : notSetValue;
+	    };
+	
+	    Stack.prototype.peek = function() {
+	      return this._head && this._head.value;
+	    };
+	
+	    // @pragma Modification
+	
+	    Stack.prototype.push = function(/*...values*/) {
+	      if (arguments.length === 0) {
+	        return this;
+	      }
+	      var newSize = this.size + arguments.length;
+	      var head = this._head;
+	      for (var ii = arguments.length - 1; ii >= 0; ii--) {
+	        head = {
+	          value: arguments[ii],
+	          next: head
+	        };
+	      }
+	      if (this.__ownerID) {
+	        this.size = newSize;
+	        this._head = head;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return makeStack(newSize, head);
+	    };
+	
+	    Stack.prototype.pushAll = function(iter) {
+	      iter = IndexedIterable(iter);
+	      if (iter.size === 0) {
+	        return this;
+	      }
+	      assertNotInfinite(iter.size);
+	      var newSize = this.size;
+	      var head = this._head;
+	      iter.reverse().forEach(function(value ) {
+	        newSize++;
+	        head = {
+	          value: value,
+	          next: head
+	        };
+	      });
+	      if (this.__ownerID) {
+	        this.size = newSize;
+	        this._head = head;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return makeStack(newSize, head);
+	    };
+	
+	    Stack.prototype.pop = function() {
+	      return this.slice(1);
+	    };
+	
+	    Stack.prototype.unshift = function(/*...values*/) {
+	      return this.push.apply(this, arguments);
+	    };
+	
+	    Stack.prototype.unshiftAll = function(iter) {
+	      return this.pushAll(iter);
+	    };
+	
+	    Stack.prototype.shift = function() {
+	      return this.pop.apply(this, arguments);
+	    };
+	
+	    Stack.prototype.clear = function() {
+	      if (this.size === 0) {
+	        return this;
+	      }
+	      if (this.__ownerID) {
+	        this.size = 0;
+	        this._head = undefined;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return emptyStack();
+	    };
+	
+	    Stack.prototype.slice = function(begin, end) {
+	      if (wholeSlice(begin, end, this.size)) {
+	        return this;
+	      }
+	      var resolvedBegin = resolveBegin(begin, this.size);
+	      var resolvedEnd = resolveEnd(end, this.size);
+	      if (resolvedEnd !== this.size) {
+	        // super.slice(begin, end);
+	        return IndexedCollection.prototype.slice.call(this, begin, end);
+	      }
+	      var newSize = this.size - resolvedBegin;
+	      var head = this._head;
+	      while (resolvedBegin--) {
+	        head = head.next;
+	      }
+	      if (this.__ownerID) {
+	        this.size = newSize;
+	        this._head = head;
+	        this.__hash = undefined;
+	        this.__altered = true;
+	        return this;
+	      }
+	      return makeStack(newSize, head);
+	    };
+	
+	    // @pragma Mutability
+	
+	    Stack.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        this.__altered = false;
+	        return this;
+	      }
+	      return makeStack(this.size, this._head, ownerID, this.__hash);
+	    };
+	
+	    // @pragma Iteration
+	
+	    Stack.prototype.__iterate = function(fn, reverse) {
+	      if (reverse) {
+	        return this.reverse().__iterate(fn);
+	      }
+	      var iterations = 0;
+	      var node = this._head;
+	      while (node) {
+	        if (fn(node.value, iterations++, this) === false) {
+	          break;
+	        }
+	        node = node.next;
+	      }
+	      return iterations;
+	    };
+	
+	    Stack.prototype.__iterator = function(type, reverse) {
+	      if (reverse) {
+	        return this.reverse().__iterator(type);
+	      }
+	      var iterations = 0;
+	      var node = this._head;
+	      return new src_Iterator__Iterator(function()  {
+	        if (node) {
+	          var value = node.value;
+	          node = node.next;
+	          return iteratorValue(type, iterations++, value);
+	        }
+	        return iteratorDone();
+	      });
+	    };
+	
+	
+	  function isStack(maybeStack) {
+	    return !!(maybeStack && maybeStack[IS_STACK_SENTINEL]);
+	  }
+	
+	  Stack.isStack = isStack;
+	
+	  var IS_STACK_SENTINEL = '@@__IMMUTABLE_STACK__@@';
+	
+	  var StackPrototype = Stack.prototype;
+	  StackPrototype[IS_STACK_SENTINEL] = true;
+	  StackPrototype.withMutations = MapPrototype.withMutations;
+	  StackPrototype.asMutable = MapPrototype.asMutable;
+	  StackPrototype.asImmutable = MapPrototype.asImmutable;
+	  StackPrototype.wasAltered = MapPrototype.wasAltered;
+	
+	
+	  function makeStack(size, head, ownerID, hash) {
+	    var map = Object.create(StackPrototype);
+	    map.size = size;
+	    map._head = head;
+	    map.__ownerID = ownerID;
+	    map.__hash = hash;
+	    map.__altered = false;
+	    return map;
+	  }
+	
+	  var EMPTY_STACK;
+	  function emptyStack() {
+	    return EMPTY_STACK || (EMPTY_STACK = makeStack(0));
+	  }
+	
+	  createClass(src_Set__Set, SetCollection);
+	
+	    // @pragma Construction
+	
+	    function src_Set__Set(value) {
+	      return value === null || value === undefined ? emptySet() :
+	        isSet(value) ? value :
+	        emptySet().withMutations(function(set ) {
+	          var iter = SetIterable(value);
+	          assertNotInfinite(iter.size);
+	          iter.forEach(function(v ) {return set.add(v)});
+	        });
+	    }
+	
+	    src_Set__Set.of = function(/*...values*/) {
+	      return this(arguments);
+	    };
+	
+	    src_Set__Set.fromKeys = function(value) {
+	      return this(KeyedIterable(value).keySeq());
+	    };
+	
+	    src_Set__Set.prototype.toString = function() {
+	      return this.__toString('Set {', '}');
+	    };
+	
+	    // @pragma Access
+	
+	    src_Set__Set.prototype.has = function(value) {
+	      return this._map.has(value);
+	    };
+	
+	    // @pragma Modification
+	
+	    src_Set__Set.prototype.add = function(value) {
+	      return updateSet(this, this._map.set(value, true));
+	    };
+	
+	    src_Set__Set.prototype.remove = function(value) {
+	      return updateSet(this, this._map.remove(value));
+	    };
+	
+	    src_Set__Set.prototype.clear = function() {
+	      return updateSet(this, this._map.clear());
+	    };
+	
+	    // @pragma Composition
+	
+	    src_Set__Set.prototype.union = function() {var iters = SLICE$0.call(arguments, 0);
+	      iters = iters.filter(function(x ) {return x.size !== 0});
+	      if (iters.length === 0) {
+	        return this;
+	      }
+	      if (this.size === 0 && !this.__ownerID && iters.length === 1) {
+	        return this.constructor(iters[0]);
+	      }
+	      return this.withMutations(function(set ) {
+	        for (var ii = 0; ii < iters.length; ii++) {
+	          SetIterable(iters[ii]).forEach(function(value ) {return set.add(value)});
+	        }
+	      });
+	    };
+	
+	    src_Set__Set.prototype.intersect = function() {var iters = SLICE$0.call(arguments, 0);
+	      if (iters.length === 0) {
+	        return this;
+	      }
+	      iters = iters.map(function(iter ) {return SetIterable(iter)});
+	      var originalSet = this;
+	      return this.withMutations(function(set ) {
+	        originalSet.forEach(function(value ) {
+	          if (!iters.every(function(iter ) {return iter.includes(value)})) {
+	            set.remove(value);
+	          }
+	        });
+	      });
+	    };
+	
+	    src_Set__Set.prototype.subtract = function() {var iters = SLICE$0.call(arguments, 0);
+	      if (iters.length === 0) {
+	        return this;
+	      }
+	      iters = iters.map(function(iter ) {return SetIterable(iter)});
+	      var originalSet = this;
+	      return this.withMutations(function(set ) {
+	        originalSet.forEach(function(value ) {
+	          if (iters.some(function(iter ) {return iter.includes(value)})) {
+	            set.remove(value);
+	          }
+	        });
+	      });
+	    };
+	
+	    src_Set__Set.prototype.merge = function() {
+	      return this.union.apply(this, arguments);
+	    };
+	
+	    src_Set__Set.prototype.mergeWith = function(merger) {var iters = SLICE$0.call(arguments, 1);
+	      return this.union.apply(this, iters);
+	    };
+	
+	    src_Set__Set.prototype.sort = function(comparator) {
+	      // Late binding
+	      return OrderedSet(sortFactory(this, comparator));
+	    };
+	
+	    src_Set__Set.prototype.sortBy = function(mapper, comparator) {
+	      // Late binding
+	      return OrderedSet(sortFactory(this, comparator, mapper));
+	    };
+	
+	    src_Set__Set.prototype.wasAltered = function() {
+	      return this._map.wasAltered();
+	    };
+	
+	    src_Set__Set.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      return this._map.__iterate(function(_, k)  {return fn(k, k, this$0)}, reverse);
+	    };
+	
+	    src_Set__Set.prototype.__iterator = function(type, reverse) {
+	      return this._map.map(function(_, k)  {return k}).__iterator(type, reverse);
+	    };
+	
+	    src_Set__Set.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      var newMap = this._map.__ensureOwner(ownerID);
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        this._map = newMap;
+	        return this;
+	      }
+	      return this.__make(newMap, ownerID);
+	    };
+	
+	
+	  function isSet(maybeSet) {
+	    return !!(maybeSet && maybeSet[IS_SET_SENTINEL]);
+	  }
+	
+	  src_Set__Set.isSet = isSet;
+	
+	  var IS_SET_SENTINEL = '@@__IMMUTABLE_SET__@@';
+	
+	  var SetPrototype = src_Set__Set.prototype;
+	  SetPrototype[IS_SET_SENTINEL] = true;
+	  SetPrototype[DELETE] = SetPrototype.remove;
+	  SetPrototype.mergeDeep = SetPrototype.merge;
+	  SetPrototype.mergeDeepWith = SetPrototype.mergeWith;
+	  SetPrototype.withMutations = MapPrototype.withMutations;
+	  SetPrototype.asMutable = MapPrototype.asMutable;
+	  SetPrototype.asImmutable = MapPrototype.asImmutable;
+	
+	  SetPrototype.__empty = emptySet;
+	  SetPrototype.__make = makeSet;
+	
+	  function updateSet(set, newMap) {
+	    if (set.__ownerID) {
+	      set.size = newMap.size;
+	      set._map = newMap;
+	      return set;
+	    }
+	    return newMap === set._map ? set :
+	      newMap.size === 0 ? set.__empty() :
+	      set.__make(newMap);
+	  }
+	
+	  function makeSet(map, ownerID) {
+	    var set = Object.create(SetPrototype);
+	    set.size = map ? map.size : 0;
+	    set._map = map;
+	    set.__ownerID = ownerID;
+	    return set;
+	  }
+	
+	  var EMPTY_SET;
+	  function emptySet() {
+	    return EMPTY_SET || (EMPTY_SET = makeSet(emptyMap()));
+	  }
+	
+	  createClass(OrderedSet, src_Set__Set);
+	
+	    // @pragma Construction
+	
+	    function OrderedSet(value) {
+	      return value === null || value === undefined ? emptyOrderedSet() :
+	        isOrderedSet(value) ? value :
+	        emptyOrderedSet().withMutations(function(set ) {
+	          var iter = SetIterable(value);
+	          assertNotInfinite(iter.size);
+	          iter.forEach(function(v ) {return set.add(v)});
+	        });
+	    }
+	
+	    OrderedSet.of = function(/*...values*/) {
+	      return this(arguments);
+	    };
+	
+	    OrderedSet.fromKeys = function(value) {
+	      return this(KeyedIterable(value).keySeq());
+	    };
+	
+	    OrderedSet.prototype.toString = function() {
+	      return this.__toString('OrderedSet {', '}');
+	    };
+	
+	
+	  function isOrderedSet(maybeOrderedSet) {
+	    return isSet(maybeOrderedSet) && isOrdered(maybeOrderedSet);
+	  }
+	
+	  OrderedSet.isOrderedSet = isOrderedSet;
+	
+	  var OrderedSetPrototype = OrderedSet.prototype;
+	  OrderedSetPrototype[IS_ORDERED_SENTINEL] = true;
+	
+	  OrderedSetPrototype.__empty = emptyOrderedSet;
+	  OrderedSetPrototype.__make = makeOrderedSet;
+	
+	  function makeOrderedSet(map, ownerID) {
+	    var set = Object.create(OrderedSetPrototype);
+	    set.size = map ? map.size : 0;
+	    set._map = map;
+	    set.__ownerID = ownerID;
+	    return set;
+	  }
+	
+	  var EMPTY_ORDERED_SET;
+	  function emptyOrderedSet() {
+	    return EMPTY_ORDERED_SET || (EMPTY_ORDERED_SET = makeOrderedSet(emptyOrderedMap()));
+	  }
+	
+	  createClass(Record, KeyedCollection);
+	
+	    function Record(defaultValues, name) {
+	      var hasInitialized;
+	
+	      var RecordType = function Record(values) {
+	        if (values instanceof RecordType) {
+	          return values;
+	        }
+	        if (!(this instanceof RecordType)) {
+	          return new RecordType(values);
+	        }
+	        if (!hasInitialized) {
+	          hasInitialized = true;
+	          var keys = Object.keys(defaultValues);
+	          setProps(RecordTypePrototype, keys);
+	          RecordTypePrototype.size = keys.length;
+	          RecordTypePrototype._name = name;
+	          RecordTypePrototype._keys = keys;
+	          RecordTypePrototype._defaultValues = defaultValues;
+	        }
+	        this._map = src_Map__Map(values);
+	      };
+	
+	      var RecordTypePrototype = RecordType.prototype = Object.create(RecordPrototype);
+	      RecordTypePrototype.constructor = RecordType;
+	
+	      return RecordType;
+	    }
+	
+	    Record.prototype.toString = function() {
+	      return this.__toString(recordName(this) + ' {', '}');
+	    };
+	
+	    // @pragma Access
+	
+	    Record.prototype.has = function(k) {
+	      return this._defaultValues.hasOwnProperty(k);
+	    };
+	
+	    Record.prototype.get = function(k, notSetValue) {
+	      if (!this.has(k)) {
+	        return notSetValue;
+	      }
+	      var defaultVal = this._defaultValues[k];
+	      return this._map ? this._map.get(k, defaultVal) : defaultVal;
+	    };
+	
+	    // @pragma Modification
+	
+	    Record.prototype.clear = function() {
+	      if (this.__ownerID) {
+	        this._map && this._map.clear();
+	        return this;
+	      }
+	      var RecordType = this.constructor;
+	      return RecordType._empty || (RecordType._empty = makeRecord(this, emptyMap()));
+	    };
+	
+	    Record.prototype.set = function(k, v) {
+	      if (!this.has(k)) {
+	        throw new Error('Cannot set unknown key "' + k + '" on ' + recordName(this));
+	      }
+	      var newMap = this._map && this._map.set(k, v);
+	      if (this.__ownerID || newMap === this._map) {
+	        return this;
+	      }
+	      return makeRecord(this, newMap);
+	    };
+	
+	    Record.prototype.remove = function(k) {
+	      if (!this.has(k)) {
+	        return this;
+	      }
+	      var newMap = this._map && this._map.remove(k);
+	      if (this.__ownerID || newMap === this._map) {
+	        return this;
+	      }
+	      return makeRecord(this, newMap);
+	    };
+	
+	    Record.prototype.wasAltered = function() {
+	      return this._map.wasAltered();
+	    };
+	
+	    Record.prototype.__iterator = function(type, reverse) {var this$0 = this;
+	      return KeyedIterable(this._defaultValues).map(function(_, k)  {return this$0.get(k)}).__iterator(type, reverse);
+	    };
+	
+	    Record.prototype.__iterate = function(fn, reverse) {var this$0 = this;
+	      return KeyedIterable(this._defaultValues).map(function(_, k)  {return this$0.get(k)}).__iterate(fn, reverse);
+	    };
+	
+	    Record.prototype.__ensureOwner = function(ownerID) {
+	      if (ownerID === this.__ownerID) {
+	        return this;
+	      }
+	      var newMap = this._map && this._map.__ensureOwner(ownerID);
+	      if (!ownerID) {
+	        this.__ownerID = ownerID;
+	        this._map = newMap;
+	        return this;
+	      }
+	      return makeRecord(this, newMap, ownerID);
+	    };
+	
+	
+	  var RecordPrototype = Record.prototype;
+	  RecordPrototype[DELETE] = RecordPrototype.remove;
+	  RecordPrototype.deleteIn =
+	  RecordPrototype.removeIn = MapPrototype.removeIn;
+	  RecordPrototype.merge = MapPrototype.merge;
+	  RecordPrototype.mergeWith = MapPrototype.mergeWith;
+	  RecordPrototype.mergeIn = MapPrototype.mergeIn;
+	  RecordPrototype.mergeDeep = MapPrototype.mergeDeep;
+	  RecordPrototype.mergeDeepWith = MapPrototype.mergeDeepWith;
+	  RecordPrototype.mergeDeepIn = MapPrototype.mergeDeepIn;
+	  RecordPrototype.setIn = MapPrototype.setIn;
+	  RecordPrototype.update = MapPrototype.update;
+	  RecordPrototype.updateIn = MapPrototype.updateIn;
+	  RecordPrototype.withMutations = MapPrototype.withMutations;
+	  RecordPrototype.asMutable = MapPrototype.asMutable;
+	  RecordPrototype.asImmutable = MapPrototype.asImmutable;
+	
+	
+	  function makeRecord(likeRecord, map, ownerID) {
+	    var record = Object.create(Object.getPrototypeOf(likeRecord));
+	    record._map = map;
+	    record.__ownerID = ownerID;
+	    return record;
+	  }
+	
+	  function recordName(record) {
+	    return record._name || record.constructor.name || 'Record';
+	  }
+	
+	  function setProps(prototype, names) {
+	    try {
+	      names.forEach(setProp.bind(undefined, prototype));
+	    } catch (error) {
+	      // Object.defineProperty failed. Probably IE8.
+	    }
+	  }
+	
+	  function setProp(prototype, name) {
+	    Object.defineProperty(prototype, name, {
+	      get: function() {
+	        return this.get(name);
+	      },
+	      set: function(value) {
+	        invariant(this.__ownerID, 'Cannot set on an immutable record.');
+	        this.set(name, value);
+	      }
+	    });
+	  }
+	
+	  function deepEqual(a, b) {
+	    if (a === b) {
+	      return true;
+	    }
+	
+	    if (
+	      !isIterable(b) ||
+	      a.size !== undefined && b.size !== undefined && a.size !== b.size ||
+	      a.__hash !== undefined && b.__hash !== undefined && a.__hash !== b.__hash ||
+	      isKeyed(a) !== isKeyed(b) ||
+	      isIndexed(a) !== isIndexed(b) ||
+	      isOrdered(a) !== isOrdered(b)
+	    ) {
+	      return false;
+	    }
+	
+	    if (a.size === 0 && b.size === 0) {
+	      return true;
+	    }
+	
+	    var notAssociative = !isAssociative(a);
+	
+	    if (isOrdered(a)) {
+	      var entries = a.entries();
+	      return b.every(function(v, k)  {
+	        var entry = entries.next().value;
+	        return entry && is(entry[1], v) && (notAssociative || is(entry[0], k));
+	      }) && entries.next().done;
+	    }
+	
+	    var flipped = false;
+	
+	    if (a.size === undefined) {
+	      if (b.size === undefined) {
+	        if (typeof a.cacheResult === 'function') {
+	          a.cacheResult();
+	        }
+	      } else {
+	        flipped = true;
+	        var _ = a;
+	        a = b;
+	        b = _;
+	      }
+	    }
+	
+	    var allEqual = true;
+	    var bSize = b.__iterate(function(v, k)  {
+	      if (notAssociative ? !a.has(v) :
+	          flipped ? !is(v, a.get(k, NOT_SET)) : !is(a.get(k, NOT_SET), v)) {
+	        allEqual = false;
+	        return false;
+	      }
+	    });
+	
+	    return allEqual && a.size === bSize;
+	  }
+	
+	  createClass(Range, IndexedSeq);
+	
+	    function Range(start, end, step) {
+	      if (!(this instanceof Range)) {
+	        return new Range(start, end, step);
+	      }
+	      invariant(step !== 0, 'Cannot step a Range by 0');
+	      start = start || 0;
+	      if (end === undefined) {
+	        end = Infinity;
+	      }
+	      step = step === undefined ? 1 : Math.abs(step);
+	      if (end < start) {
+	        step = -step;
+	      }
+	      this._start = start;
+	      this._end = end;
+	      this._step = step;
+	      this.size = Math.max(0, Math.ceil((end - start) / step - 1) + 1);
+	      if (this.size === 0) {
+	        if (EMPTY_RANGE) {
+	          return EMPTY_RANGE;
+	        }
+	        EMPTY_RANGE = this;
+	      }
+	    }
+	
+	    Range.prototype.toString = function() {
+	      if (this.size === 0) {
+	        return 'Range []';
+	      }
+	      return 'Range [ ' +
+	        this._start + '...' + this._end +
+	        (this._step > 1 ? ' by ' + this._step : '') +
+	      ' ]';
+	    };
+	
+	    Range.prototype.get = function(index, notSetValue) {
+	      return this.has(index) ?
+	        this._start + wrapIndex(this, index) * this._step :
+	        notSetValue;
+	    };
+	
+	    Range.prototype.includes = function(searchValue) {
+	      var possibleIndex = (searchValue - this._start) / this._step;
+	      return possibleIndex >= 0 &&
+	        possibleIndex < this.size &&
+	        possibleIndex === Math.floor(possibleIndex);
+	    };
+	
+	    Range.prototype.slice = function(begin, end) {
+	      if (wholeSlice(begin, end, this.size)) {
+	        return this;
+	      }
+	      begin = resolveBegin(begin, this.size);
+	      end = resolveEnd(end, this.size);
+	      if (end <= begin) {
+	        return new Range(0, 0);
+	      }
+	      return new Range(this.get(begin, this._end), this.get(end, this._end), this._step);
+	    };
+	
+	    Range.prototype.indexOf = function(searchValue) {
+	      var offsetValue = searchValue - this._start;
+	      if (offsetValue % this._step === 0) {
+	        var index = offsetValue / this._step;
+	        if (index >= 0 && index < this.size) {
+	          return index
+	        }
+	      }
+	      return -1;
+	    };
+	
+	    Range.prototype.lastIndexOf = function(searchValue) {
+	      return this.indexOf(searchValue);
+	    };
+	
+	    Range.prototype.__iterate = function(fn, reverse) {
+	      var maxIndex = this.size - 1;
+	      var step = this._step;
+	      var value = reverse ? this._start + maxIndex * step : this._start;
+	      for (var ii = 0; ii <= maxIndex; ii++) {
+	        if (fn(value, ii, this) === false) {
+	          return ii + 1;
+	        }
+	        value += reverse ? -step : step;
+	      }
+	      return ii;
+	    };
+	
+	    Range.prototype.__iterator = function(type, reverse) {
+	      var maxIndex = this.size - 1;
+	      var step = this._step;
+	      var value = reverse ? this._start + maxIndex * step : this._start;
+	      var ii = 0;
+	      return new src_Iterator__Iterator(function()  {
+	        var v = value;
+	        value += reverse ? -step : step;
+	        return ii > maxIndex ? iteratorDone() : iteratorValue(type, ii++, v);
+	      });
+	    };
+	
+	    Range.prototype.equals = function(other) {
+	      return other instanceof Range ?
+	        this._start === other._start &&
+	        this._end === other._end &&
+	        this._step === other._step :
+	        deepEqual(this, other);
+	    };
+	
+	
+	  var EMPTY_RANGE;
+	
+	  createClass(Repeat, IndexedSeq);
+	
+	    function Repeat(value, times) {
+	      if (!(this instanceof Repeat)) {
+	        return new Repeat(value, times);
+	      }
+	      this._value = value;
+	      this.size = times === undefined ? Infinity : Math.max(0, times);
+	      if (this.size === 0) {
+	        if (EMPTY_REPEAT) {
+	          return EMPTY_REPEAT;
+	        }
+	        EMPTY_REPEAT = this;
+	      }
+	    }
+	
+	    Repeat.prototype.toString = function() {
+	      if (this.size === 0) {
+	        return 'Repeat []';
+	      }
+	      return 'Repeat [ ' + this._value + ' ' + this.size + ' times ]';
+	    };
+	
+	    Repeat.prototype.get = function(index, notSetValue) {
+	      return this.has(index) ? this._value : notSetValue;
+	    };
+	
+	    Repeat.prototype.includes = function(searchValue) {
+	      return is(this._value, searchValue);
+	    };
+	
+	    Repeat.prototype.slice = function(begin, end) {
+	      var size = this.size;
+	      return wholeSlice(begin, end, size) ? this :
+	        new Repeat(this._value, resolveEnd(end, size) - resolveBegin(begin, size));
+	    };
+	
+	    Repeat.prototype.reverse = function() {
+	      return this;
+	    };
+	
+	    Repeat.prototype.indexOf = function(searchValue) {
+	      if (is(this._value, searchValue)) {
+	        return 0;
+	      }
+	      return -1;
+	    };
+	
+	    Repeat.prototype.lastIndexOf = function(searchValue) {
+	      if (is(this._value, searchValue)) {
+	        return this.size;
+	      }
+	      return -1;
+	    };
+	
+	    Repeat.prototype.__iterate = function(fn, reverse) {
+	      for (var ii = 0; ii < this.size; ii++) {
+	        if (fn(this._value, ii, this) === false) {
+	          return ii + 1;
+	        }
+	      }
+	      return ii;
+	    };
+	
+	    Repeat.prototype.__iterator = function(type, reverse) {var this$0 = this;
+	      var ii = 0;
+	      return new src_Iterator__Iterator(function() 
+	        {return ii < this$0.size ? iteratorValue(type, ii++, this$0._value) : iteratorDone()}
+	      );
+	    };
+	
+	    Repeat.prototype.equals = function(other) {
+	      return other instanceof Repeat ?
+	        is(this._value, other._value) :
+	        deepEqual(other);
+	    };
+	
+	
+	  var EMPTY_REPEAT;
+	
+	  /**
+	   * Contributes additional methods to a constructor
+	   */
+	  function mixin(ctor, methods) {
+	    var keyCopier = function(key ) { ctor.prototype[key] = methods[key]; };
+	    Object.keys(methods).forEach(keyCopier);
+	    Object.getOwnPropertySymbols &&
+	      Object.getOwnPropertySymbols(methods).forEach(keyCopier);
+	    return ctor;
+	  }
+	
+	  Iterable.Iterator = src_Iterator__Iterator;
+	
+	  mixin(Iterable, {
+	
+	    // ### Conversion to other types
+	
+	    toArray: function() {
+	      assertNotInfinite(this.size);
+	      var array = new Array(this.size || 0);
+	      this.valueSeq().__iterate(function(v, i)  { array[i] = v; });
+	      return array;
+	    },
+	
+	    toIndexedSeq: function() {
+	      return new ToIndexedSequence(this);
+	    },
+	
+	    toJS: function() {
+	      return this.toSeq().map(
+	        function(value ) {return value && typeof value.toJS === 'function' ? value.toJS() : value}
+	      ).__toJS();
+	    },
+	
+	    toJSON: function() {
+	      return this.toSeq().map(
+	        function(value ) {return value && typeof value.toJSON === 'function' ? value.toJSON() : value}
+	      ).__toJS();
+	    },
+	
+	    toKeyedSeq: function() {
+	      return new ToKeyedSequence(this, true);
+	    },
+	
+	    toMap: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return src_Map__Map(this.toKeyedSeq());
+	    },
+	
+	    toObject: function() {
+	      assertNotInfinite(this.size);
+	      var object = {};
+	      this.__iterate(function(v, k)  { object[k] = v; });
+	      return object;
+	    },
+	
+	    toOrderedMap: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return OrderedMap(this.toKeyedSeq());
+	    },
+	
+	    toOrderedSet: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return OrderedSet(isKeyed(this) ? this.valueSeq() : this);
+	    },
+	
+	    toSet: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return src_Set__Set(isKeyed(this) ? this.valueSeq() : this);
+	    },
+	
+	    toSetSeq: function() {
+	      return new ToSetSequence(this);
+	    },
+	
+	    toSeq: function() {
+	      return isIndexed(this) ? this.toIndexedSeq() :
+	        isKeyed(this) ? this.toKeyedSeq() :
+	        this.toSetSeq();
+	    },
+	
+	    toStack: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return Stack(isKeyed(this) ? this.valueSeq() : this);
+	    },
+	
+	    toList: function() {
+	      // Use Late Binding here to solve the circular dependency.
+	      return List(isKeyed(this) ? this.valueSeq() : this);
+	    },
+	
+	
+	    // ### Common JavaScript methods and properties
+	
+	    toString: function() {
+	      return '[Iterable]';
+	    },
+	
+	    __toString: function(head, tail) {
+	      if (this.size === 0) {
+	        return head + tail;
+	      }
+	      return head + ' ' + this.toSeq().map(this.__toStringMapper).join(', ') + ' ' + tail;
+	    },
+	
+	
+	    // ### ES6 Collection methods (ES6 Array and Map)
+	
+	    concat: function() {var values = SLICE$0.call(arguments, 0);
+	      return reify(this, concatFactory(this, values));
+	    },
+	
+	    contains: function(searchValue) {
+	      return this.includes(searchValue);
+	    },
+	
+	    includes: function(searchValue) {
+	      return this.some(function(value ) {return is(value, searchValue)});
+	    },
+	
+	    entries: function() {
+	      return this.__iterator(ITERATE_ENTRIES);
+	    },
+	
+	    every: function(predicate, context) {
+	      assertNotInfinite(this.size);
+	      var returnValue = true;
+	      this.__iterate(function(v, k, c)  {
+	        if (!predicate.call(context, v, k, c)) {
+	          returnValue = false;
+	          return false;
+	        }
+	      });
+	      return returnValue;
+	    },
+	
+	    filter: function(predicate, context) {
+	      return reify(this, filterFactory(this, predicate, context, true));
+	    },
+	
+	    find: function(predicate, context, notSetValue) {
+	      var entry = this.findEntry(predicate, context);
+	      return entry ? entry[1] : notSetValue;
+	    },
+	
+	    findEntry: function(predicate, context) {
+	      var found;
+	      this.__iterate(function(v, k, c)  {
+	        if (predicate.call(context, v, k, c)) {
+	          found = [k, v];
+	          return false;
+	        }
+	      });
+	      return found;
+	    },
+	
+	    findLastEntry: function(predicate, context) {
+	      return this.toSeq().reverse().findEntry(predicate, context);
+	    },
+	
+	    forEach: function(sideEffect, context) {
+	      assertNotInfinite(this.size);
+	      return this.__iterate(context ? sideEffect.bind(context) : sideEffect);
+	    },
+	
+	    join: function(separator) {
+	      assertNotInfinite(this.size);
+	      separator = separator !== undefined ? '' + separator : ',';
+	      var joined = '';
+	      var isFirst = true;
+	      this.__iterate(function(v ) {
+	        isFirst ? (isFirst = false) : (joined += separator);
+	        joined += v !== null && v !== undefined ? v.toString() : '';
+	      });
+	      return joined;
+	    },
+	
+	    keys: function() {
+	      return this.__iterator(ITERATE_KEYS);
+	    },
+	
+	    map: function(mapper, context) {
+	      return reify(this, mapFactory(this, mapper, context));
+	    },
+	
+	    reduce: function(reducer, initialReduction, context) {
+	      assertNotInfinite(this.size);
+	      var reduction;
+	      var useFirst;
+	      if (arguments.length < 2) {
+	        useFirst = true;
+	      } else {
+	        reduction = initialReduction;
+	      }
+	      this.__iterate(function(v, k, c)  {
+	        if (useFirst) {
+	          useFirst = false;
+	          reduction = v;
+	        } else {
+	          reduction = reducer.call(context, reduction, v, k, c);
+	        }
+	      });
+	      return reduction;
+	    },
+	
+	    reduceRight: function(reducer, initialReduction, context) {
+	      var reversed = this.toKeyedSeq().reverse();
+	      return reversed.reduce.apply(reversed, arguments);
+	    },
+	
+	    reverse: function() {
+	      return reify(this, reverseFactory(this, true));
+	    },
+	
+	    slice: function(begin, end) {
+	      return reify(this, sliceFactory(this, begin, end, true));
+	    },
+	
+	    some: function(predicate, context) {
+	      return !this.every(not(predicate), context);
+	    },
+	
+	    sort: function(comparator) {
+	      return reify(this, sortFactory(this, comparator));
+	    },
+	
+	    values: function() {
+	      return this.__iterator(ITERATE_VALUES);
+	    },
+	
+	
+	    // ### More sequential methods
+	
+	    butLast: function() {
+	      return this.slice(0, -1);
+	    },
+	
+	    isEmpty: function() {
+	      return this.size !== undefined ? this.size === 0 : !this.some(function()  {return true});
+	    },
+	
+	    count: function(predicate, context) {
+	      return ensureSize(
+	        predicate ? this.toSeq().filter(predicate, context) : this
+	      );
+	    },
+	
+	    countBy: function(grouper, context) {
+	      return countByFactory(this, grouper, context);
+	    },
+	
+	    equals: function(other) {
+	      return deepEqual(this, other);
+	    },
+	
+	    entrySeq: function() {
+	      var iterable = this;
+	      if (iterable._cache) {
+	        // We cache as an entries array, so we can just return the cache!
+	        return new ArraySeq(iterable._cache);
+	      }
+	      var entriesSequence = iterable.toSeq().map(entryMapper).toIndexedSeq();
+	      entriesSequence.fromEntrySeq = function()  {return iterable.toSeq()};
+	      return entriesSequence;
+	    },
+	
+	    filterNot: function(predicate, context) {
+	      return this.filter(not(predicate), context);
+	    },
+	
+	    findLast: function(predicate, context, notSetValue) {
+	      return this.toKeyedSeq().reverse().find(predicate, context, notSetValue);
+	    },
+	
+	    first: function() {
+	      return this.find(returnTrue);
+	    },
+	
+	    flatMap: function(mapper, context) {
+	      return reify(this, flatMapFactory(this, mapper, context));
+	    },
+	
+	    flatten: function(depth) {
+	      return reify(this, flattenFactory(this, depth, true));
+	    },
+	
+	    fromEntrySeq: function() {
+	      return new FromEntriesSequence(this);
+	    },
+	
+	    get: function(searchKey, notSetValue) {
+	      return this.find(function(_, key)  {return is(key, searchKey)}, undefined, notSetValue);
+	    },
+	
+	    getIn: function(searchKeyPath, notSetValue) {
+	      var nested = this;
+	      // Note: in an ES6 environment, we would prefer:
+	      // for (var key of searchKeyPath) {
+	      var iter = forceIterator(searchKeyPath);
+	      var step;
+	      while (!(step = iter.next()).done) {
+	        var key = step.value;
+	        nested = nested && nested.get ? nested.get(key, NOT_SET) : NOT_SET;
+	        if (nested === NOT_SET) {
+	          return notSetValue;
+	        }
+	      }
+	      return nested;
+	    },
+	
+	    groupBy: function(grouper, context) {
+	      return groupByFactory(this, grouper, context);
+	    },
+	
+	    has: function(searchKey) {
+	      return this.get(searchKey, NOT_SET) !== NOT_SET;
+	    },
+	
+	    hasIn: function(searchKeyPath) {
+	      return this.getIn(searchKeyPath, NOT_SET) !== NOT_SET;
+	    },
+	
+	    isSubset: function(iter) {
+	      iter = typeof iter.includes === 'function' ? iter : Iterable(iter);
+	      return this.every(function(value ) {return iter.includes(value)});
+	    },
+	
+	    isSuperset: function(iter) {
+	      iter = typeof iter.isSubset === 'function' ? iter : Iterable(iter);
+	      return iter.isSubset(this);
+	    },
+	
+	    keySeq: function() {
+	      return this.toSeq().map(keyMapper).toIndexedSeq();
+	    },
+	
+	    last: function() {
+	      return this.toSeq().reverse().first();
+	    },
+	
+	    max: function(comparator) {
+	      return maxFactory(this, comparator);
+	    },
+	
+	    maxBy: function(mapper, comparator) {
+	      return maxFactory(this, comparator, mapper);
+	    },
+	
+	    min: function(comparator) {
+	      return maxFactory(this, comparator ? neg(comparator) : defaultNegComparator);
+	    },
+	
+	    minBy: function(mapper, comparator) {
+	      return maxFactory(this, comparator ? neg(comparator) : defaultNegComparator, mapper);
+	    },
+	
+	    rest: function() {
+	      return this.slice(1);
+	    },
+	
+	    skip: function(amount) {
+	      return this.slice(Math.max(0, amount));
+	    },
+	
+	    skipLast: function(amount) {
+	      return reify(this, this.toSeq().reverse().skip(amount).reverse());
+	    },
+	
+	    skipWhile: function(predicate, context) {
+	      return reify(this, skipWhileFactory(this, predicate, context, true));
+	    },
+	
+	    skipUntil: function(predicate, context) {
+	      return this.skipWhile(not(predicate), context);
+	    },
+	
+	    sortBy: function(mapper, comparator) {
+	      return reify(this, sortFactory(this, comparator, mapper));
+	    },
+	
+	    take: function(amount) {
+	      return this.slice(0, Math.max(0, amount));
+	    },
+	
+	    takeLast: function(amount) {
+	      return reify(this, this.toSeq().reverse().take(amount).reverse());
+	    },
+	
+	    takeWhile: function(predicate, context) {
+	      return reify(this, takeWhileFactory(this, predicate, context));
+	    },
+	
+	    takeUntil: function(predicate, context) {
+	      return this.takeWhile(not(predicate), context);
+	    },
+	
+	    valueSeq: function() {
+	      return this.toIndexedSeq();
+	    },
+	
+	
+	    // ### Hashable Object
+	
+	    hashCode: function() {
+	      return this.__hash || (this.__hash = hashIterable(this));
+	    },
+	
+	
+	    // ### Internal
+	
+	    // abstract __iterate(fn, reverse)
+	
+	    // abstract __iterator(type, reverse)
+	  });
+	
+	  // var IS_ITERABLE_SENTINEL = '@@__IMMUTABLE_ITERABLE__@@';
+	  // var IS_KEYED_SENTINEL = '@@__IMMUTABLE_KEYED__@@';
+	  // var IS_INDEXED_SENTINEL = '@@__IMMUTABLE_INDEXED__@@';
+	  // var IS_ORDERED_SENTINEL = '@@__IMMUTABLE_ORDERED__@@';
+	
+	  var IterablePrototype = Iterable.prototype;
+	  IterablePrototype[IS_ITERABLE_SENTINEL] = true;
+	  IterablePrototype[ITERATOR_SYMBOL] = IterablePrototype.values;
+	  IterablePrototype.__toJS = IterablePrototype.toArray;
+	  IterablePrototype.__toStringMapper = quoteString;
+	  IterablePrototype.inspect =
+	  IterablePrototype.toSource = function() { return this.toString(); };
+	  IterablePrototype.chain = IterablePrototype.flatMap;
+	
+	  // Temporary warning about using length
+	  (function () {
+	    try {
+	      Object.defineProperty(IterablePrototype, 'length', {
+	        get: function () {
+	          if (!Iterable.noLengthWarning) {
+	            var stack;
+	            try {
+	              throw new Error();
+	            } catch (error) {
+	              stack = error.stack;
+	            }
+	            if (stack.indexOf('_wrapObject') === -1) {
+	              console && console.warn && console.warn(
+	                'iterable.length has been deprecated, '+
+	                'use iterable.size or iterable.count(). '+
+	                'This warning will become a silent error in a future version. ' +
+	                stack
+	              );
+	              return this.size;
+	            }
+	          }
+	        }
+	      });
+	    } catch (e) {}
+	  })();
+	
+	
+	
+	  mixin(KeyedIterable, {
+	
+	    // ### More sequential methods
+	
+	    flip: function() {
+	      return reify(this, flipFactory(this));
+	    },
+	
+	    findKey: function(predicate, context) {
+	      var entry = this.findEntry(predicate, context);
+	      return entry && entry[0];
+	    },
+	
+	    findLastKey: function(predicate, context) {
+	      return this.toSeq().reverse().findKey(predicate, context);
+	    },
+	
+	    keyOf: function(searchValue) {
+	      return this.findKey(function(value ) {return is(value, searchValue)});
+	    },
+	
+	    lastKeyOf: function(searchValue) {
+	      return this.findLastKey(function(value ) {return is(value, searchValue)});
+	    },
+	
+	    mapEntries: function(mapper, context) {var this$0 = this;
+	      var iterations = 0;
+	      return reify(this,
+	        this.toSeq().map(
+	          function(v, k)  {return mapper.call(context, [k, v], iterations++, this$0)}
+	        ).fromEntrySeq()
+	      );
+	    },
+	
+	    mapKeys: function(mapper, context) {var this$0 = this;
+	      return reify(this,
+	        this.toSeq().flip().map(
+	          function(k, v)  {return mapper.call(context, k, v, this$0)}
+	        ).flip()
+	      );
+	    },
+	
+	  });
+	
+	  var KeyedIterablePrototype = KeyedIterable.prototype;
+	  KeyedIterablePrototype[IS_KEYED_SENTINEL] = true;
+	  KeyedIterablePrototype[ITERATOR_SYMBOL] = IterablePrototype.entries;
+	  KeyedIterablePrototype.__toJS = IterablePrototype.toObject;
+	  KeyedIterablePrototype.__toStringMapper = function(v, k)  {return JSON.stringify(k) + ': ' + quoteString(v)};
+	
+	
+	
+	  mixin(IndexedIterable, {
+	
+	    // ### Conversion to other types
+	
+	    toKeyedSeq: function() {
+	      return new ToKeyedSequence(this, false);
+	    },
+	
+	
+	    // ### ES6 Collection methods (ES6 Array and Map)
+	
+	    filter: function(predicate, context) {
+	      return reify(this, filterFactory(this, predicate, context, false));
+	    },
+	
+	    findIndex: function(predicate, context) {
+	      var entry = this.findEntry(predicate, context);
+	      return entry ? entry[0] : -1;
+	    },
+	
+	    indexOf: function(searchValue) {
+	      var key = this.toKeyedSeq().keyOf(searchValue);
+	      return key === undefined ? -1 : key;
+	    },
+	
+	    lastIndexOf: function(searchValue) {
+	      return this.toSeq().reverse().indexOf(searchValue);
+	    },
+	
+	    reverse: function() {
+	      return reify(this, reverseFactory(this, false));
+	    },
+	
+	    slice: function(begin, end) {
+	      return reify(this, sliceFactory(this, begin, end, false));
+	    },
+	
+	    splice: function(index, removeNum /*, ...values*/) {
+	      var numArgs = arguments.length;
+	      removeNum = Math.max(removeNum | 0, 0);
+	      if (numArgs === 0 || (numArgs === 2 && !removeNum)) {
+	        return this;
+	      }
+	      index = resolveBegin(index, this.size);
+	      var spliced = this.slice(0, index);
+	      return reify(
+	        this,
+	        numArgs === 1 ?
+	          spliced :
+	          spliced.concat(arrCopy(arguments, 2), this.slice(index + removeNum))
+	      );
+	    },
+	
+	
+	    // ### More collection methods
+	
+	    findLastIndex: function(predicate, context) {
+	      var key = this.toKeyedSeq().findLastKey(predicate, context);
+	      return key === undefined ? -1 : key;
+	    },
+	
+	    first: function() {
+	      return this.get(0);
+	    },
+	
+	    flatten: function(depth) {
+	      return reify(this, flattenFactory(this, depth, false));
+	    },
+	
+	    get: function(index, notSetValue) {
+	      index = wrapIndex(this, index);
+	      return (index < 0 || (this.size === Infinity ||
+	          (this.size !== undefined && index > this.size))) ?
+	        notSetValue :
+	        this.find(function(_, key)  {return key === index}, undefined, notSetValue);
+	    },
+	
+	    has: function(index) {
+	      index = wrapIndex(this, index);
+	      return index >= 0 && (this.size !== undefined ?
+	        this.size === Infinity || index < this.size :
+	        this.indexOf(index) !== -1
+	      );
+	    },
+	
+	    interpose: function(separator) {
+	      return reify(this, interposeFactory(this, separator));
+	    },
+	
+	    interleave: function(/*...iterables*/) {
+	      var iterables = [this].concat(arrCopy(arguments));
+	      var zipped = zipWithFactory(this.toSeq(), IndexedSeq.of, iterables);
+	      var interleaved = zipped.flatten(true);
+	      if (zipped.size) {
+	        interleaved.size = zipped.size * iterables.length;
+	      }
+	      return reify(this, interleaved);
+	    },
+	
+	    last: function() {
+	      return this.get(-1);
+	    },
+	
+	    skipWhile: function(predicate, context) {
+	      return reify(this, skipWhileFactory(this, predicate, context, false));
+	    },
+	
+	    zip: function(/*, ...iterables */) {
+	      var iterables = [this].concat(arrCopy(arguments));
+	      return reify(this, zipWithFactory(this, defaultZipper, iterables));
+	    },
+	
+	    zipWith: function(zipper/*, ...iterables */) {
+	      var iterables = arrCopy(arguments);
+	      iterables[0] = this;
+	      return reify(this, zipWithFactory(this, zipper, iterables));
+	    },
+	
+	  });
+	
+	  IndexedIterable.prototype[IS_INDEXED_SENTINEL] = true;
+	  IndexedIterable.prototype[IS_ORDERED_SENTINEL] = true;
+	
+	
+	
+	  mixin(SetIterable, {
+	
+	    // ### ES6 Collection methods (ES6 Array and Map)
+	
+	    get: function(value, notSetValue) {
+	      return this.has(value) ? value : notSetValue;
+	    },
+	
+	    includes: function(value) {
+	      return this.has(value);
+	    },
+	
+	
+	    // ### More sequential methods
+	
+	    keySeq: function() {
+	      return this.valueSeq();
+	    },
+	
+	  });
+	
+	  SetIterable.prototype.has = IterablePrototype.includes;
+	
+	
+	  // Mixin subclasses
+	
+	  mixin(KeyedSeq, KeyedIterable.prototype);
+	  mixin(IndexedSeq, IndexedIterable.prototype);
+	  mixin(SetSeq, SetIterable.prototype);
+	
+	  mixin(KeyedCollection, KeyedIterable.prototype);
+	  mixin(IndexedCollection, IndexedIterable.prototype);
+	  mixin(SetCollection, SetIterable.prototype);
+	
+	
+	  // #pragma Helper functions
+	
+	  function keyMapper(v, k) {
+	    return k;
+	  }
+	
+	  function entryMapper(v, k) {
+	    return [k, v];
+	  }
+	
+	  function not(predicate) {
+	    return function() {
+	      return !predicate.apply(this, arguments);
+	    }
+	  }
+	
+	  function neg(predicate) {
+	    return function() {
+	      return -predicate.apply(this, arguments);
+	    }
+	  }
+	
+	  function quoteString(value) {
+	    return typeof value === 'string' ? JSON.stringify(value) : value;
+	  }
+	
+	  function defaultZipper() {
+	    return arrCopy(arguments);
+	  }
+	
+	  function defaultNegComparator(a, b) {
+	    return a < b ? 1 : a > b ? -1 : 0;
+	  }
+	
+	  function hashIterable(iterable) {
+	    if (iterable.size === Infinity) {
+	      return 0;
+	    }
+	    var ordered = isOrdered(iterable);
+	    var keyed = isKeyed(iterable);
+	    var h = ordered ? 1 : 0;
+	    var size = iterable.__iterate(
+	      keyed ?
+	        ordered ?
+	          function(v, k)  { h = 31 * h + hashMerge(hash(v), hash(k)) | 0; } :
+	          function(v, k)  { h = h + hashMerge(hash(v), hash(k)) | 0; } :
+	        ordered ?
+	          function(v ) { h = 31 * h + hash(v) | 0; } :
+	          function(v ) { h = h + hash(v) | 0; }
+	    );
+	    return murmurHashOfSize(size, h);
+	  }
+	
+	  function murmurHashOfSize(size, h) {
+	    h = src_Math__imul(h, 0xCC9E2D51);
+	    h = src_Math__imul(h << 15 | h >>> -15, 0x1B873593);
+	    h = src_Math__imul(h << 13 | h >>> -13, 5);
+	    h = (h + 0xE6546B64 | 0) ^ size;
+	    h = src_Math__imul(h ^ h >>> 16, 0x85EBCA6B);
+	    h = src_Math__imul(h ^ h >>> 13, 0xC2B2AE35);
+	    h = smi(h ^ h >>> 16);
+	    return h;
+	  }
+	
+	  function hashMerge(a, b) {
+	    return a ^ b + 0x9E3779B9 + (a << 6) + (a >> 2) | 0; // int
+	  }
+	
+	  var Immutable = {
+	
+	    Iterable: Iterable,
+	
+	    Seq: Seq,
+	    Collection: Collection,
+	    Map: src_Map__Map,
+	    OrderedMap: OrderedMap,
+	    List: List,
+	    Stack: Stack,
+	    Set: src_Set__Set,
+	    OrderedSet: OrderedSet,
+	
+	    Record: Record,
+	    Range: Range,
+	    Repeat: Repeat,
+	
+	    is: is,
+	    fromJS: fromJS,
+	
+	  };
+	
+	  return Immutable;
+	
+	}));
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 	
-	var svg = __webpack_require__(138);
+	var svg = __webpack_require__(165);
 	
-	var _require = __webpack_require__(37);
+	var _require = __webpack_require__(53);
 	
 	var makeDOMDriver = _require.makeDOMDriver;
 	
-	var _require2 = __webpack_require__(69);
+	var _require2 = __webpack_require__(96);
 	
 	var makeHTMLDriver = _require2.makeHTMLDriver;
 	
-	var h = __webpack_require__(39);
+	var h = __webpack_require__(55);
 	
 	var CycleDOM = {
 	  /**
@@ -435,7 +5302,5468 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = CycleDOM;
 
 /***/ },
-/* 6 */
+/* 7 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function (value) {
+		if (value == null) throw new TypeError("Cannot use null or undefined");
+		return value;
+	};
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	module.exports = isWidget
+	
+	function isWidget(w) {
+	    return w && w.type === "Widget"
+	}
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	var $Object = Object;
+	module.exports = {
+	  create:     $Object.create,
+	  getProto:   $Object.getPrototypeOf,
+	  isEnum:     {}.propertyIsEnumerable,
+	  getDesc:    $Object.getOwnPropertyDescriptor,
+	  setDesc:    $Object.defineProperty,
+	  setDescs:   $Object.defineProperties,
+	  getKeys:    $Object.keys,
+	  getNames:   $Object.getOwnPropertyNames,
+	  getSymbols: $Object.getOwnPropertySymbols,
+	  each:       [].forEach
+	};
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"ATTACK_TYPES": {
+			"acid": {
+				"damagePerRound": {
+					"$rand": 6
+				},
+				"meta": "Acid usually has to be washed off with either water or chemicals, depending. Some acids are aggravated by water."
+			},
+			"explosion": {},
+			"fire": {
+				"damagePerRound": {
+					"$rand": 6
+				},
+				"meta": "Fire can be extinguished by spending one full combat round rolling on the ground, provided the ground isn’t on fire, too. The person or critter’s AC will be reduced to what they are wearing while on the ground, and the must spend the usual 4 AP to get up the next round. Note that the poor person still takes damage during the turn in which they are extinguishing themselves."
+			},
+			"laser": {},
+			"normal": {},
+			"plasma": {},
+			"poisonTypeA": {
+				"damagePerHour": 1,
+				"durationHours": 18,
+				"meta": "roll Endurance for no damage"
+			},
+			"poisonTypeB": {
+				"damagePerHour": 2,
+				"durationHours": 18,
+				"meta": "roll Endurance for no damage"
+			},
+			"poisonTypeC": {
+				"durationHours": 12,
+				"effect": {
+					"agility": {
+						"$max": [
+							"value",
+							2
+						]
+					},
+					"perception": {
+						"$max": [
+							"value",
+							2
+						]
+					},
+					"strength": {
+						"$max": [
+							"value",
+							2
+						]
+					}
+				}
+			},
+			"poisonTypeD": {
+				"damagePerHour": 4,
+				"durationHours": 24,
+				"meta": "roll Endurance for half damage"
+			},
+			"poisonTypeE": {
+				"damagePerHour": 6,
+				"durationHours": 24,
+				"meta": "roll Endurance for half damage"
+			},
+			"poisonTypeF": {
+				"meta": "Go into shock 1 hour after contact, slip into a coma for 1d10 days. For each day the character spends in a coma and goes untreated by a doctor or an antidote, that character must successfully roll against Endurance or die."
+			},
+			"poisonTypeG": {
+				"meta": "Causes death 5 minutes after exposure, unless Antidote is administered."
+			},
+			"radiation": {
+				"effect": {
+					"rads": {
+						"$add": [
+							"value",
+							"input"
+						]
+					}
+				}
+			},
+			"reduceActionPoints": {
+				"effect": {
+					"actionPoints": {
+						"$sub": [
+							"value",
+							"input"
+						]
+					}
+				}
+			}
+		},
+		"BESTIARY": {
+			"bloatfly": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"spit": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"poisonTypeA": 1,
+						"skill": 65
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 15,
+				"health": 9,
+				"resistContactGas": 10,
+				"resistInhaledGas": 10,
+				"resistPoison": 60,
+				"resistRadiation": 20,
+				"sequence": 7
+			},
+			"brahmin": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"horn": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"skill": 75
+					}
+				},
+				"criticalChance": 2,
+				"experienceValue": 50,
+				"health": 40,
+				"resistContactGas": 10,
+				"resistExplosion": 10,
+				"resistExplosionThreshold": 2,
+				"resistNormal": 10,
+				"resistNormalThreshold": 2,
+				"resistPoison": 20,
+				"resistRadiation": 30,
+				"sequence": 6
+			},
+			"centaur": {
+				"actionPoints": 9,
+				"armorClass": 25,
+				"attacks": {
+					"spit": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"radiation": 50,
+						"range": 5,
+						"skill": 65
+					},
+					"swing": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 20
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 8,
+				"experienceValue": 750,
+				"health": 60,
+				"resistContactGas": 70,
+				"resistExplosion": 90,
+				"resistExplosionThreshold": 10,
+				"resistFire": 40,
+				"resistFireThreshold": 5,
+				"resistInhaledGas": 40,
+				"resistLaser": 10,
+				"resistLaserThreshold": 1,
+				"resistNormal": 95,
+				"resistNormalThreshold": 10,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 1,
+				"resistPoison": 50,
+				"resistRadiation": 80,
+				"sequence": 9
+			},
+			"coyote": {
+				"actionPoints": 6,
+				"armorClass": 3,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 70
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 100,
+				"health": 20,
+				"resistPoison": 20,
+				"resistRadiation": 10,
+				"sequence": 6
+			},
+			"deathclaw": {
+				"actionPoints": 10,
+				"armorClass": 25,
+				"attacks": {
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 9,
+				"experienceValue": 800,
+				"health": 70,
+				"resistContactGas": 40,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 4,
+				"resistFire": 40,
+				"resistFireThreshold": 4,
+				"resistNormal": 40,
+				"resistNormalThreshold": 4,
+				"resistPoison": 80,
+				"resistRadiation": 60,
+				"sequence": 10
+			},
+			"direWolf": {
+				"actionPoints": 9,
+				"armorClass": 9,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"skill": 90
+					},
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"meta": "roll against Endurance to avoid knockdown",
+						"skill": 80
+					}
+				},
+				"criticalChance": 7,
+				"experienceValue": 700,
+				"health": 60,
+				"resistNormal": 40,
+				"resistNormalThreshold": 5,
+				"resistPoison": 40,
+				"resistRadiation": 20,
+				"sequence": 9
+			},
+			"dog": {
+				"actionPoints": 6,
+				"armorClass": 3,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"meta": "roll against Agility to avoid a knockdown",
+						"skill": 80
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 100,
+				"health": 20,
+				"resistPoison": 18,
+				"resistRadiation": 8,
+				"sequence": 6
+			},
+			"feralDog": {
+				"actionPoints": 6,
+				"armorClass": 3,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 70
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 100,
+				"health": 20,
+				"resistPoison": 20,
+				"resistRadiation": 10,
+				"sequence": 6
+			},
+			"feralGhoul": {
+				"actionPoints": 8,
+				"armorClass": 3,
+				"attacks": {
+					"bite": {
+						"actionPoints": 5,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"skill": 60
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 50,
+				"health": 15,
+				"resistPoison": 40,
+				"resistRadiation": 100,
+				"sequence": 8
+			},
+			"feralGhoulReaver": {
+				"actionPoints": 10,
+				"armorClass": 8,
+				"attacks": {
+					"bite": {
+						"actionPoints": 5,
+						"damage": {
+							"$rand": 10
+						},
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 75
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 100,
+				"health": 30,
+				"resistExplosion": 1,
+				"resistExplosionThreshold": 10,
+				"resistNormal": 1,
+				"resistNormalThreshold": 10,
+				"resistPoison": 40,
+				"resistRadiation": 100,
+				"sequence": 10
+			},
+			"feralGhoulRoamer": {
+				"actionPoints": 8,
+				"armorClass": 4,
+				"attacks": {
+					"bite": {
+						"actionPoints": 5,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"skill": 70
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 60,
+				"health": 15,
+				"resistPoison": 40,
+				"resistRadiation": 100,
+				"sequence": 10
+			},
+			"feralGlowingOne": {
+				"actionPoints": 10,
+				"armorClass": 5,
+				"attacks": {
+					"bite": {
+						"actionPoints": 5,
+						"damage": {
+							"$rand": 8
+						},
+						"radiation": 10,
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"radiation": 10,
+						"skill": 70
+					},
+					"radiationBurst": {
+						"actionPoints": 10,
+						"areaOfEffect": true,
+						"damage": {
+							"$rand": 4
+						},
+						"meta": "Acts as explosive for resistance purposes. Sends small objects flying.",
+						"radiation": 20,
+						"skill": 90
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 150,
+				"health": 20,
+				"resistPoison": 40,
+				"resistRadiation": 120,
+				"sequence": 8
+			},
+			"fireAnt": {
+				"actionPoints": 6,
+				"armorClass": 2,
+				"attacks": {
+					"fireBreath": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 6
+						},
+						"fire": 1,
+						"skill": 60
+					},
+					"mandibles": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"poisonTypeA": 1,
+						"skill": 60
+					}
+				},
+				"criticalChance": 3,
+				"experienceValue": 60,
+				"health": 15,
+				"resistContactGas": 90,
+				"resistExplosion": 10,
+				"resistExplosionThreshold": 1,
+				"resistFire": 40,
+				"resistFireThreshold": 5,
+				"resistInhaledGas": 60,
+				"resistPoison": 100,
+				"resistRadiation": 60,
+				"sequence": 6
+			},
+			"fireGecko": {
+				"actionPoints": 9,
+				"armorClass": 8,
+				"attacks": {
+					"bite": {
+						"actionPoints": 4,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 75
+					},
+					"fireBreath": {
+						"actionPoints": 4,
+						"areaOfEffect": "cone",
+						"areaOfEffectSize": 5,
+						"damage": {
+							"$rand": 4
+						},
+						"fire": 1,
+						"rounds": 2,
+						"skill": 70
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 300,
+				"health": 40,
+				"resistContactGas": 20,
+				"resistExplosion": 10,
+				"resistExplosionThreshold": 2,
+				"resistFire": 30,
+				"resistFireThreshold": 3,
+				"resistNormal": 30,
+				"resistNormalThreshold": 3,
+				"resistPoison": 80,
+				"resistRadiation": 80,
+				"sequence": 9
+			},
+			"flailer": {
+				"actionPoints": 9,
+				"armorClass": 25,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"poisonTypeD": 1,
+						"skill": 90
+					},
+					"flail": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 8,
+				"experienceValue": 750,
+				"health": 60,
+				"resistContactGas": 100,
+				"resistExplosion": 90,
+				"resistExplosionThreshold": 10,
+				"resistFire": 40,
+				"resistFireThreshold": 5,
+				"resistInhaledGas": 100,
+				"resistLaser": 10,
+				"resistLaserThreshold": 1,
+				"resistNormal": 95,
+				"resistNormalThreshold": 10,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 1,
+				"resistPoison": 95,
+				"resistRadiation": 100,
+				"sequence": 9
+			},
+			"floater": {
+				"actionPoints": 9,
+				"armorClass": 20,
+				"attacks": {
+					"stalk": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 4
+								},
+								{
+									"$rand": 4
+								},
+								{
+									"$rand": 4
+								}
+							]
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 8,
+				"experienceValue": 500,
+				"health": 60,
+				"resistContactGas": 90,
+				"resistExplosion": 90,
+				"resistExplosionThreshold": 10,
+				"resistFire": 40,
+				"resistFireThreshold": 5,
+				"resistInhaledGas": 100,
+				"resistLaser": 10,
+				"resistLaserThreshold": 1,
+				"resistNormal": 95,
+				"resistNormalThreshold": 10,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 1,
+				"resistPoison": 80,
+				"resistRadiation": 80,
+				"sequence": 9
+			},
+			"gecko": {
+				"actionPoints": 7,
+				"armorClass": 5,
+				"attacks": {
+					"bite": {
+						"actionPoints": 4,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 75
+					}
+				},
+				"criticalChance": 2,
+				"experienceValue": 150,
+				"health": 30,
+				"resistContactGas": 10,
+				"resistNormal": 10,
+				"resistNormalThreshold": 1,
+				"resistPoison": 80,
+				"resistRadiation": 75,
+				"sequence": 7
+			},
+			"giantAnt": {
+				"actionPoints": 6,
+				"armorClass": 2,
+				"attacks": {
+					"mandibles": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"poisonTypeA": 1,
+						"skill": 60
+					}
+				},
+				"criticalChance": 3,
+				"experienceValue": 50,
+				"health": 15,
+				"resistContactGas": 90,
+				"resistInhaledGas": 60,
+				"resistPoison": 100,
+				"resistRadiation": 60,
+				"sequence": 6
+			},
+			"giantRat": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 4
+						},
+						"poisonTypeA": 1,
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 4
+						},
+						"skill": 75
+					}
+				},
+				"criticalChance": 3,
+				"experienceValue": 25,
+				"health": 10,
+				"resistPoison": 50,
+				"resistRadiation": 20,
+				"sequence": 6
+			},
+			"goldenGecko": {
+				"actionPoints": 9,
+				"armorClass": 10,
+				"attacks": {
+					"bite": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 20
+						},
+						"radiation": 15,
+						"skill": 85
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 12
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 400,
+				"health": 50,
+				"resistContactGas": 50,
+				"resistExplosion": 10,
+				"resistExplosionThreshold": 2,
+				"resistFire": 50,
+				"resistFireThreshold": 5,
+				"resistNormal": 50,
+				"resistNormalThreshold": 5,
+				"resistPoison": 100,
+				"resistRadiation": 100,
+				"sequence": 9
+			},
+			"greaterMolerat": {
+				"actionPoints": 9,
+				"armorClass": 12,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 10
+						},
+						"poisonTypeB": 1,
+						"skill": 75
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 10
+						},
+						"skill": 75
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 400,
+				"health": 30,
+				"resistContactGas": 25,
+				"resistExplosion": 20,
+				"resistLaser": 15,
+				"resistNormal": 20,
+				"resistPoison": 60,
+				"resistRadiation": 25,
+				"sequence": 9
+			},
+			"greaterRadscorpion": {
+				"actionPoints": 8,
+				"armorClass": 10,
+				"attacks": {
+					"tail": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 12
+						},
+						"poisonTypeD": 1,
+						"skill": 80
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 400,
+				"health": 35,
+				"resistContactGas": 100,
+				"resistExplosion": 5,
+				"resistExplosionThreshold": 1,
+				"resistFire": 20,
+				"resistFireThreshold": 4,
+				"resistInhaledGas": 50,
+				"resistNormal": 5,
+				"resistNormalThreshold": 1,
+				"resistPoison": 100,
+				"resistRadiation": 50,
+				"sequence": 8
+			},
+			"lesserMolerat": {
+				"actionPoints": 7,
+				"armorClass": 9,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"poisonTypeA": 1,
+						"skill": 75
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 3,
+				"experienceValue": 100,
+				"health": 15,
+				"resistExplosion": 5,
+				"resistExplosionThreshold": 1,
+				"resistNormal": 5,
+				"resistNormalThreshold": 1,
+				"resistPoison": 50,
+				"resistRadiation": 25,
+				"sequence": 7
+			},
+			"lesserPigrat": {
+				"actionPoints": 9,
+				"armorClass": 14,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"poisonTypeB": 1,
+						"skill": 75
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 6,
+				"experienceValue": 450,
+				"health": 30,
+				"resistContactGas": 20,
+				"resistExplosion": 25,
+				"resistExplosionThreshold": 4,
+				"resistFire": 10,
+				"resistFireThreshold": 2,
+				"resistNormal": 25,
+				"resistNormalThreshold": 4,
+				"resistPoison": 70,
+				"resistRadiation": 45,
+				"sequence": 9
+			},
+			"lesserRadscorpion": {
+				"actionPoints": 8,
+				"armorClass": 7,
+				"attacks": {
+					"tail": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 10
+						},
+						"poisonTypeD": 1,
+						"skill": 70
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 200,
+				"health": 25,
+				"resistContactGas": 100,
+				"resistExplosion": 5,
+				"resistExplosionThreshold": 1,
+				"resistFire": 20,
+				"resistFireThreshold": 4,
+				"resistInhaledGas": 30,
+				"resistNormal": 5,
+				"resistNormalThreshold": 1,
+				"resistPoison": 100,
+				"resistRadiation": 25,
+				"sequence": 8
+			},
+			"mantis": {
+				"actionPoints": 7,
+				"armorClass": 5,
+				"attacks": {
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 75
+					},
+					"mandible": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 6
+						},
+						"poisonTypeB": 1,
+						"skill": 70
+					}
+				},
+				"criticalChance": 2,
+				"experienceValue": 50,
+				"health": 10,
+				"resistContactGas": 90,
+				"resistInhaledGas": 60,
+				"resistPoison": 75,
+				"resistRadiation": 80,
+				"sequence": 7
+			},
+			"mirelurk": {
+				"actionPoints": 6,
+				"armorClass": 10,
+				"attacks": {
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 10
+						},
+						"skill": 70
+					},
+					"ram": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 100,
+				"health": 30,
+				"resistContactGas": 10,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 5,
+				"resistFire": 20,
+				"resistFireThreshold": 3,
+				"resistLaser": 10,
+				"resistLaserThreshold": 1,
+				"resistNormal": 50,
+				"resistNormalThreshold": 6,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 1,
+				"resistPoison": 10,
+				"resistRadiation": 40,
+				"sequence": 6
+			},
+			"mirelurkHunter": {
+				"actionPoints": 7,
+				"armorClass": 14,
+				"attacks": {
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 12
+						},
+						"skill": 70
+					},
+					"ram": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 200,
+				"health": 40,
+				"resistContactGas": 20,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 5,
+				"resistFire": 30,
+				"resistFireThreshold": 4,
+				"resistLaser": 10,
+				"resistLaserThreshold": 1,
+				"resistNormal": 70,
+				"resistNormalThreshold": 8,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 1,
+				"resistPoison": 10,
+				"resistRadiation": 40,
+				"sequence": 8
+			},
+			"mirelurkKing": {
+				"actionPoints": 8,
+				"armorClass": 6,
+				"attacks": {
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					},
+					"screech": {
+						"actionPoints": 5,
+						"damage": {
+							"$rand": 6
+						},
+						"range": 2,
+						"reduceActionPoints": 2,
+						"skill": 85
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 200,
+				"health": 30,
+				"resistContactGas": 10,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 3,
+				"resistFire": 40,
+				"resistFireThreshold": 5,
+				"resistLaser": 10,
+				"resistLaserThreshold": 2,
+				"resistNormal": 30,
+				"resistNormalThreshold": 4,
+				"resistPlasma": 10,
+				"resistPlasmaThreshold": 2,
+				"resistPoison": 10,
+				"resistRadiation": 40,
+				"sequence": 10
+			},
+			"nukaLurk": {
+				"actionPoints": 6,
+				"armorClass": 10,
+				"attacks": {
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 10
+						},
+						"skill": 75
+					},
+					"ram": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 100,
+				"health": 40,
+				"resistContactGas": 20,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 5,
+				"resistFire": 30,
+				"resistFireThreshold": 4,
+				"resistLaser": 30,
+				"resistLaserThreshold": 4,
+				"resistNormal": 40,
+				"resistNormalThreshold": 5,
+				"resistPlasma": 30,
+				"resistPlasmaThreshold": 4,
+				"resistPoison": 20,
+				"resistRadiation": 50,
+				"sequence": 8
+			},
+			"nukaLurkQuantum": {
+				"actionPoints": 8,
+				"armorClass": 10,
+				"attacks": {
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 12
+						},
+						"skill": 70
+					},
+					"ram": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 80
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 200,
+				"health": 40,
+				"resistContactGas": 20,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 5,
+				"resistFire": 20,
+				"resistFireThreshold": 3,
+				"resistLaser": 50,
+				"resistLaserThreshold": 6,
+				"resistNormal": 50,
+				"resistNormalThreshold": 6,
+				"resistPlasma": 40,
+				"resistPlasmaThreshold": 5,
+				"resistPoison": 20,
+				"resistRadiation": 60,
+				"sequence": 8
+			},
+			"radRat": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 4
+						},
+						"radiation": 10,
+						"skill": 70
+					},
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 4
+						},
+						"radiation": 10,
+						"skill": 75
+					}
+				},
+				"criticalChance": 3,
+				"experienceValue": 35,
+				"health": 10,
+				"resistContactGas": 50,
+				"resistPoison": 60,
+				"resistRadiation": 100,
+				"sequence": 6
+			},
+			"radroach": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"mandible": {
+						"actionPoints": 3,
+						"damage": {
+							"$rand": 4
+						},
+						"poisonTypeB": 1,
+						"skill": 60
+					}
+				},
+				"criticalChance": 4,
+				"experienceValue": 50,
+				"health": 15,
+				"resistContactGas": 100,
+				"resistInhaledGas": 80,
+				"resistNormal": 30,
+				"resistNormalThreshold": 3,
+				"resistPoison": 100,
+				"resistRadiation": 95,
+				"sequence": 6
+			},
+			"wolf": {
+				"actionPoints": 6,
+				"armorClass": 5,
+				"attacks": {
+					"bite": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 6
+								},
+								{
+									"$rand": 6
+								}
+							]
+						},
+						"skill": 80
+					},
+					"claw": {
+						"actionPoints": 4,
+						"damage": {
+							"$rand": 8
+						},
+						"skill": 70
+					}
+				},
+				"criticalChance": 5,
+				"experienceValue": 100,
+				"health": 20,
+				"resistPoison": 25,
+				"resistRadiation": 15,
+				"sequence": 6
+			},
+			"yaoGuai": {
+				"actionPoints": 10,
+				"armorClass": 25,
+				"attacks": {
+					"claw": {
+						"actionPoints": 3,
+						"damage": {
+							"$add": [
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								},
+								{
+									"$rand": 8
+								}
+							]
+						},
+						"skill": 90
+					}
+				},
+				"criticalChance": 9,
+				"experienceValue": 850,
+				"health": 100,
+				"resistContactGas": 40,
+				"resistExplosion": 40,
+				"resistExplosionThreshold": 4,
+				"resistFire": 30,
+				"resistFireThreshold": 3,
+				"resistNormal": 20,
+				"resistNormalThreshold": 2,
+				"resistPoison": 80,
+				"resistRadiation": 60,
+				"sequence": 10
+			}
+		},
+		"BODY_PARTS": {
+			"arm": {
+				"count": 2,
+				"crippleEffect": {
+					"bigGuns": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"climb": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"doctor": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"firstAid": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"swim": {
+						"$sub": [
+							"value",
+							15
+						]
+					}
+				},
+				"crippleHealth": {
+					"$add": [
+						"endurance",
+						{
+							"$floor": {
+								"$div": [
+									"health",
+									10
+								]
+							}
+						}
+					]
+				},
+				"cripplePartCount": 2,
+				"meta": "-45% penalty to all skills if both arms are crippled",
+				"parts": {
+					"elbow": {
+						"crippleEffect": {
+							"climb": {
+								"$sub": [
+									"value",
+									8
+								]
+							},
+							"strength": {
+								"$dec": "value"
+							},
+							"swim": {
+								"$sub": [
+									"value",
+									8
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								{
+									"$ceil": {
+										"$half": "endurance"
+									}
+								},
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"targetPenalty": 17
+					},
+					"hand": {
+						"crippleEffect": {
+							"medicine": {
+								"$sub": [
+									10,
+									"value"
+								]
+							},
+							"technical": {
+								"$sub": [
+									10,
+									"value"
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								{
+									"$ceil": {
+										"$half": "endurance"
+									}
+								},
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											40
+										]
+									}
+								}
+							]
+						},
+						"meta": "-15% penalty to all skills involving that hand",
+						"targetPenalty": 25
+					},
+					"shoulder": {
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"meta": "-10% penalty to all attacks with that arm",
+						"targetPenalty": 15
+					}
+				},
+				"targetPenalty": 15
+			},
+			"head": {
+				"crippleEffect": {
+					"barter": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"gambling": {
+						"$sub": [
+							"value",
+							15
+						]
+					},
+					"intelligence": {
+						"$dec": "value"
+					},
+					"perception": {
+						"$dec": "value"
+					},
+					"speech": {
+						"$sub": [
+							"value",
+							15
+						]
+					}
+				},
+				"crippleHealth": {
+					"$add": [
+						"endurance",
+						{
+							"$floor": {
+								"$div": [
+									"health",
+									20
+								]
+							}
+						}
+					]
+				},
+				"cripplePartCount": 1,
+				"damage": {
+					"$add": [
+						"value",
+						2
+					]
+				},
+				"parts": {
+					"eyes": {
+						"crippleEffect": {
+							"doctor": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"energyWeapons": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"explosives": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"lockpick": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"perception": {
+								"$dec": "value"
+							},
+							"pilot": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"repair": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"science": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"smallGuns": {
+								"$sub": [
+									"value",
+									25
+								]
+							},
+							"throwing": {
+								"$sub": [
+									"value",
+									25
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								{
+									"$ceil": {
+										"$div": [
+											"endurance",
+											1.5
+										]
+									}
+								},
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											40
+										]
+									}
+								}
+							]
+						},
+						"meta": "effect is permanent without cybernetic replacement or critical success during surgery",
+						"targetPenalty": 20
+					},
+					"forehead": {
+						"crippleEffect": {
+							"intelligence": {
+								"$sub": [
+									"value",
+									3
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											40
+										]
+									}
+								}
+							]
+						},
+						"meta": "a luck check must be rolled to see if they survive with permanent damage or simply die. Crits are always fatal.",
+						"targetPenalty": 30
+					},
+					"neck": {
+						"crippleEffect": {
+							"damagePerTurn": {
+								"$inc": "value"
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								{
+									"$ceil": {
+										"$div": [
+											"endurance",
+											1.5
+										]
+									}
+								},
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											40
+										]
+									}
+								}
+							]
+						},
+						"meta": "When the neck is crippled, a luck check is made by the player. A successful luck check means they have a damaged artery, and will lose 1 HP each turn until it is treated with Medicine or the player dies. A failed luck check means the spinal cord has been severed, and the subject is paralyzed. Critical hits that cripple the neck ALWAYS sever the spinal cord.",
+						"targetPenalty": 20
+					}
+				},
+				"targetPenalty": 25
+			},
+			"leg": {
+				"count": 2,
+				"crippleHealth": {
+					"$add": [
+						"endurance",
+						{
+							"$floor": {
+								"$div": [
+									"health",
+									10
+								]
+							}
+						}
+					]
+				},
+				"cripplePartCount": 2,
+				"meta": "Each leg is necessary to move properly, so having one crippled will make running and sprinting impossible. If both legs become crippled, the player will no longer be able to walk, and moving one hex will be treated as a ‘Run’ action (As they are crawling across the ground).",
+				"parts": {
+					"calf": {
+						"crippleEffect": {
+							"agility": {
+								"$dec": "value"
+							},
+							"sneak": {
+								"$sub": [
+									"value",
+									15
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								{
+									"$ceil": {
+										"$half": "endurance"
+									}
+								},
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"targetPenalty": 20
+					},
+					"hip": {
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"meta": "When a hip is crippled, whenever the player turns in that direction all their skills take a -5% penalty for the turn",
+						"targetPenalty": 15
+					},
+					"knee": {
+						"crippleEffect": {
+							"climb": {
+								"$sub": [
+									"value",
+									15
+								]
+							},
+							"swim": {
+								"$sub": [
+									"value",
+									15
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"meta": "Crippling a knee makes running impossible",
+						"targetPenalty": 17
+					}
+				},
+				"targetPenalty": 10
+			},
+			"torso": {
+				"crippleEffect": {
+					"carryWeight": {
+						"$half": "value"
+					},
+					"skills": {
+						"$sub": [
+							"value",
+							5
+						]
+					}
+				},
+				"crippleHealth": {
+					"$add": [
+						{
+							"$double": "endurance"
+						},
+						{
+							"$floor": {
+								"$div": [
+									"health",
+									10
+								]
+							}
+						}
+					]
+				},
+				"cripplePartCount": 2,
+				"damage": {
+					"$sub": [
+						"value",
+						2
+					]
+				},
+				"parts": {
+					"chest": {
+						"crippleEffect": {
+							"damagePerTurn": {
+								"$inc": "value"
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											10
+										]
+									}
+								}
+							]
+						},
+						"targetPenalty": 25
+					},
+					"groin": {
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											20
+										]
+									}
+								}
+							]
+						},
+						"damage": {
+							"$add": [
+								"value",
+								2
+							]
+						},
+						"meta": "player is rendered unable to jog, walk, or sprint",
+						"targetPenalty": 35
+					},
+					"gut": {
+						"crippleEffect": {
+							"damagePerDay": {
+								"$add": [
+									"value",
+									4
+								]
+							},
+							"resistPoison": {
+								"$sub": [
+									"value",
+									10
+								]
+							},
+							"resistRadiation": {
+								"$sub": [
+									"value",
+									10
+								]
+							}
+						},
+						"crippleHealth": {
+							"$add": [
+								"endurance",
+								{
+									"$floor": {
+										"$div": [
+											"health",
+											10
+										]
+									}
+								}
+							]
+						},
+						"meta": "if the player goes for one week without treatment, they die",
+						"targetPenalty": 20
+					}
+				},
+				"targetPenalty": 0
+			}
+		},
+		"LOCALIZATION": {
+			"en-US": {
+				"name": "Name",
+				"age": "Age",
+				"hair": "Hair",
+				"eyes": "Eyes",
+				"appearance": "Appearance",
+				"sex": "Sex",
+				"weight": "Weight",
+				"height": "Height",
+				"travel": "Travel",
+				"experience": {
+					"abbr": "XP",
+					"name": "Experience"
+				},
+				"race": "Race",
+				"actionChild": "Action Boy (or Girl)",
+				"actionPointRegeneration": {
+					"abbr": "APR",
+					"name": "Action Point Regeneration"
+				},
+				"actionPoints": {
+					"abbr": "AP",
+					"name": "Action Points"
+				},
+				"adrenalineRush": "Adrenaline Rush",
+				"agility": {
+					"abbr": "Agi",
+					"name": "Agility"
+				},
+				"alphaMutant": "Mutant (Alpha)",
+				"animalFriend": "Animal Friend",
+				"arm": "Arm",
+				"armorClass": {
+					"abbr": "AC",
+					"name": "Armor Class"
+				},
+				"awareness": "Awareness",
+				"barter": "Barter",
+				"bendTheRules": "Bend The Rules",
+				"betaMutant": "Mutant (Beta)",
+				"betterCriticals": "Better Criticals",
+				"bigGuns": {
+					"abbr": "BG",
+					"name": "Big Guns"
+				},
+				"bite": "Bite",
+				"bloatfly": "Bloatfly",
+				"bloodyMess": "Bloody Mess",
+				"bluffMaster": "Bluff Master",
+				"boneHead": "Bone-Head",
+				"bonsai": "Bonsai",
+				"bonusHandToHandAttacks": "Bonus Hand-to-Hand Attacks",
+				"bonusHandToHandDamage": "Bonus Hand-to-Hand Damage",
+				"bonusMove": "Bonus Move",
+				"bonusRangedDamage": "Bonus Ranged Damage",
+				"bonusRateOfFire": "Bonus Rate of Fire",
+				"bracing": "Bracing",
+				"brahmin": "Brahmin",
+				"breakTheRules": "Break the Rules",
+				"brownNoser": "Brown-Noser",
+				"bruiser": "Bruiser",
+				"brutishHulk": "Brutish Hulk",
+				"calf": "Calf",
+				"cancerousGrowth": "Cancerous Growth",
+				"carryWeight": {
+					"abbr": "CW",
+					"name": "Carry Weight"
+				},
+				"cautiousNature": "Cautious Nature",
+				"centaur": "Centaur",
+				"charisma": {
+					"abbr": "Cha",
+					"name": "Charisma"
+				},
+				"chemReliant": "Chem Reliant",
+				"chemResistant": "Chem Resistant",
+				"chems": "Chems",
+				"chest": "Chest",
+				"claw": "Claw",
+				"climb": "Climb",
+				"comprehension": "Comprehension",
+				"coyote": "Coyote",
+				"crazyBomber": "Crazy Bomber",
+				"criticalChance": {
+					"abbr": "CC",
+					"name": "Critical Chance"
+				},
+				"criticalFailure": {
+					"abbr": "CF",
+					"name": "Critical Failure"
+				},
+				"cultOfPersonality": "Cult of Personality",
+				"damageThreshold": {
+					"abbr": "DT",
+					"name": "Damage Threshold"
+				},
+				"deathSense": "Death Sense",
+				"deathclaw": "Deathclaw",
+				"demolitionExpert": "Demolition Expert",
+				"detectionClass": {
+					"abbr": "DC",
+					"name": "Detection Class"
+				},
+				"dieHard": "Die Hard",
+				"direWolf": "Dire Wolf",
+				"disguise": "Disguise",
+				"divineFavor": "Divine Favor",
+				"doctor": "Doctor",
+				"dodger": "Dodger",
+				"dog": "Dog",
+				"dolphin": "Dolphin",
+				"drivingCityStyle": "Driving City Style",
+				"drunkenMaster": "Drunken Master",
+				"earlierSequence": "Earlier Sequence",
+				"educated": "Educated",
+				"elbow": "Elbow",
+				"empathy": "Empathy",
+				"endurance": {
+					"abbr": "End",
+					"name": "Endurance"
+				},
+				"energyWeapons": "Energy Weapons",
+				"explorer": "Explorer",
+				"explosives": "Explosives",
+				"fastMetabolism": "Fast Metabolism",
+				"fastShot": "Fast Shot",
+				"fasterHealing": "Faster Healing",
+				"fearTheReaper": "Fear The Reaper",
+				"feralDog": "Feral Dog",
+				"feralGhoul": "Feral Ghoul",
+				"feralGhoulReaver": "Feral Ghoul Reaver",
+				"feralGhoulRoamer": "Feral Ghoul Roamer",
+				"feralGlowingOne": "Feral Glowing One",
+				"finesse": "Finesse",
+				"fireAnt": "Fire Ant",
+				"fireBreath": "Fire Breath",
+				"fireGecko": "Fire Gecko",
+				"firstAid": "First Aid",
+				"flail": "Flail",
+				"flailer": "Flailer",
+				"flexible": "Flexible",
+				"floater": "Floater",
+				"flowerChild": "Flower Child",
+				"forehead": "Forehead",
+				"fortuneFinder": "Fortune Finder",
+				"gainAgility": "Gain Agility",
+				"gainCharisma": "Gain Charisma",
+				"gainEndurance": "Gain Endurance",
+				"gainIntelligence": "Gain Intelligence",
+				"gainLuck": "Gain Luck",
+				"gainPerception": "Gain Perception",
+				"gainStrength": "Gain Strength",
+				"gambler": "Gambler",
+				"gambling": "Gambling",
+				"gecko": "Gecko",
+				"ghost": "Ghost",
+				"ghoul": "Ghoul",
+				"giantAnt": "Giant Ant",
+				"giantRat": "Giant Rat",
+				"gifted": "Gifted",
+				"glowingOne": "Glowing One",
+				"goldenGecko": "Golden Gecko",
+				"goodNatured": "Good Natured",
+				"greaterMolerat": "Greater Molerat",
+				"greaterRadscorpion": "Greater Radscorption",
+				"groin": "Groin",
+				"gunner": "Gunner",
+				"gut": "Gut",
+				"hamFisted": "Ham-Fisted",
+				"hand": "Hand",
+				"handToHandEvade": "Hand-to-Hand Evade",
+				"harmless": "Harmless",
+				"head": "Head",
+				"healer": "Healer",
+				"healingRate": {
+					"abbr": "HR",
+					"name": "Healing Rate"
+				},
+				"health": {
+					"abbr": "HP",
+					"name": "Health"
+				},
+				"heaveHo": "Heave, Ho!",
+				"hereAndNow": "Here and Now",
+				"hideOfScars": "Hide of Scars",
+				"hip": "Hip",
+				"hitTheDeck": "Hit the Deck",
+				"horn": "Horn",
+				"human": "Human",
+				"intelligence": {
+					"abbr": "Int",
+					"name": "Intelligence"
+				},
+				"jinxed": "Jinxed",
+				"jollyRoger": "Jolly Roger",
+				"judgementClass": {
+					"abbr": "JC",
+					"name": "Judgement Class"
+				},
+				"jump": "Jump",
+				"kamaSutra": "Kama Sutra",
+				"kamikaze": "Kamikaze",
+				"karmaBeacon": "Karma Beacon",
+				"knee": "Knee",
+				"leader": "Leader",
+				"leadfoot": "Leadfoot",
+				"leg": "Leg",
+				"lesserMolerat": "Lesser Molerat",
+				"lesserPigrat": "Greater Pigrat",
+				"lesserRadscorpion": "Lesser Radscorption",
+				"level": "Level",
+				"lifegiver": "Lifegiver",
+				"lightStep": "Light Step",
+				"livingAnatomy": "Living Anatomy",
+				"lockpick": "Lockpick",
+				"loner": "Loner",
+				"luck": {
+					"abbr": "Lck",
+					"name": "Luck"
+				},
+				"mandible": "Mandible",
+				"mandibles": "Mandibles",
+				"mantis": "Mantis",
+				"masterThief": "Master Thief",
+				"masterTrader": "Master Trader",
+				"medic": "Medic",
+				"medicine": "Medicine",
+				"melee": "Melee",
+				"meleeDamage": {
+					"abbr": "MD",
+					"name": "Melee Damage"
+				},
+				"mentalBlock": "Mental Block",
+				"mirelurk": "Mirelurk",
+				"mirelurkHunter": "Mirelurk Hunter",
+				"mirelurkKing": "Mirelurk King",
+				"moreCriticals": "More Criticals",
+				"mrFixit": "Mr. (or Ms.) Fixit",
+				"mutate": "Mutate!",
+				"mysteriousStranger": "Mysterious Stranger",
+				"neck": "Neck",
+				"negotiator": "Negotiator",
+				"nightPerson": "Night Person",
+				"nightVision": "Night Vision",
+				"nukaLurk": "Nuka-Lurk",
+				"nukaLurkQuantum": "Nuka-Lurk Quantum",
+				"oneHander": "One-Hander",
+				"outdoorsman": "Outdoorsman",
+				"packRat": "Pack Rat",
+				"pathfinder": "Pathfinder",
+				"perception": {
+					"abbr": "Per",
+					"name": "Perception"
+				},
+				"pickpocket": "Pickpocket",
+				"pilot": "Pilot",
+				"presence": "Presence",
+				"psychotic": "Psychotic",
+				"pyromaniac": "Pyromaniac",
+				"quickPockets": "Quick Pockets",
+				"quickRecovery": "Quick Recovery",
+				"radChild": "Rad Child",
+				"radRat": "Rad Rat",
+				"radResistance": "Rad Resistance",
+				"radiationBurst": "Radiation Burst",
+				"radroach": "Radroach",
+				"ram": "Ram",
+				"rangedWeapons": "Ranged Weapons",
+				"ranger": "Ranger",
+				"redBaron": "Red Baron",
+				"repair": "Repair",
+				"resistContactGas": {
+					"abbr": "CGR",
+					"name": "Contact Gas Resistance"
+				},
+				"resistElectricity": {
+					"abbr": "ER",
+					"name": "Electricity Resistance"
+				},
+				"resistExplosion": {
+					"abbr": "ExR",
+					"name": "Explosion Resistance"
+				},
+				"resistExplosionThreshold": {
+					"abbr": "ExT",
+					"name": "Explosion Threshold"
+				},
+				"resistFire": {
+					"abbr": "FR",
+					"name": "Fire Resistance"
+				},
+				"resistFireThreshold": {
+					"abbr": "FT",
+					"name": "Fire Threshold"
+				},
+				"resistInhaledGas": {
+					"abbr": "IGR",
+					"name": "Inhaled Gas Resistance"
+				},
+				"resistLaser": {
+					"abbr": "LR",
+					"name": "Laser Resistance"
+				},
+				"resistLaserThreshold": {
+					"abbr": "LT",
+					"name": "Laser Threshold"
+				},
+				"resistNormal": {
+					"abbr": "NR",
+					"name": "Normal Resistance"
+				},
+				"resistNormalThreshold": {
+					"abbr": "NT",
+					"name": "Normal Threshold"
+				},
+				"resistPlasma": {
+					"abbr": "PlR",
+					"name": "Plasma Resistance"
+				},
+				"resistPlasmaThreshold": {
+					"abbr": "PlT",
+					"name": "Plasma Threshold"
+				},
+				"resistPoison": {
+					"abbr": "PR",
+					"name": "Poison Resistance"
+				},
+				"resistRadiation": {
+					"abbr": "RR",
+					"name": "Radiation Resistance"
+				},
+				"roadWarrior": "Road Warrior",
+				"salesman": "Salesman",
+				"science": "Science",
+				"scout": "Scout",
+				"screech": "Screech",
+				"scrounger": "Scrounger",
+				"sequence": {
+					"abbr": "Seq",
+					"name": "Sequence"
+				},
+				"sexAppeal": "Sex Appeal",
+				"sharpshooter": "Sharpshooter",
+				"shoulder": "Shoulder",
+				"silentDeath": "Silent Death",
+				"silentRunning": "Silent Running",
+				"simpleWeapons": "Simple Weapons",
+				"skilled": "Skilled",
+				"slayer": "Slayer",
+				"smallFrame": "Small Frame",
+				"smallGuns": {
+					"abbr": "SG",
+					"name": "Small Guns"
+				},
+				"smoothTalker": "Smooth Talker",
+				"snakeEater": "Snake-Eater",
+				"sneak": "Sneak",
+				"sniper": "Sniper",
+				"social": "Social",
+				"speaker": "Speaker",
+				"speech": "Speech",
+				"spit": "Spit",
+				"stalk": "Stalk",
+				"stat": "Stat!",
+				"steadyArm": "Steady Arm",
+				"steal": "Steal",
+				"stoneWall": "Stonewall",
+				"strength": {
+					"abbr": "Str",
+					"name": "Strength"
+				},
+				"strongBack": "Strong Back",
+				"stuntDevil": "Stunt Devil",
+				"survival": "Survival",
+				"survivalist": "Survivalist",
+				"swiftLearner": "Swift Learner",
+				"swim": "Swim",
+				"swing": "Swing",
+				"tag": "Tag!",
+				"tail": "Tail",
+				"talonOfFear": "Talon of Fear",
+				"teamPlayer": "Team Player",
+				"techWizard": "Tech Wizard",
+				"technical": "Technical",
+				"thief": "Thief",
+				"thieving": "Thieving",
+				"throwing": "Throwing",
+				"torso": "Torso",
+				"toughHide": "Tough Hide",
+				"toughness": "Toughness",
+				"tunnelRat": "Tunnel Rat",
+				"unarmed": "Unarmed",
+				"vatSkin": "Vat Skin",
+				"wayOfTheFruit": "Way of the Fruit",
+				"weaponHandling": "Weapon Handling",
+				"webCrawler": "Web Crawler",
+				"wolf": "Wolf",
+				"yaoGuai": "Yao Guai"
+			}
+		},
+		"MISCELLANEOUS": {
+			"actionPointCost": {},
+			"addictionChance": {},
+			"addictionRecovery": {},
+			"armorClassPerUnusedActionPoint": {},
+			"burstAttackActionPointCost": {},
+			"changeStanceCost": {},
+			"chemDuration": {},
+			"criticalDamage": {},
+			"criticalFailureChance": {},
+			"damage": {},
+			"damagePerDay": {},
+			"damagePerTurn": {},
+			"doctorActionPointCost": {},
+			"doctorHealing": {},
+			"experience": {},
+			"explosiveDamage": {},
+			"fallDamage": {},
+			"firstAidActionPointCost": {},
+			"firstAidHealing": {},
+			"freeMovement": {},
+			"inventoryActionPointCost": {},
+			"karma": {},
+			"levelsPerPerk": {},
+			"lightLevelPenality": {},
+			"likability": {},
+			"limbDamageChance": {},
+			"movingVehicleDamagePenalty": {},
+			"primaryTotal": {},
+			"psychoAddictionChance": {},
+			"psychoEffects": {},
+			"radsPerHour": {},
+			"rangedDamage": {},
+			"receivedExplosiveDamage": {},
+			"skillPoints": {},
+			"skillPointsPerBook": {},
+			"skillPointsPerLevel": {},
+			"skills": {},
+			"standUpActionPointCost": {},
+			"travel": {},
+			"travelTime": {},
+			"vehicleMaximumSpeed": {},
+			"vehicleWreckDamage": {},
+			"withdrawalTime": {},
+			"xpMultiplier": {}
+		},
+		"PERKS": {
+			"actionChild": {
+				"effect": {
+					"actionPointRegeneration": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"agility": 5,
+					"level": 12
+				}
+			},
+			"adrenalineRush": {
+				"effect": {
+					"$when": {
+						"halfHealth": {
+							"strength": {
+								"$inc": "value"
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 6,
+					"strength": {
+						"max": 9,
+						"min": 1
+					}
+				}
+			},
+			"animalFriend": {
+				"meta": "Your character spends a lot of time with animals. A LOT of time. Animals will not attack one of their friends, unless the animal is threatened or attacked first.",
+				"ranks": 1,
+				"requirements": {
+					"intelligence": 5,
+					"level": 9,
+					"outdoorsman": 25
+				}
+			},
+			"awareness": {
+				"meta": "You know exactly what is going on in combat. This perk gives you more information when you examine a critter. You can see their exact number of hit points and the weapon they are armed with, if any.",
+				"ranks": 1,
+				"requirements": {
+					"level": 3,
+					"perception": 5
+				}
+			},
+			"bendTheRules": {
+				"meta": "With this perk, the next time your character gets to choose a perk, they can ignore all restrictions except for race. You rule!",
+				"ranks": 1,
+				"requirements": {
+					"level": 16,
+					"luck": 6
+				}
+			},
+			"betterCriticals": {
+				"effect": {
+					"criticalDamage": {
+						"$mul": [
+							"value",
+							1.5
+						]
+					},
+					"limbDamageChance": {
+						"$mul": [
+							"value",
+							1.5
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 4,
+					"level": 9,
+					"luck": 6,
+					"perception": 6,
+					"race": {
+						"$not": [
+							"alphaMutant",
+							"betaMutant"
+						]
+					}
+				}
+			},
+			"bluffMaster": {
+				"meta": "You are the king or queen of smooth talking. Whenever you are caught stealing, your character can automatically talk his or her way out of the situation.",
+				"ranks": 1,
+				"requirements": {
+					"charisma": 7,
+					"level": 8,
+					"speech": 70
+				}
+			},
+			"boneHead": {
+				"meta": "You have a very thick skull, just like your mother always told you. With the first rank of this perk, you get a 50% chance to avoid being knocked unconscious. With the second rank, that chance increases to 75%.",
+				"ranks": 2,
+				"requirements": {
+					"level": 7,
+					"strength": 7
+				}
+			},
+			"bonsai": {
+				"meta": "Through careful nurturing, you have a small fruit tree growing out of your head. Now you have a steady supply of fruit!",
+				"ranks": 1,
+				"requirements": {
+					"level": 12,
+					"outdoorsman": 50,
+					"race": "ghoul",
+					"science": 40
+				}
+			},
+			"bonusHandToHandAttacks": {
+				"effect": {
+					"$when": {
+						"melee": {
+							"actionPointCost": {
+								"$dec": "value"
+							}
+						},
+						"unarmed": {
+							"actionPointCost": {
+								"$dec": "value"
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 15
+				}
+			},
+			"bonusHandToHandDamage": {
+				"effect": {
+					"meleeDamage": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"agility": 6,
+					"level": 3,
+					"strength": 6
+				}
+			},
+			"bonusMove": {
+				"effect": {
+					"freeMovement": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"agility": 5,
+					"level": 6
+				}
+			},
+			"bonusRangedDamage": {
+				"effect": {
+					"rangedDamage": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"agility": 6,
+					"level": 6,
+					"luck": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"bonusRateOfFire": {
+				"effect": {
+					"$when": {
+						"ranged": {
+							"actionPointCost": {
+								"$dec": "value"
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 7,
+					"intelligence": 6,
+					"level": 15,
+					"perception": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"bracing": {
+				"meta": "You know how to brace large weapons while you are standing. When applicable, you get a bonus for using a tripod just by holding a weapon in your hands.",
+				"ranks": 1,
+				"requirements": {
+					"bigGuns": 80,
+					"level": 4,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					},
+					"strength": 7
+				}
+			},
+			"breakTheRules": {
+				"meta": "When you choose this perk, you may choose any perk next time, regardless of requirements or race.",
+				"ranks": 1,
+				"requirements": {
+					"level": 20,
+					"luck": 6
+				}
+			},
+			"brownNoser": {
+				"effect": {
+					"$when": {
+						"talkingToAuthority": {
+							"charisma": {
+								"$inc": 1
+							}
+						}
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"charisma": 5,
+					"intelligence": 6,
+					"level": 2,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"brutishHulk": {
+				"effect": {
+					"health": {
+						"$add": [
+							"value",
+							{
+								"$mul": [
+									"level",
+									{
+										"$floor": {
+											"$add": [
+												3,
+												{
+													"$half": "endurance"
+												}
+											]
+										}
+									}
+								]
+							}
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 5,
+					"level": 8,
+					"race": "deathclaw",
+					"strength": 7
+				}
+			},
+			"cancerousGrowth": {
+				"effect": {
+					"healingRate": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"meta": "regenerate one crippled limb every 48 hours",
+				"ranks": 1,
+				"requirements": {
+					"level": 6,
+					"race": "ghoul",
+					"strength": {
+						"max": 7,
+						"min": 1
+					}
+				}
+			},
+			"cautiousNature": {
+				"effect": {
+					"$when": {
+						"initiatingEncounter": {
+							"perception": {
+								"$add": [
+									"value",
+									3
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 3,
+					"perception": 6
+				}
+			},
+			"comprehension": {
+				"effect": {
+					"skillPointsPerBook": {
+						"$mul": [
+							"value",
+							1.5
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"intelligence": 6,
+					"level": 3,
+					"race": {
+						"$not": "dog"
+					}
+				}
+			},
+			"crazyBomber": {
+				"meta": "Your luck with explosives is legendary. Characters with this perk who fail to set an explosive properly will know immediately, and that explosive will not go off or detonate – it will be reset, so the Bomber can try again.",
+				"ranks": 1,
+				"requirements": {
+					"explosives": 60,
+					"intelligence": 6,
+					"level": 9,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"cultOfPersonality": {
+				"effect": {
+					"likability": {
+						"$abs": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"charisma": 10,
+					"level": 12
+				}
+			},
+			"deathSense": {
+				"effect": {
+					"$when": {
+						"dark": {
+							"perception": {
+								"$add": [
+									"value",
+									2
+								]
+							}
+						}
+					},
+					"detectionClass": {
+						"$add": [
+							"value",
+							25
+						]
+					},
+					"lightLevelPenality": {
+						"$half": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"intelligence": 5,
+					"level": 4,
+					"race": "deathclaw"
+				}
+			},
+			"demolitionExpert": {
+				"effect": {
+					"explosiveDamage": {
+						"$mul": [
+							"value",
+							1.5
+						]
+					}
+				},
+				"meta": "Explosives set by this character will always detonate on time.",
+				"ranks": 1,
+				"requirements": {
+					"agility": 4,
+					"explosives": 90,
+					"level": 9,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"dieHard": {
+				"effect": {
+					"$when": {
+						"fifthHealth": {
+							"damageThreshold": {
+								"$add": [
+									"value",
+									5
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 6,
+					"firstAid": 40,
+					"level": 2
+				}
+			},
+			"divineFavor": {
+				"meta": "A higher power has taken a liking to you. Anytime a roll fails, you have the option of re-rolling, but you must accept the results of the re-roll (you cannot re-roll a re-roll). You can only invoke your higher power once in a 24-hour period.",
+				"ranks": 1,
+				"requirements": {
+					"charisma": 8,
+					"level": 14
+				}
+			},
+			"dodger": {
+				"effect": {
+					"armorClass": {
+						"$add": [
+							"value",
+							5
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"agility": 6,
+					"level": 9
+				}
+			},
+			"dolphin": {
+				"effect": {
+					"swim": {
+						"$add": [
+							"value",
+							30
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"endurance": 8,
+					"level": 6,
+					"strength": 6
+				}
+			},
+			"drivingCityStyle": {
+				"effect": {
+					"pilot": {
+						"$add": [
+							"value",
+							30
+						]
+					}
+				},
+				"meta": "any rolls against stats made while behind the wheel get a +2 bonus",
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"level": 9,
+					"perception": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"drunkenMaster": {
+				"effect": {
+					"$when": {
+						"drunk": {
+							"unarmed": {
+								"$add": [
+									"value",
+									20
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 3,
+					"unarmed": 60
+				}
+			},
+			"earlierSequence": {
+				"effect": {
+					"sequence": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"level": 3,
+					"perception": 6
+				}
+			},
+			"educated": {
+				"effect": {
+					"skillPointsPerLevel": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"intelligence": 6,
+					"level": 6
+				}
+			},
+			"empathy": {
+				"meta": "You get a better idea of what to say to an NPC with this perk. The GM must warn you when dialogue will be interpreted the wrong way.",
+				"ranks": 1,
+				"requirements": {
+					"intelligence": 5,
+					"level": 6,
+					"perception": 7
+				}
+			},
+			"explorer": {
+				"meta": "This perk will make it more likely that your character will find those strange and interesting encounters and items. It is up to the GM to decide what those items and encounters are.",
+				"ranks": 1,
+				"requirements": {
+					"level": 9
+				}
+			},
+			"fasterHealing": {
+				"effect": {
+					"healingRate": {
+						"$add": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"endurance": 6,
+					"level": 3
+				}
+			},
+			"flexible": {
+				"effect": {
+					"changeStanceCost": 1
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 4,
+					"sneak": 60
+				}
+			},
+			"flowerChild": {
+				"effect": {
+					"addictionChance": {
+						"$half": "value"
+					},
+					"withdrawalTime": {
+						"$half": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 5,
+					"level": 9
+				}
+			},
+			"fortuneFinder": {
+				"meta": "Random encounters yield more money. Of course, you have to take it off the cold, dead bodies of your opponents. How much money is up to the GM.",
+				"ranks": 1,
+				"requirements": {
+					"level": 6,
+					"luck": 8
+				}
+			},
+			"gainAgility": {
+				"effect": {
+					"agility": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainCharisma": {
+				"effect": {
+					"charisma": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainEndurance": {
+				"effect": {
+					"endurance": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainIntelligence": {
+				"effect": {
+					"intelligence": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainLuck": {
+				"effect": {
+					"luck": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainPerception": {
+				"effect": {
+					"perception": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gainStrength": {
+				"effect": {
+					"strength": {
+						"$inc": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"gambler": {
+				"effect": {
+					"gambling": {
+						"$add": [
+							"value",
+							20
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"gambling": 50,
+					"level": 6
+				}
+			},
+			"ghost": {
+				"effect": {
+					"$when": {
+						"dark": {
+							"sneak": {
+								"$add": [
+									"value",
+									20
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 6,
+					"sneak": 60
+				}
+			},
+			"gunner": {
+				"effect": {
+					"$when": {
+						"inMovingVehicle": {
+							"movingVehicleDamagePenalty": 0
+						}
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"$some": [
+						{
+							"unarmed": 40
+						},
+						{
+							"melee": 40
+						},
+						{
+							"throwing": 40
+						},
+						{
+							"smallGuns": 40
+						},
+						{
+							"bigGuns": 40
+						},
+						{
+							"energyWeapons": 40
+						}
+					],
+					"agility": 6,
+					"level": 3
+				}
+			},
+			"handToHandEvade": {
+				"effect": {
+					"$when": {
+						"unarmed": {
+							"armorClassPerUnusedActionPoint": {
+								"$add": [
+									"value",
+									2
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12,
+					"unarmed": 75
+				}
+			},
+			"harmless": {
+				"effect": {
+					"steal": {
+						"$add": [
+							"value",
+							20
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"karma": 50,
+					"level": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					},
+					"steal": 50
+				}
+			},
+			"healer": {
+				"effect": {
+					"doctorHealing": {
+						"$add": [
+							"value",
+							4,
+							{
+								"$rand": 6
+							}
+						]
+					},
+					"firstAidHealing": {
+						"$add": [
+							"value",
+							4,
+							{
+								"$rand": [
+									1,
+									6
+								]
+							}
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"agility": 6,
+					"firstAid": 40,
+					"intelligence": 5,
+					"level": 3,
+					"perception": 7
+				}
+			},
+			"heaveHo": {
+				"meta": "For purposes of determining the maximum range of thrown weapons only, this perk will increase Strength by +2 for each rank.",
+				"ranks": 3,
+				"requirements": {
+					"level": 6
+				}
+			},
+			"hereAndNow": {
+				"meta": "With this perk, your character immediately gains enough experience points to go up to the next level.",
+				"ranks": 1,
+				"requirements": {
+					"level": 9
+				}
+			},
+			"hideOfScars": {
+				"effect": {
+					"damageThreshold": {
+						"$add": [
+							"value",
+							3
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"endurance": 6,
+					"level": 10,
+					"race": "deathclaw"
+				}
+			},
+			"hitTheDeck": {
+				"effect": {
+					"receivedExplosiveDamage": {
+						"$half": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 4
+				}
+			},
+			"jollyRoger": {
+				"effect": {
+					"pilot": {
+						"$add": [
+							"value",
+							30
+						]
+					}
+				},
+				"meta": "you do not suffer penalties from using weapons on the water",
+				"ranks": 1,
+				"requirements": {
+					"endurance": 7,
+					"level": 9,
+					"pilot": 75
+				}
+			},
+			"kamaSutra": {
+				"effect": {
+					"$when": {
+						"doingTheDirty": {
+							"agility": {
+								"$add": [
+									"value",
+									1
+								]
+							},
+							"charisma": {
+								"$add": [
+									"value",
+									2
+								]
+							},
+							"endurance": {
+								"$add": [
+									"value",
+									2
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"endurance": 5,
+					"level": 3
+				}
+			},
+			"karmaBeacon": {
+				"effect": {
+					"karma": {
+						"$double": "karma"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"endurance": 5,
+					"level": 3
+				}
+			},
+			"leader": {
+				"effect": {
+					"$nearby": {
+						"agility": {
+							"$inc": "value"
+						},
+						"armorClass": {
+							"$add": [
+								"value",
+								5
+							]
+						}
+					}
+				},
+				"requirements": {
+					"charisma": 6,
+					"level": 4
+				}
+			},
+			"leadfoot": {
+				"effect": {
+					"$when": {
+						"driving": {
+							"vehicleMaximumSpeed": {
+								"$mul": [
+									"value",
+									1.25
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 3,
+					"perception": 6,
+					"pilot": 60
+				}
+			},
+			"lifegiver": {
+				"effect": {
+					"health": {
+						"$add": [
+							"value",
+							{
+								"$mul": [
+									4,
+									"level"
+								]
+							}
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"endurance": 4,
+					"level": 12
+				}
+			},
+			"lightStep": {
+				"meta": "Characters with this perk are much less likely to set off traps. For purposes of triggering a trap, they gain a +4 bonus to Agility.",
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"level": 9,
+					"luck": 5
+				}
+			},
+			"livingAnatomy": {
+				"effect": {
+					"$when": {
+						"attackingBiological": {
+							"damage": {
+								"$add": [
+									"value",
+									5
+								]
+							}
+						}
+					},
+					"doctor": {
+						"$add": [
+							"doctor",
+							10
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"doctor": 60,
+					"level": 12
+				}
+			},
+			"loner": {
+				"effect": {
+					"$when": {
+						"noNearbyParty": {
+							"skills": {
+								"$add": [
+									"value",
+									10
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"charisma": {
+						"max": 4,
+						"min": 1
+					},
+					"level": 4,
+					"outdoorsman": 50
+				}
+			},
+			"masterThief": {
+				"effect": {
+					"lockpick": {
+						"$add": [
+							"value",
+							15
+						]
+					},
+					"steal": {
+						"$add": [
+							"value",
+							15
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 12,
+					"lockpick": 50,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					},
+					"steal": 50
+				}
+			},
+			"masterTrader": {
+				"effect": {
+					"barter": {
+						"$add": [
+							"value",
+							30
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"barter": 60,
+					"charisma": 7,
+					"level": 9,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"medic": {
+				"effect": {
+					"doctor": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"firstAid": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"$some": [
+						{
+							"firstAid": 40
+						},
+						{
+							"doctor": 40
+						}
+					],
+					"level": 12
+				}
+			},
+			"mentalBlock": {
+				"meta": "For purposes of determining range in combat AND finding traps ONLY, your character’s Perception is raised by 1, up to the racial maximum.",
+				"ranks": 1,
+				"requirements": {
+					"level": 15
+				}
+			},
+			"moreCriticals": {
+				"effect": {
+					"criticalChance": {
+						"$add": [
+							"value",
+							5
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"level": 6,
+					"luck": 6
+				}
+			},
+			"mrFixit": {
+				"effect": {
+					"repair": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"science": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"$some": [
+						{
+							"repair": 40
+						},
+						{
+							"science": 40
+						}
+					],
+					"level": 12
+				}
+			},
+			"mutate": {
+				"meta": "Picking this perk will also make you select one of your current Traits to remove. You then get a chance to pick another Trait. Weird, eh?",
+				"ranks": 1,
+				"requirements": {
+					"level": 9
+				}
+			},
+			"mysteriousStranger": {
+				"meta": "When you select this perk, there is a chance (30% + (2 X LK)) that your character will gain a temporary ally, but only in random encounters. The GM will choose that ally.",
+				"ranks": 1,
+				"requirements": {
+					"level": 9,
+					"luck": 4
+				}
+			},
+			"negotiator": {
+				"effect": {
+					"barter": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"speech": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"barter": 50,
+					"level": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					},
+					"speech": 50
+				}
+			},
+			"nightVision": {
+				"meta": "Negative modifiers for dark conditions are reduced by 50%.",
+				"requirements": {
+					"level": 3,
+					"perception": 6
+				}
+			},
+			"packRat": {
+				"effect": {
+					"carryWeight": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"level": 3,
+					"perception": 6
+				}
+			},
+			"pathfinder": {
+				"effect": {
+					"travelTime": {
+						"$mul": [
+							"value",
+							0.75
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 6,
+					"level": 6,
+					"outdoorsman": 60
+				}
+			},
+			"pickpocket": {
+				"effect": {
+					"steal": {
+						"$add": [
+							"value",
+							25
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 8,
+					"level": 15,
+					"steal": 80
+				}
+			},
+			"presence": {
+				"effect": {
+					"$when": {
+						"reactionRoll": {
+							"charisma": {
+								"$inc": "value"
+							}
+						}
+					}
+				},
+				"ranks": 3
+			},
+			"psychotic": {
+				"effect": {
+					"psychoAddictionChance": {
+						"$floor": {
+							"$half": "value"
+						}
+					},
+					"psychoEffects": {
+						"$mul": [
+							"value",
+							2
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 5,
+					"level": 8,
+					"race": [
+						"alphaMutant",
+						"betaMutant"
+					]
+				}
+			},
+			"pyromaniac": {
+				"effect": {
+					"$when": {
+						"fireBasedWeapon": {
+							"damage": {
+								"$add": [
+									"value",
+									5
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"bigGuns": 75,
+					"level": 9
+				}
+			},
+			"quickPockets": {
+				"effect": {
+					"inventoryActionPointCost": {
+						"$ceil": {
+							"$half": "value"
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"level": 3
+				}
+			},
+			"quickRecovery": {
+				"effect": {
+					"standUpActionPointCost": 1
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 5,
+					"level": 6
+				}
+			},
+			"radChild": {
+				"effect": {
+					"$when": {
+						"irradiated": {
+							"healingRate": {
+								"$add": [
+									"value",
+									5
+								]
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 6,
+					"level": 3,
+					"race": "ghoul"
+				}
+			},
+			"radResistance": {
+				"effect": {
+					"resistRadiation": {
+						"$add": [
+							"value",
+							15
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"endurance": 6,
+					"intelligence": 4,
+					"level": 6
+				}
+			},
+			"ranger": {
+				"effect": {
+					"outdoorsman": {
+						"$add": [
+							"value",
+							15
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 6,
+					"perception": 6
+				}
+			},
+			"redBaron": {
+				"effect": {
+					"pilot": {
+						"$add": [
+							"value",
+							25
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 9,
+					"perception": 7
+				}
+			},
+			"roadWarrior": {
+				"meta": "You do not suffer any penalties when driving vehicles and making attacks at the same time.",
+				"ranks": 1,
+				"requirements": {
+					"intelligence": 6,
+					"level": 12,
+					"pilot": 60,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"salesman": {
+				"effect": {
+					"barter": {
+						"$add": [
+							"value",
+							20
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"barter": 50,
+					"level": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"scout": {
+				"meta": "Your character can see further in the wilderness. Maps are easier to read. It is up to the GM to determine exactly how this works. Special encounters and items are a little easier to find with this skill as well.",
+				"ranks": 1,
+				"requirements": {
+					"level": 3,
+					"perception": 7
+				}
+			},
+			"scrounger": {
+				"meta": "You can find more ammo than the normal post-nuclear survivor. You always find double the normal ammunition in random encounters.",
+				"ranks": 1,
+				"requirements": {
+					"level": 9,
+					"luck": 8
+				}
+			},
+			"sharpshooter": {
+				"meta": "With each rank of this perk, Perception increases by +2 for the purposes of determining the modifiers for range in combat.",
+				"ranks": 2,
+				"requirements": {
+					"intelligence": 6,
+					"level": 9,
+					"perception": 7
+				}
+			},
+			"silentDeath": {
+				"effect": {
+					"$when": {
+						"backstab": {
+							"damage": {
+								"$double": "value"
+							}
+						}
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 10,
+					"level": 18,
+					"sneak": 80,
+					"unarmed": 80
+				}
+			},
+			"silentRunning": {
+				"meta": "This perk allows characters to run and sneak at the same time.",
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"level": 6,
+					"sneak": 50
+				}
+			},
+			"slayer": {
+				"meta": "The slayer walks the earth! In HtH or melee combat, characters with this Perk do a critical hit with a successful roll against Luck!",
+				"ranks": 1,
+				"requirements": {
+					"agility": 8,
+					"level": 24,
+					"strength": 8,
+					"unarmed": 80
+				}
+			},
+			"smoothTalker": {
+				"effect": {
+					"$when": {
+						"smoothtalking": {
+							"intelligence": {
+								"$inc": "value"
+							}
+						}
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"intelligence": 4,
+					"level": 3,
+					"race": {
+						"$not": "dog"
+					}
+				}
+			},
+			"snakeEater": {
+				"effect": {
+					"resistPoison": {
+						"$add": [
+							"value",
+							25
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"endurance": 3,
+					"level": 6
+				}
+			},
+			"sniper": {
+				"meta": "When using a ranged weapon, your character will do a critical hit with successful roll against Luck and this perk. ",
+				"ranks": 1,
+				"requirements": {
+					"agility": 8,
+					"level": 24,
+					"perception": 8,
+					"smallGuns": 80
+				}
+			},
+			"speaker": {
+				"effect": {
+					"speech": {
+						"$add": [
+							"value",
+							20
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 9,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					},
+					"speech": 50
+				}
+			},
+			"stat": {
+				"effect": {
+					"doctorActionPointCost": 5,
+					"firstAidActionPointCost": 5
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"doctor": 50,
+					"firstAid": 75,
+					"level": 3
+				}
+			},
+			"steadyArm": {
+				"effect": {
+					"burstAttackActionPointCost": {
+						"$dec": "value"
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"level": 4,
+					"race": [
+						"alphaMutant",
+						"betaMutant"
+					],
+					"strength": 6
+				}
+			},
+			"stoneWall": {
+				"meta": "If your character is about to be knocked down in combat, he can roll a percentile dice and has a 50% chance to avoid that fate.",
+				"ranks": 1,
+				"requirements": {
+					"level": 3,
+					"strength": 6
+				}
+			},
+			"strongBack": {
+				"effect": {
+					"carryWeight": {
+						"$add": [
+							"value",
+							50
+						]
+					}
+				},
+				"ranks": 2,
+				"requirements": {
+					"endurance": 6,
+					"level": 3,
+					"strength": 6
+				}
+			},
+			"stuntDevil": {
+				"effect": {
+					"fallDamage": {
+						"$mul": [
+							"value",
+							0.75
+						]
+					},
+					"pilot": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"vehicleWreckDamage": {
+						"$mul": [
+							"value",
+							0.75
+						]
+					}
+				},
+				"ranks": 1,
+				"requirements": {
+					"agility": 6,
+					"endurance": 6,
+					"level": 6,
+					"race": {
+						"$not": "dog"
+					},
+					"strength": 6
+				}
+			},
+			"survivalist": {
+				"effect": {
+					"outdoorsman": {
+						"$add": [
+							"value",
+							25
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"endurance": 6,
+					"intelligence": 6,
+					"level": 3,
+					"outdoorsman": 40
+				}
+			},
+			"swiftLearner": {
+				"effect": {
+					"xpMultiplier": {
+						"$add": [
+							"value",
+							5
+						]
+					}
+				},
+				"ranks": 3,
+				"requirements": {
+					"intelligence": 4,
+					"level": 3
+				}
+			},
+			"tag": {
+				"meta": "Pick an additional tag skill",
+				"ranks": 1,
+				"requirements": {
+					"level": 12
+				}
+			},
+			"talonOfFear": {
+				"meta": "Venom has seeped into your claws. All of your unarmed attacks carry a Type B poison.",
+				"ranks": 1,
+				"requirements": {
+					"level": 12,
+					"strength": 6,
+					"unarmed": 60
+				}
+			},
+			"teamPlayer": {
+				"effect": {
+					"$nearby": {
+						"skills": {
+							"$add": [
+								"value",
+								10
+							]
+						}
+					}
+				},
+				"requirements": {
+					"charisma": 4,
+					"level": 12
+				}
+			},
+			"thief": {
+				"effect": {
+					"explosives": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"lockpick": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"sneak": {
+						"$add": [
+							"value",
+							10
+						]
+					},
+					"steal": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"requirements": {
+					"level": 3,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"toughHide": {
+				"effect": {
+					"armorClass": {
+						"$add": [
+							"value",
+							15
+						]
+					},
+					"damageThreshold": {
+						"$add": [
+							"value",
+							5
+						]
+					}
+				},
+				"requirements": {
+					"endurance": {
+						"max": 8,
+						"min": 1
+					},
+					"level": 12,
+					"race": [
+						"alphaMutant",
+						"betaMutant"
+					]
+				}
+			},
+			"toughness": {
+				"effect": {
+					"damageThreshold": {
+						"$add": [
+							"value",
+							3
+						]
+					}
+				},
+				"requirements": {
+					"endurance": 6,
+					"level": 3,
+					"luck": 6
+				}
+			},
+			"tunnelRat": {
+				"meta": "You crawl like a baby. Well, you crawl like a very fast baby. You can move at your normal rate (1 AP per hex) while crouching or prone.",
+				"requirements": {
+					"agility": 6,
+					"level": 4,
+					"sneak": 60
+				}
+			},
+			"wayOfTheFruit": {
+				"meta": "You have learned about the mystical healing effects of eating fruit. For 24 hours after eating a piece of fruit, your character gains +1 to Perception and Agility.",
+				"requirements": {
+					"charisma": 6,
+					"level": 6,
+					"race": {
+						"$not": [
+							"deathclaw",
+							"dog"
+						]
+					}
+				}
+			},
+			"weaponHandling": {
+				"meta": "This perk adds +3 Strength for the purposes of strength requirements for handling and firing weapons.",
+				"requirements": {
+					"agility": 5,
+					"level": 12
+				}
+			},
+			"webCrawler": {
+				"effect": {
+					"climb": {
+						"$add": [
+							"value",
+							30
+						]
+					}
+				},
+				"requirements": {
+					"endurance": 7,
+					"level": 6,
+					"strength": 6
+				}
+			}
+		},
+		"PRIMARY_STATISTICS": {
+			"agility": {
+				"order": 6
+			},
+			"charisma": {
+				"order": 4
+			},
+			"endurance": {
+				"order": 3
+			},
+			"intelligence": {
+				"order": 5
+			},
+			"luck": {
+				"order": 7
+			},
+			"perception": {
+				"order": 2
+			},
+			"strength": {
+				"order": 1
+			}
+		},
+		"RACES": {
+			"alphaMutant": {
+				"agility": {
+					"max": 8,
+					"min": 1
+				},
+				"charisma": {
+					"max": 8,
+					"min": 1
+				},
+				"endurance": {
+					"max": 12,
+					"min": 3
+				},
+				"height": {
+					"max": 3,
+					"min": 2.8
+				},
+				"intelligence": {
+					"max": 11,
+					"min": 1
+				},
+				"levelsPerPerk": 4,
+				"luck": {
+					"max": 10,
+					"min": 1
+				},
+				"perception": {
+					"max": 10,
+					"min": 1
+				},
+				"primaryTotal": 40,
+				"resistContactGas": 35,
+				"resistPoison": 20,
+				"resistRadiation": 10,
+				"strength": {
+					"max": 13,
+					"min": 4
+				},
+				"weight": {
+					"max": 400,
+					"min": 300
+				}
+			},
+			"betaMutant": {
+				"agility": {
+					"max": 8,
+					"min": 1
+				},
+				"charisma": {
+					"max": 8,
+					"min": 1
+				},
+				"endurance": {
+					"max": 12,
+					"min": 4
+				},
+				"height": {
+					"max": 3,
+					"min": 2.8
+				},
+				"intelligence": {
+					"max": 8,
+					"min": 1
+				},
+				"levelsPerPerk": 4,
+				"luck": {
+					"max": 10,
+					"min": 1
+				},
+				"perception": {
+					"max": 10,
+					"min": 1
+				},
+				"primaryTotal": 40,
+				"resistContactGas": 35,
+				"resistPoison": 20,
+				"resistRadiation": 10,
+				"strength": {
+					"max": 13,
+					"min": 5
+				},
+				"weight": {
+					"max": 400,
+					"min": 300
+				}
+			},
+			"deathclaw": {},
+			"dog": {},
+			"ghoul": {
+				"agility": {
+					"max": 8,
+					"min": 1
+				},
+				"charisma": {
+					"max": 9,
+					"min": 1
+				},
+				"endurance": {
+					"max": 10,
+					"min": 1
+				},
+				"health": {
+					"$sub": [
+						"value",
+						5
+					]
+				},
+				"height": {
+					"max": 2.5,
+					"min": 1.5
+				},
+				"intelligence": {
+					"max": 13,
+					"min": 2
+				},
+				"levelsPerPerk": 4,
+				"luck": {
+					"max": 10,
+					"min": 5
+				},
+				"perception": {
+					"max": 14,
+					"min": 4
+				},
+				"primaryTotal": 42,
+				"resistPoison": 10,
+				"resistRadiation": 40,
+				"strength": {
+					"max": 6,
+					"min": 1
+				},
+				"weight": {
+					"max": 160,
+					"min": 80
+				}
+			},
+			"human": {
+				"agility": {
+					"max": 10,
+					"min": 1
+				},
+				"charisma": {
+					"max": 10,
+					"min": 1
+				},
+				"endurance": {
+					"max": 10,
+					"min": 1
+				},
+				"height": {
+					"max": 2.5,
+					"min": 1.5
+				},
+				"intelligence": {
+					"max": 10,
+					"min": 1
+				},
+				"levelsPerPerk": 3,
+				"luck": {
+					"max": 10,
+					"min": 1
+				},
+				"perception": {
+					"max": 10,
+					"min": 1
+				},
+				"primaryTotal": 40,
+				"resistElectricity": 10,
+				"strength": {
+					"max": 10,
+					"min": 1
+				},
+				"weight": {
+					"max": 280,
+					"min": 110
+				}
+			}
+		},
+		"CONDITIONS": {
+			"jogging": {},
+			"running": {},
+			"sprinting": {},
+			"still": {},
+			"walking": {}
+		},
+		"SECONDARY_STATISTICS": {
+			"actionPointRegeneration": {
+				"value": {
+					"$when": {
+						"jogging": {
+							"$floor": {
+								"$half": "agility"
+							}
+						},
+						"running": 0,
+						"sprinting": {
+							"$mul": [
+								-2,
+								{
+									"$sub": [
+										"travel",
+										5
+									]
+								}
+							]
+						},
+						"walking": {
+							"$add": [
+								3,
+								{
+									"$floor": {
+										"$half": "agility"
+									}
+								}
+							]
+						},
+						"otherwise": {
+							"$add": [
+								3,
+								"agility"
+							]
+						}
+					}
+				}
+			},
+			"actionPoints": {
+				"value": {
+					"$add": [
+						5,
+						{
+							"$floor": {
+								"$half": "agility"
+							}
+						},
+						{
+							"$floor": {
+								"$half": "endurance"
+							}
+						}
+					]
+				}
+			},
+			"armorClass": {
+				"percent": true,
+				"value": "agility"
+			},
+			"carryWeight": {
+				"value": {
+					"$add": [
+						25,
+						{
+							"$mul": [
+								25,
+								"strength"
+							]
+						}
+					]
+				}
+			},
+			"criticalChance": {
+				"percent": true,
+				"value": "luck"
+			},
+			"criticalFailure": {
+				"percent": true,
+				"value": {
+					"$add": [
+						89,
+						"luck"
+					]
+				}
+			},
+			"damageThreshold": {
+				"value": 0
+			},
+			"detectionClass": {
+				"percent": true,
+				"value": "perception"
+			},
+			"healingRate": {
+				"value": {
+					"$floor": {
+						"$div": [
+							"endurance",
+							3
+						]
+					}
+				}
+			},
+			"health": {
+				"value": {
+					"$add": [
+						15,
+						"strength",
+						{
+							"$double": "endurance"
+						},
+						{
+							"$mul": [
+								"level",
+								{
+									"$floor": {
+										"$add": [
+											3,
+											{
+												"$half": "endurance"
+											}
+										]
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			"judgementClass": {
+				"percent": true,
+				"value": "charisma"
+			},
+			"level": {
+				"value": {
+					"$floor": {
+						"$add": [
+							0.5,
+							{
+								"$div": [
+									{
+										"$sqrt": {
+											"$add": [
+												{
+													"$div": [
+														"experience",
+														10
+													]
+												},
+												25
+											]
+										}
+									},
+									10
+								]
+							}
+						]
+					}
+				}
+			},
+			"meleeDamage": {
+				"value": {
+					"$max": [
+						1,
+						{
+							"$sub": [
+								"strength",
+								5
+							]
+						}
+					]
+				}
+			},
+			"resistContactGas": {
+				"percent": true,
+				"value": 0
+			},
+			"resistElectricity": {
+				"percent": true,
+				"value": 0
+			},
+			"resistExplosion": {
+				"percent": true,
+				"value": 0
+			},
+			"resistExplosionThreshold": {
+				"value": 0
+			},
+			"resistFire": {
+				"percent": true,
+				"value": 0
+			},
+			"resistFireThreshold": {
+				"value": 0
+			},
+			"resistInhaledGas": {
+				"percent": true,
+				"value": 0
+			},
+			"resistLaser": {
+				"percent": true,
+				"value": 0
+			},
+			"resistLaserThreshold": {
+				"value": 0
+			},
+			"resistNormal": {
+				"percent": true,
+				"value": 0
+			},
+			"resistNormalThreshold": {
+				"value": 0
+			},
+			"resistPlasma": {
+				"percent": true,
+				"value": 0
+			},
+			"resistPlasmaThreshold": {
+				"value": 0
+			},
+			"resistPoison": {
+				"percent": true,
+				"value": {
+					"$mul": [
+						5,
+						"endurance"
+					]
+				}
+			},
+			"resistRadiation": {
+				"percent": true,
+				"value": {
+					"$double": "endurance"
+				}
+			},
+			"sequence": {
+				"value": {
+					"$double": "perception"
+				}
+			}
+		},
+		"SKILLS": {
+			"medicine": {
+				"chems": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "intelligence"
+							}
+						]
+					}
+				},
+				"doctor": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "intelligence"
+							}
+						]
+					}
+				},
+				"firstAid": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "intelligence"
+							}
+						]
+					}
+				}
+			},
+			"rangedWeapons": {
+				"bigGuns": {
+					"value": {
+						"$add": [
+							{
+								"$double": "endurance"
+							},
+							"perception",
+							"strength"
+						]
+					}
+				},
+				"energyWeapons": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "perception"
+							}
+						]
+					}
+				},
+				"explosives": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "perception"
+							}
+						]
+					}
+				},
+				"smallGuns": {
+					"value": {
+						"$add": [
+							10,
+							"agility",
+							"perception"
+						]
+					}
+				}
+			},
+			"simpleWeapons": {
+				"melee": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "strength"
+							}
+						]
+					}
+				},
+				"throwing": {
+					"value": {
+						"$mul": [
+							4,
+							"agility"
+						]
+					}
+				},
+				"unarmed": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "agility"
+							},
+							"strength"
+						]
+					}
+				}
+			},
+			"social": {
+				"barter": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "charisma"
+							}
+						]
+					}
+				},
+				"gambling": {
+					"value": {
+						"$add": [
+							10,
+							"luck",
+							"perception"
+						]
+					}
+				},
+				"speech": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "charisma"
+							}
+						]
+					}
+				}
+			},
+			"survival": {
+				"climb": {
+					"value": {
+						"$add": [
+							10,
+							"endurance",
+							"strength"
+						]
+					}
+				},
+				"jump": {
+					"value": {
+						"$add": [
+							10,
+							"agility",
+							"strength"
+						]
+					}
+				},
+				"outdoorsman": {
+					"value": {
+						"$add": [
+							10,
+							"endurance"
+						]
+					}
+				},
+				"swim": {
+					"value": {
+						"$add": [
+							10,
+							"endurance",
+							"strength"
+						]
+					}
+				}
+			},
+			"technical": {
+				"pilot": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "agility"
+							}
+						]
+					}
+				},
+				"repair": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "intelligence"
+							}
+						]
+					}
+				},
+				"science": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "intelligence"
+							}
+						]
+					}
+				}
+			},
+			"thieving": {
+				"disguise": {
+					"value": {
+						"$add": [
+							10,
+							"charisma",
+							"perception"
+						]
+					}
+				},
+				"lockpick": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "perception"
+							}
+						]
+					}
+				},
+				"sneak": {
+					"value": {
+						"$add": [
+							10,
+							{
+								"$double": "agility"
+							}
+						]
+					}
+				},
+				"steal": {
+					"value": {
+						"$add": [
+							10,
+							"agility",
+							"luck"
+						]
+					}
+				}
+			}
+		},
+		"TRAITS": {
+			"bloodyMess": {},
+			"bruiser": {
+				"actionPoints": {
+					"$sub": [
+						"value",
+						2
+					]
+				},
+				"requirements": {
+					"race": {
+						"$not": "ghoul"
+					}
+				},
+				"strength": {
+					"$add": [
+						"value",
+						2
+					]
+				}
+			},
+			"chemReliant": {
+				"addictionChance": {
+					"$double": "value"
+				},
+				"addictionRecovery": {
+					"$double": "value"
+				}
+			},
+			"chemResistant": {
+				"addictionChance": {
+					"$half": "value"
+				},
+				"chemDuration": {
+					"$half": "value"
+				}
+			},
+			"fastMetabolism": {
+				"healingRate": {
+					"$double": "value"
+				},
+				"requirements": {
+					"race": {
+						"$not": "ghoul"
+					}
+				},
+				"resistPoison": 0,
+				"resistRadiation": 0
+			},
+			"fastShot": {
+				"actionPointCost": {
+					"$sub": [
+						"value",
+						1
+					]
+				},
+				"meta": "Prevents action: Targeted Shot"
+			},
+			"fearTheReaper": {
+				"levelsPerPerk": {
+					"$sub": [
+						"value",
+						1
+					]
+				},
+				"requirements": {
+					"race": "ghoul"
+				}
+			},
+			"finesse": {
+				"criticalChance": {
+					"$add": [
+						"value",
+						10
+					]
+				},
+				"damage": {
+					"$ceil": {
+						"$mul": [
+							"value",
+							0.75
+						]
+					}
+				}
+			},
+			"gifted": {
+				"primaryTotal": {
+					"$add": [
+						"value",
+						5
+					]
+				},
+				"skillPoints": {
+					"$add": [
+						"value",
+						-10,
+						{
+							"$mul": [
+								"level",
+								-5
+							]
+						}
+					]
+				}
+			},
+			"glowingOne": {
+				"$nearby": {
+					"radsPerHour": {
+						"$add": [
+							"value",
+							10
+						]
+					}
+				},
+				"meta": "Light effects are prevented",
+				"requirements": {
+					"race": "ghoul"
+				},
+				"resistRadiation": {
+					"$add": [
+						"value",
+						50
+					]
+				}
+			},
+			"goodNatured": {
+				"barter": {
+					"$add": [
+						"value",
+						20
+					]
+				},
+				"bigGuns": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"doctor": {
+					"$add": [
+						"value",
+						20
+					]
+				},
+				"energyWeapons": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"explosives": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"firstAid": {
+					"$add": [
+						"value",
+						20
+					]
+				},
+				"melee": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"smallGuns": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"speech": {
+					"$add": [
+						"value",
+						20
+					]
+				},
+				"throwing": {
+					"$sub": [
+						"value",
+						10
+					]
+				},
+				"unarmed": {
+					"$sub": [
+						"value",
+						10
+					]
+				}
+			},
+			"hamFisted": {
+				"bigGuns": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"doctor": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"energyWeapons": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"firstAid": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"lockpick": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"meta": "Tag Unarmed skill",
+				"repair": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"requirements": {
+					"race": [
+						"alphaMutant",
+						"betaMutant"
+					]
+				},
+				"science": {
+					"$sub": [
+						"value",
+						20
+					]
+				},
+				"smallGuns": {
+					"$sub": [
+						"value",
+						20
+					]
+				}
+			},
+			"jinxed": {
+				"$nearby": {
+					"criticalFailureChance": {
+						"$add": [
+							"value",
+							50
+						]
+					}
+				},
+				"criticalFailureChance": {
+					"$add": [
+						"value",
+						50
+					]
+				}
+			},
+			"kamikaze": {
+				"armorClass": 0,
+				"sequence": {
+					"$add": [
+						"value",
+						5
+					]
+				}
+			},
+			"nightPerson": {
+				"$when": {
+					"daytime": {
+						"intelligence": {
+							"$dec": "value"
+						},
+						"perception": {
+							"$dec": "value"
+						}
+					},
+					"nighttime": {
+						"intelligence": {
+							"$inc": "value"
+						},
+						"perception": {
+							"$inc": "value"
+						}
+					}
+				}
+			},
+			"oneHander": {
+				"$when": {
+					"holdingOneHandedWeapon": {
+						"energyWeapons": {
+							"$add": [
+								"value",
+								20
+							]
+						},
+						"smallGuns": {
+							"$add": [
+								"value",
+								20
+							]
+						},
+						"throwing": {
+							"$add": [
+								"value",
+								20
+							]
+						}
+					},
+					"holdingTwoHandedWeapon": {
+						"bigGuns": {
+							"$sub": [
+								"value",
+								40
+							]
+						},
+						"energyWeapons": {
+							"$sub": [
+								"value",
+								40
+							]
+						},
+						"smallGuns": {
+							"$sub": [
+								"value",
+								40
+							]
+						},
+						"throwing": {
+							"$sub": [
+								"value",
+								40
+							]
+						}
+					}
+				}
+			},
+			"sexAppeal": {
+				"$when": {
+					"talkingToAttractedSex": {
+						"barter": {
+							"$add": [
+								"value",
+								40
+							]
+						},
+						"charisma": {
+							"$inc": "value"
+						},
+						"speech": {
+							"$add": [
+								"value",
+								40
+							]
+						}
+					},
+					"talkingToUnattractedSex": {
+						"barter": {
+							"$sub": [
+								"value",
+								40
+							]
+						},
+						"charisma": {
+							"$dec": "value"
+						},
+						"speech": {
+							"$sub": [
+								"value",
+								40
+							]
+						}
+					}
+				},
+				"requirements": {
+					"race": "human"
+				}
+			},
+			"skilled": {
+				"levelsPerPerk": {
+					"$inc": "value"
+				},
+				"skillPointsPerLevel": {
+					"$add": [
+						"value",
+						5
+					]
+				}
+			},
+			"smallFrame": {
+				"agility": {
+					"$inc": "value"
+				},
+				"carryWeight": {
+					"$add": [
+						"value",
+						-25,
+						{
+							"$mul": [
+								-10,
+								"level"
+							]
+						}
+					]
+				},
+				"requirements": {
+					"race": {
+						"$not": [
+							"alphaMutant",
+							"betaMutant"
+						]
+					}
+				}
+			},
+			"techWizard": {
+				"lockpick": {
+					"$add": [
+						"value",
+						15
+					]
+				},
+				"perception": {
+					"$dec": "value"
+				},
+				"repair": {
+					"$add": [
+						"value",
+						15
+					]
+				},
+				"requirements": {
+					"race": {
+						"$not": "betaMutant"
+					}
+				},
+				"science": {
+					"$add": [
+						"value",
+						15
+					]
+				}
+			},
+			"vatSkin": {
+				"$nearby": {
+					"perception": {
+						"$dec": "value"
+					}
+				},
+				"armorClass": {
+					"$add": [
+						"value",
+						10
+					]
+				},
+				"requirements": {
+					"race": [
+						"alphaMutant",
+						"betaMutant"
+					]
+				}
+			}
+		}
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var assign        = __webpack_require__(38)
+	  , normalizeOpts = __webpack_require__(120)
+	  , isCallable    = __webpack_require__(57)
+	  , contains      = __webpack_require__(60)
+	
+	  , d;
+	
+	d = module.exports = function (dscr, value/*, options*/) {
+		var c, e, w, options, desc;
+		if ((arguments.length < 2) || (typeof dscr !== 'string')) {
+			options = value;
+			value = dscr;
+			dscr = null;
+		} else {
+			options = arguments[2];
+		}
+		if (dscr == null) {
+			c = w = true;
+			e = false;
+		} else {
+			c = contains.call(dscr, 'c');
+			e = contains.call(dscr, 'e');
+			w = contains.call(dscr, 'w');
+		}
+	
+		desc = { value: value, configurable: c, enumerable: e, writable: w };
+		return !options ? desc : assign(normalizeOpts(options), desc);
+	};
+	
+	d.gs = function (dscr, get, set/*, options*/) {
+		var c, e, options, desc;
+		if (typeof dscr !== 'string') {
+			options = set;
+			set = get;
+			get = dscr;
+			dscr = null;
+		} else {
+			options = arguments[3];
+		}
+		if (get == null) {
+			get = undefined;
+		} else if (!isCallable(get)) {
+			options = get;
+			get = set = undefined;
+		} else if (set == null) {
+			set = undefined;
+		} else if (!isCallable(set)) {
+			options = set;
+			set = undefined;
+		}
+		if (dscr == null) {
+			c = true;
+			e = false;
+		} else {
+			c = contains.call(dscr, 'c');
+			e = contains.call(dscr, 'e');
+		}
+	
+		desc = { get: get, set: set, configurable: c, enumerable: e };
+		return !options ? desc : assign(normalizeOpts(options), desc);
+	};
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _getIterator = __webpack_require__(185)["default"];
+	
+	var _isIterable = __webpack_require__(186)["default"];
+	
+	exports["default"] = (function () {
+	  function sliceIterator(arr, i) {
+	    var _arr = [];
+	    var _n = true;
+	    var _d = false;
+	    var _e = undefined;
+	
+	    try {
+	      for (var _i = _getIterator(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
+	        _arr.push(_s.value);
+	
+	        if (i && _arr.length === i) break;
+	      }
+	    } catch (err) {
+	      _d = true;
+	      _e = err;
+	    } finally {
+	      try {
+	        if (!_n && _i["return"]) _i["return"]();
+	      } finally {
+	        if (_d) throw _e;
+	      }
+	    }
+	
+	    return _arr;
+	  }
+	
+	  return function (arr, i) {
+	    if (Array.isArray(arr)) {
+	      return arr;
+	    } else if (_isIterable(Object(arr))) {
+	      return sliceIterator(arr, i);
+	    } else {
+	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+	    }
+	  };
+	})();
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var store  = __webpack_require__(215)('wks')
+	  , Symbol = __webpack_require__(47).Symbol;
+	module.exports = function(name){
+	  return store[name] || (store[name] =
+	    Symbol && Symbol[name] || (Symbol || __webpack_require__(219))('Symbol.' + name));
+	};
+
+/***/ },
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -447,10 +10775,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(13)
+	var version = __webpack_require__(31)
 	
 	module.exports = isVirtualNode
 	
@@ -460,14 +10788,158 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports) {
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
 
-	var core = module.exports = {};
-	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+	'use strict';
+	
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _createClass = __webpack_require__(26)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = withNiceToString;
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	function withNiceToString(Class) {
+	    var fields = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	    return (function (_Class) {
+	        _inherits(SubClass, _Class);
+	
+	        function SubClass() {
+	            _classCallCheck(this, SubClass);
+	
+	            _get(Object.getPrototypeOf(SubClass.prototype), 'constructor', this).apply(this, arguments);
+	        }
+	
+	        _createClass(SubClass, [{
+	            key: 'toString',
+	            value: function toString() {
+	                var _this = this;
+	
+	                return (this.name || this._name || 'unnamed') + ' {' + _Object$entries(fields).filter(function (_ref) {
+	                    var _ref2 = _slicedToArray(_ref, 1);
+	
+	                    var key = _ref2[0];
+	                    return key !== 'key';
+	                }).map(function (_ref3) {
+	                    var _ref32 = _slicedToArray(_ref3, 2);
+	
+	                    var key = _ref32[0];
+	                    var value = _ref32[1];
+	
+	                    if (value === _this[key] || _immutable2['default'].is(value, _this[key])) {
+	                        return '';
+	                    }
+	                    return ' ' + key + ': ' + _this[key];
+	                }).filter(function (x) {
+	                    return x;
+	                }).join(',') + ' }';
+	            }
+	        }]);
+	
+	        return SubClass;
+	    })(Class);
+	}
+	
+	module.exports = exports['default'];
 
 /***/ },
-/* 9 */
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(195), __esModule: true };
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(198), __esModule: true };
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports["default"] = function (instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global    = __webpack_require__(47)
+	  , core      = __webpack_require__(4)
+	  , PROTOTYPE = 'prototype';
+	var ctx = function(fn, that){
+	  return function(){
+	    return fn.apply(that, arguments);
+	  };
+	};
+	var $def = function(type, name, source){
+	  var key, own, out, exp
+	    , isGlobal = type & $def.G
+	    , isProto  = type & $def.P
+	    , target   = isGlobal ? global : type & $def.S
+	        ? global[name] : (global[name] || {})[PROTOTYPE]
+	    , exports  = isGlobal ? core : core[name] || (core[name] = {});
+	  if(isGlobal)source = name;
+	  for(key in source){
+	    // contains in native
+	    own = !(type & $def.F) && target && key in target;
+	    if(own && key in exports)continue;
+	    // export native or passed
+	    out = own ? target[key] : source[key];
+	    // prevent global pollution for namespaces
+	    if(isGlobal && typeof target[key] != 'function')exp = source[key];
+	    // bind timers to global for call from export context
+	    else if(type & $def.B && own)exp = ctx(out, global);
+	    // wrap global constructors for prevent change them in library
+	    else if(type & $def.W && target[key] == out)!function(C){
+	      exp = function(param){
+	        return this instanceof C ? new C(param) : C(param);
+	      };
+	      exp[PROTOTYPE] = C[PROTOTYPE];
+	    }(out);
+	    else exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
+	    // export
+	    exports[key] = exp;
+	    if(isProto)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+	  }
+	};
+	// type bitmap
+	$def.F = 1;  // forced
+	$def.G = 2;  // global
+	$def.S = 4;  // static
+	$def.P = 8;  // proto
+	$def.B = 16; // bind
+	$def.W = 32; // wrap
+	module.exports = $def;
+
+/***/ },
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -478,10 +10950,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(13)
+	var version = __webpack_require__(31)
 	
 	module.exports = isVirtualText
 	
@@ -491,18 +10963,285 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var store  = __webpack_require__(164)('wks')
-	  , Symbol = __webpack_require__(33).Symbol;
-	module.exports = function(name){
-	  return store[name] || (store[name] =
-	    Symbol && Symbol[name] || (Symbol || __webpack_require__(169))('Symbol.' + name));
-	};
+	'use strict';
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = combineLatestObject;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	function toObservable(value) {
+	    if (value instanceof _cycleCore.Rx.Observable) {
+	        return value;
+	    } else if (value && value.constructor === Object) {
+	        return combineLatestObject(value);
+	    } else {
+	        return _cycleCore.Rx.Observable['return'](value);
+	    }
+	}
+	
+	function combineLatestObject(object) {
+	    var keys = _Object$keys(object);
+	    return _cycleCore.Rx.Observable.combineLatest(keys.map(function (key) {
+	        return toObservable(object[key]);
+	    })).map(function (values) {
+	        return keys.reduce(function (acc, key, i) {
+	            acc[key] = values[i];
+	            return acc;
+	        }, {});
+	    });
+	}
+	
+	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _createClass = __webpack_require__(26)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _interopRequireWildcard = __webpack_require__(191)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _localize = __webpack_require__(177);
+	
+	var localize = _interopRequireWildcard(_localize);
+	
+	exports['default'] = function (Record) {
+	    return (function (_Record) {
+	        _inherits(_class, _Record);
+	
+	        function _class() {
+	            _classCallCheck(this, _class);
+	
+	            _get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+	        }
+	
+	        _createClass(_class, [{
+	            key: 'name',
+	            get: function get() {
+	                return localize.name(this.key);
+	            }
+	        }, {
+	            key: 'plural',
+	            get: function get() {
+	                return localize.plural(this.key);
+	            }
+	        }, {
+	            key: 'abbr',
+	            get: function get() {
+	                return localize.abbr(this.key);
+	            }
+	        }, {
+	            key: 'description',
+	            get: function get() {
+	                return localize.description(this.key);
+	            }
+	        }]);
+	
+	        return _class;
+	    })(Record);
+	};
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$defineProperty = __webpack_require__(44)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = withLookup;
+	function memoize(fetcher) {
+	    var cacheKey = Math.random().toString(36).slice(2);
+	    return function () {
+	        var cache = this[cacheKey];
+	        if (!cache) {
+	            _Object$defineProperty(this, cacheKey, {
+	                value: cache = {}
+	            });
+	        }
+	        var argsKey = Array.prototype.join.call(arguments, ';');
+	        return cache[argsKey] || (cache[argsKey] = fetcher.apply(this, arguments));
+	    };
+	}
+	
+	function withLookup(Record, fetchers) {
+	    var SubRecord = (function (_Record) {
+	        _inherits(SubRecord, _Record);
+	
+	        function SubRecord() {
+	            _classCallCheck(this, SubRecord);
+	
+	            _get(Object.getPrototypeOf(SubRecord.prototype), 'constructor', this).apply(this, arguments);
+	        }
+	
+	        return SubRecord;
+	    })(Record);
+	
+	    _Object$entries(fetchers).forEach(function (_ref) {
+	        var _ref2 = _slicedToArray(_ref, 2);
+	
+	        var key = _ref2[0];
+	        var value = _ref2[1];
+	
+	        _Object$defineProperty(SubRecord, key, {
+	            value: memoize(value),
+	            enumerable: true
+	        });
+	    });
+	    return SubRecord;
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$defineProperty = __webpack_require__(44)["default"];
+	
+	exports["default"] = (function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];
+	      descriptor.enumerable = descriptor.enumerable || false;
+	      descriptor.configurable = true;
+	      if ("value" in descriptor) descriptor.writable = true;
+	
+	      _Object$defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }
+	
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	})();
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$getOwnPropertyDescriptor = __webpack_require__(188)["default"];
+	
+	exports["default"] = function get(_x, _x2, _x3) {
+	  var _again = true;
+	
+	  _function: while (_again) {
+	    var object = _x,
+	        property = _x2,
+	        receiver = _x3;
+	    desc = parent = getter = undefined;
+	    _again = false;
+	    if (object === null) object = Function.prototype;
+	
+	    var desc = _Object$getOwnPropertyDescriptor(object, property);
+	
+	    if (desc === undefined) {
+	      var parent = Object.getPrototypeOf(object);
+	
+	      if (parent === null) {
+	        return undefined;
+	      } else {
+	        _x = parent;
+	        _x2 = property;
+	        _x3 = receiver;
+	        _again = true;
+	        continue _function;
+	      }
+	    } else if ("value" in desc) {
+	      return desc.value;
+	    } else {
+	      var getter = desc.get;
+	
+	      if (getter === undefined) {
+	        return undefined;
+	      }
+	
+	      return getter.call(receiver);
+	    }
+	  }
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$create = __webpack_require__(187)["default"];
+	
+	var _Object$setPrototypeOf = __webpack_require__(189)["default"];
+	
+	exports["default"] = function (subClass, superClass) {
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+	  }
+	
+	  subClass.prototype = _Object$create(superClass && superClass.prototype, {
+	    constructor: {
+	      value: subClass,
+	      enumerable: false,
+	      writable: true,
+	      configurable: true
+	    }
+	  });
+	  if (superClass) _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports) {
+
+	module.exports = {};
+
+/***/ },
+/* 30 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -515,14 +11254,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 14 */
+/* 32 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -536,51 +11275,163 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(153), __esModule: true };
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	exports["default"] = function (obj) {
-	  return obj && obj.__esModule ? obj : {
-	    "default": obj
-	  };
-	};
-	
-	exports.__esModule = true;
-
-/***/ },
-/* 17 */
-/***/ function(module, exports) {
-
-	module.exports = {};
-
-/***/ },
-/* 18 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(42)()
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = input;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var typeToEvents = {
+	    text: {
+	        keyup: 0,
+	        input: 0,
+	        change: 0
+	    },
+	    textarea: {
+	        keyup: 0,
+	        input: 0,
+	        change: 0
+	    },
+	    number: {
+	        keyup: 0,
+	        input: 0,
+	        change: 0
+	    },
+	    checkbox: {
+	        change: 0
+	    }
+	};
+	
+	var typeToConverter = {
+	    number: Number
+	};
+	
+	function identity(x) {
+	    return x;
+	}
+	
+	function maybeDebounce(time) {
+	    if (!time) {
+	        return identity;
+	    }
+	    return function (event$) {
+	        return event$.debounce(time);
+	    };
+	}
+	
+	function eventsByType(DOM, type) {
+	    var events = typeToEvents[type];
+	    return _cycleCore.Rx.Observable.from(_Object$keys(events)).flatMap(function (event) {
+	        return DOM.events(event)['let'](maybeDebounce(events[event]));
+	    });
+	}
+	
+	function calculateProps(key, type, value, props) {
+	    switch (type) {
+	        case 'checkbox':
+	            return _Object$assign({
+	                key: key,
+	                type: type,
+	                value: key,
+	                checked: value
+	            }, props || {});
+	        case 'textarea':
+	            return _Object$assign({
+	                key: key,
+	                value: value
+	            }, props || {});
+	        default:
+	            return _Object$assign({
+	                key: key,
+	                type: type,
+	                value: value
+	            }, props || {});
+	    }
+	}
+	
+	function getValueByType(type) {
+	    if (type === 'checkbox') {
+	        return function (ev) {
+	            return ev.target.checked;
+	        };
+	    } else {
+	        return function (ev) {
+	            return ev.target.value;
+	        };
+	    }
+	}
+	
+	function input(key, type, _ref) {
+	    var DOM = _ref.DOM;
+	    var inputValue$ = _ref.value$;
+	    var _ref$props$ = _ref.props$;
+	    var props$ = _ref$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref$props$;
+	
+	    var tag = type === 'textarea' ? type : 'input';
+	    var selector = tag + '.' + key;
+	
+	    var newValue$ = eventsByType(DOM.select(selector), type).map(getValueByType(type)).map(typeToConverter[type] || identity);
+	
+	    var value$ = inputValue$.merge(newValue$);
+	
+	    props$ = props$.shareReplay(1);
+	    var boundValue$ = _cycleCore.Rx.Observable.combineLatest(value$, props$, function (value, props) {
+	        if (!props) {
+	            return value;
+	        }
+	        if ('min' in props && value < props.min) {
+	            return props.min;
+	        }
+	        if ('max' in props && value > props.max) {
+	            return props.max;
+	        }
+	        return value;
+	    }).distinctUntilChanged().shareReplay(1);
+	
+	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(boundValue$, props$, function (value, props) {
+	        return (0, _cycleDom.h)(selector, calculateProps(key, type, value, props));
+	    });
+	
+	    return {
+	        DOM: vtree$,
+	        value$: boundValue$
+	    };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	module.exports = __webpack_require__(58)()
 		? Object.setPrototypeOf
-		: __webpack_require__(43);
+		: __webpack_require__(59);
 
 
 /***/ },
-/* 19 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(13)
-	var isVNode = __webpack_require__(7)
-	var isWidget = __webpack_require__(3)
-	var isThunk = __webpack_require__(9)
-	var isVHook = __webpack_require__(12)
+	var version = __webpack_require__(31)
+	var isVNode = __webpack_require__(15)
+	var isWidget = __webpack_require__(8)
+	var isThunk = __webpack_require__(21)
+	var isVHook = __webpack_require__(30)
 	
 	module.exports = VirtualNode
 	
@@ -651,51 +11502,564 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _Object$keys = __webpack_require__(15)['default'];
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _createClass = __webpack_require__(26)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	exports['default'] = combineLatestObject;
+	exports['default'] = _exports;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _immutable = __webpack_require__(5);
 	
-	function toObservable(value) {
-	    if (value instanceof _cycleCore.Rx.Observable) {
-	        return value;
-	    } else if (value && value.constructor === Object) {
-	        return combineLatestObject(value);
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _When = __webpack_require__(76);
+	
+	var _When2 = _interopRequireDefault(_When);
+	
+	var owns = Object.prototype.hasOwnProperty;
+	
+	var UnaryOperationRecord = _immutable2['default'].Record({
+	    type: '',
+	    value: 0
+	}, 'UnaryOperation');
+	
+	var UnaryOperation = (function (_UnaryOperationRecord) {
+	    _inherits(UnaryOperation, _UnaryOperationRecord);
+	
+	    function UnaryOperation() {
+	        _classCallCheck(this, UnaryOperation);
+	
+	        _get(Object.getPrototypeOf(UnaryOperation.prototype), 'constructor', this).apply(this, arguments);
+	    }
+	
+	    _createClass(UnaryOperation, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return this.type + '(' + this.value + ')';
+	        }
+	    }]);
+	
+	    return UnaryOperation;
+	})(UnaryOperationRecord);
+	
+	var BinaryOperationRecord = _immutable2['default'].Record({
+	    type: '',
+	    left: 0,
+	    right: 0
+	}, 'BinaryOperation');
+	
+	var BinaryOperation = (function (_BinaryOperationRecord) {
+	    _inherits(BinaryOperation, _BinaryOperationRecord);
+	
+	    function BinaryOperation() {
+	        _classCallCheck(this, BinaryOperation);
+	
+	        _get(Object.getPrototypeOf(BinaryOperation.prototype), 'constructor', this).apply(this, arguments);
+	    }
+	
+	    _createClass(BinaryOperation, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return '(' + this.left + ' ' + this.type + ' ' + this.right + ')';
+	        }
+	    }]);
+	
+	    return BinaryOperation;
+	})(BinaryOperationRecord);
+	
+	var Addition = new BinaryOperation({
+	    type: '+'
+	});
+	var Subtraction = new BinaryOperation({
+	    type: '-'
+	});
+	var Multiplication = new BinaryOperation({
+	    type: '*'
+	});
+	var Division = new BinaryOperation({
+	    type: '/'
+	});
+	var Exponentiate = new BinaryOperation({
+	    type: '^'
+	});
+	var Max = new BinaryOperation({
+	    type: 'max'
+	});
+	var Min = new BinaryOperation({
+	    type: 'min'
+	});
+	var Or = new BinaryOperation({
+	    type: 'or'
+	});
+	var And = new BinaryOperation({
+	    type: 'and'
+	});
+	var Equals = new BinaryOperation({
+	    type: '='
+	});
+	var Floor = new UnaryOperation({
+	    type: 'floor'
+	});
+	var Ceiling = new UnaryOperation({
+	    type: 'ceil'
+	});
+	var Absolute = new UnaryOperation({
+	    type: 'abs'
+	});
+	var Not = new UnaryOperation({
+	    type: 'not'
+	});
+	var LessThanOrEqual = new BinaryOperation({
+	    type: '<='
+	});
+	
+	var RandomRecord = new _immutable2['default'].Record({
+	    min: 1,
+	    max: 1
+	});
+	
+	var Random = (function (_RandomRecord) {
+	    _inherits(Random, _RandomRecord);
+	
+	    function Random() {
+	        _classCallCheck(this, Random);
+	
+	        _get(Object.getPrototypeOf(Random.prototype), 'constructor', this).apply(this, arguments);
+	    }
+	
+	    _createClass(Random, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return 'rand(' + this.min + ', ' + this.max + ')';
+	        }
+	    }]);
+	
+	    return Random;
+	})(RandomRecord);
+	
+	function $when(conditions, path, validKeys, type) {
+	    if (!conditions || conditions.constructor !== Object) {
+	        throw new Error('$when expects an object, got \'' + JSON.stringify(conditions) + '\' (in ' + path + ')');
+	    }
+	
+	    return _Object$entries(conditions).filter(function (_ref) {
+	        var _ref2 = _slicedToArray(_ref, 1);
+	
+	        var key = _ref2[0];
+	        return key !== 'otherwise';
+	    }).reduce(function (acc, _ref3) {
+	        var _ref32 = _slicedToArray(_ref3, 2);
+	
+	        var key = _ref32[0];
+	        var value = _ref32[1];
+	
+	        return acc.setIn(['conditions', key], toEquation(value, path + '.' + key, validKeys, type));
+	    }, new _When2['default']({
+	        otherwise: toEquation(conditions.otherwise || 0, path + '.otherwise', validKeys, type)
+	    }));
+	}
+	
+	var operations = {
+	    number: {
+	        $inc: function $inc(operand, path, validKeys) {
+	            return this.$add([operand, 1], path, validKeys);
+	        },
+	        $dec: function $dec(operand, path, validKeys) {
+	            return this.$sub([operand, 1], path, validKeys);
+	        },
+	        $add: function $add(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$add expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Addition.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $sub: function $sub(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$sub expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Subtraction.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $double: function $double(operand, path, validKeys) {
+	            return this.$mul([2, operand], path, validKeys);
+	        },
+	        $mul: function $mul(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$mul expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Multiplication.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $max: function $max(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$max expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Max.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $min: function $min(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$min expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Min.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $floor: function $floor(operand, path, validKeys) {
+	            return Floor.set('value', toEquation(operand, path, validKeys, 'number'));
+	        },
+	        $ceil: function $ceil(operand, path, validKeys) {
+	            return Ceiling.set('value', toEquation(operand, path, validKeys, 'number'));
+	        },
+	        $abs: function $abs(operand, path, validKeys) {
+	            return Absolute.set('value', toEquation(operand, path, validKeys, 'number'));
+	        },
+	        $half: function $half(operand, path, validKeys) {
+	            return this.$div([operand, 2], path, validKeys);
+	        },
+	        $sqrt: function $sqrt(operand, path, validKeys) {
+	            return this.$pow([operand, 0.5], path, validKeys);
+	        },
+	        $pow: function $pow(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$pow expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduceRight(function (right, left) {
+	                return Exponentiate.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $div: function $div(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$div expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + path + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[' + index + ']', validKeys, 'number');
+	            }).reduce(function (left, right) {
+	                return Division.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        },
+	        $rand: function $rand(range, path, validKeys) {
+	            if (Array.isArray(range)) {
+	                if (range.length !== 2) {
+	                    throw new Error('$rand expects an array of length 2, got \'' + range.length + '\' (in ' + path + ')');
+	                }
+	                return new Random({
+	                    min: toEquation(range[0], path + '[0]', validKeys, 'number'),
+	                    max: toEquation(range[1], path + '[1]', validKeys, 'number')
+	                });
+	            }
+	
+	            return new Random({
+	                min: 1,
+	                max: toEquation(range, path, validKeys, 'number')
+	            });
+	        }
+	    },
+	    boolean: {
+	        $some: function $some(operands, path, validKeys) {
+	            if (!Array.isArray(operands)) {
+	                throw new Error('$some expects an array, got \'' + JSON.stringify(operands) + '\' (in ' + operands + ')');
+	            }
+	            return operands.map(function (o, index) {
+	                return toEquation(o, path + '[index]', validKeys, 'boolean');
+	            }).reduce(function (left, right) {
+	                return Or.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        }
+	    },
+	    string: {
+	        // $not(values, path, validKeys) {
+	        //     if (!Array.isArray(values)) {
+	        //         values = [values];
+	        //     }
+	        //     return values
+	        //         .map(value => Not.merge({
+	        //             value: Equals.merge({
+	        //                 left: left,
+	        //                 right:
+	        //             })
+	        //         })
+	        // }
+	    },
+	    any: {
+	        $when: $when
+	    }
+	};
+	
+	function convertOperation(key, value, path, validKeys, type) {
+	    if (!owns.call(operations, type)) {
+	        throw new Error('Unknown operation: \'' + type + '\' (in ' + path + ')');
+	    }
+	    var typeOperations = operations[type];
+	    var anyOperations = operations.any;
+	    if (!owns.call(typeOperations, key) && !owns.call(anyOperations, key)) {
+	        throw new Error('Unknown operation for ' + type + ': \'' + key + '\' (in ' + path + ')');
+	    }
+	    if (typeOperations[key]) {
+	        return typeOperations[key](value, path, validKeys, type);
 	    } else {
-	        return _cycleCore.Rx.Observable['return'](value);
+	        return anyOperations[key](value, path, validKeys, type);
 	    }
 	}
 	
-	function combineLatestObject(object) {
-	    var keys = _Object$keys(object);
-	    return _cycleCore.Rx.Observable.combineLatest(keys.map(function (key) {
-	        return toObservable(object[key]);
-	    })).map(function (values) {
-	        return keys.reduce(function (acc, key, i) {
-	            acc[key] = values[i];
-	            return acc;
-	        }, {});
+	function convertRange(key, range, path, validKeys) {
+	    var ranges = [range.min != null ? LessThanOrEqual.merge({
+	        left: toEquation(range.min, path + '.min', validKeys, 'number'),
+	        right: key
+	    }) : null, range.max != null ? LessThanOrEqual.merge({
+	        left: key,
+	        right: toEquation(range.max, path + '.max', validKeys, 'number')
+	    }) : null].filter(function (x) {
+	        return x;
+	    });
+	
+	    if (ranges.length !== _Object$keys(range).length) {
+	        throw new Error('Cannot have more than "min" and "max" on a range (at ' + path + ')');
+	    }
+	
+	    return ranges.reduce(function (left, right) {
+	        return And.merge({
+	            left: left,
+	            right: right
+	        });
 	    });
 	}
 	
+	var convertCheckByType = {
+	    number: function number(key, value, path, validKeys) {
+	        if (value && value.constructor === Object && ('min' in value || 'max' in value)) {
+	            // { "strength": { "min": 4, "max": 7 } }
+	            return convertRange(key, value, path, validKeys);
+	        }
+	
+	        return LessThanOrEqual.merge({
+	            left: toEquation(value, path, validKeys, 'number'),
+	            right: key
+	        });
+	    },
+	    string: function string(key, value, path, validKeys) {
+	        if (typeof value === 'string') {
+	            return Equals.merge({
+	                left: key,
+	                right: value
+	            });
+	        }
+	
+	        if (Array.isArray(value)) {
+	            return value.map(function (element, index) {
+	                return Equals.merge({
+	                    left: key,
+	                    right: toEquation(element, path + '[' + index + ']', validKeys, 'string')
+	                });
+	            }).reduce(function (left, right) {
+	                return Or.merge({
+	                    left: left,
+	                    right: right
+	                });
+	            });
+	        }
+	
+	        if (value != null && value.constructor === Object) {
+	            if (value.$not) {
+	                if (_Object$keys(value).length !== 1) {
+	                    throw new Error('Cannot use "$not" with other keys (at ' + path + ')');
+	                }
+	                return Not.merge({
+	                    value: convertCheck(key, value.$not, path, validKeys)
+	                });
+	            }
+	            return Equals.merge({
+	                left: key,
+	                right: toEquation(value, path, validKeys, 'string')
+	            });
+	        }
+	        throw new Error('Unable to convert ' + JSON.stringify(value) + ' at ' + path);
+	    }
+	};
+	
+	function convertCheck(key, value, path, validKeys) {
+	    if (!owns.call(validKeys, key)) {
+	        throw new Error('Unknown key: \'' + key + '\' (at ' + path + ')');
+	    }
+	
+	    var type = validKeys[key];
+	    return convertCheckByType[type](key, value, path, validKeys);
+	}
+	
+	function convertObject(object, path, validKeys, type) {
+	    var keys = _Object$keys(object);
+	    var len = keys.length;
+	    if (!len) {
+	        throw new Error('Expected an object with at least one property (in ' + path + ')');
+	    }
+	    var conversions = keys.map(function (key) {
+	        if (key.charAt(0) === '$') {
+	            return convertOperation(key, object[key], path + '.' + key, validKeys, type);
+	        } else if (type === 'boolean') {
+	            return convertCheck(key, object[key], path + '.' + key, validKeys);
+	        } else {
+	            throw new Error('Unexpected key \'' + key + '\' in ' + path);
+	        }
+	    });
+	    if (conversions.length === 1) {
+	        return conversions[0];
+	    }
+	    if (type !== 'boolean') {
+	        throw new Error('Expected object to only have one property (in ' + path + ')');
+	    }
+	    return conversions.reduce(function (left, right) {
+	        return And.merge({
+	            left: left,
+	            right: right
+	        });
+	    });
+	}
+	
+	var VALID_TYPES = {
+	    number: true,
+	    boolean: true,
+	    string: true,
+	    any: true
+	};
+	
+	function toEquation(value, path, validKeys, type) {
+	    if (typeof path !== 'string') {
+	        throw new TypeError('Expected ' + path + ' to be a string');
+	    }
+	    if (validKeys == null) {
+	        throw new TypeError('Expected validKeys to be an object');
+	    }
+	    var valueType = typeof value;
+	    if (valueType === 'string') {
+	        if (!owns.call(validKeys, value)) {
+	            throw new Error('Unknown value \'' + value + '\' at ' + path);
+	        }
+	        return value;
+	    }
+	    if (VALID_TYPES[valueType]) {
+	        if (typeof value !== type) {
+	            throw new TypeError('Expected ' + value + ' to be a ' + type + ', got ' + typeof value + ' (at ' + path + ')');
+	        }
+	        return value;
+	    }
+	    if (!VALID_TYPES[type]) {
+	        throw new Error('Unknown type: \'' + type + '\'');
+	    }
+	    if (value && value.constructor === Object) {
+	        return convertObject(value, path, validKeys, type);
+	    }
+	    if (type === 'boolean' && value == null) {
+	        return true;
+	    }
+	    throw new Error('Unable to convert \'' + JSON.stringify(value) + '\' to an equation (in ' + path + ')');
+	}
+	
+	function simplify(equation) {
+	    if (Object(equation) !== equation) {
+	        return equation;
+	    }
+	    if (typeof equation.simplify === 'function') {
+	        return equation.simplify();
+	    }
+	    return equation;
+	}
+	
+	function _exports(value, path, validKeys, type) {
+	    return simplify(toEquation(value, path, validKeys, type));
+	}
+	
+	_exports.Not = Not;
+	_exports.Or = Or;
+	_exports.Equals = Equals;
+	_exports.LessThanOrEqual = LessThanOrEqual;
+	_exports.BinaryOperation = BinaryOperation;
+	_exports.UnaryOperation = UnaryOperation;
+	
+	function replace(value, from, to) {
+	    if (value === from || _immutable2['default'].is(value, from)) {
+	        return to;
+	    } else if (value instanceof BinaryOperation) {
+	        return value.merge({
+	            left: replace(value.left, from, to),
+	            right: replace(value.right, from, to)
+	        });
+	    } else if (value instanceof UnaryOperation) {
+	        return value.set('value', replace(value.value, from, to));
+	    } else {
+	        return value;
+	    }
+	}
+	_exports.replace = replace;
 	module.exports = exports['default'];
 
 /***/ },
-/* 21 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $          = __webpack_require__(22)
-	  , createDesc = __webpack_require__(63);
-	module.exports = __webpack_require__(166) ? function(object, key, value){
+	var $          = __webpack_require__(9)
+	  , createDesc = __webpack_require__(90);
+	module.exports = __webpack_require__(217) ? function(object, key, value){
 	  return $.setDesc(object, key, createDesc(1, value));
 	} : function(object, key, value){
 	  object[key] = value;
@@ -703,36 +12067,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	var $Object = Object;
-	module.exports = {
-	  create:     $Object.create,
-	  getProto:   $Object.getPrototypeOf,
-	  isEnum:     {}.propertyIsEnumerable,
-	  getDesc:    $Object.getOwnPropertyDescriptor,
-	  setDesc:    $Object.defineProperty,
-	  setDescs:   $Object.defineProperties,
-	  getKeys:    $Object.keys,
-	  getNames:   $Object.getOwnPropertyNames,
-	  getSymbols: $Object.getOwnPropertySymbols,
-	  each:       [].forEach
-	};
-
-/***/ },
-/* 23 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(83)()
+	module.exports = __webpack_require__(110)()
 		? Object.assign
-		: __webpack_require__(84);
+		: __webpack_require__(111);
 
 
 /***/ },
-/* 24 */
+/* 39 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -748,18 +12094,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var clear    = __webpack_require__(40)
-	  , assign   = __webpack_require__(23)
-	  , callable = __webpack_require__(6)
-	  , value    = __webpack_require__(2)
-	  , d        = __webpack_require__(4)
-	  , autoBind = __webpack_require__(75)
-	  , Symbol   = __webpack_require__(26)
+	var clear    = __webpack_require__(56)
+	  , assign   = __webpack_require__(38)
+	  , callable = __webpack_require__(14)
+	  , value    = __webpack_require__(7)
+	  , d        = __webpack_require__(11)
+	  , autoBind = __webpack_require__(102)
+	  , Symbol   = __webpack_require__(41)
 	
 	  , defineProperty = Object.defineProperty
 	  , defineProperties = Object.defineProperties
@@ -844,9 +12190,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
-[180, 101, 103],
-/* 27 */
+/* 41 */
+[234, 128, 130],
+/* 42 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -869,10 +12215,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(13)
+	var version = __webpack_require__(31)
 	
 	module.exports = VirtualText
 	
@@ -885,170 +12231,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-	
-	var _Object$keys = __webpack_require__(15)['default'];
-	
-	var _Object$assign = __webpack_require__(30)['default'];
-	
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-	exports['default'] = input;
-	
-	var _cycleCore = __webpack_require__(1);
-	
-	var _cycleDom = __webpack_require__(5);
-	
-	var typeToEvents = {
-	    text: {
-	        keyup: 0,
-	        input: 0,
-	        change: 0
-	    },
-	    number: {
-	        keyup: 0,
-	        input: 0,
-	        change: 0
-	    },
-	    checkbox: {
-	        change: 0
-	    }
-	};
-	
-	var typeToConverter = {
-	    number: Number
-	};
-	
-	function identity(x) {
-	    return x;
-	}
-	
-	function maybeDebounce(time) {
-	    if (time) {
-	        return function (event$) {
-	            return event$.debounce(time);
-	        };
-	    } else {
-	        return function (event$) {
-	            return event$;
-	        };
-	    }
-	}
-	
-	function eventsByType(DOM, type) {
-	    var events = typeToEvents[type];
-	    return _cycleCore.Rx.Observable.from(_Object$keys(events)).flatMap(function (event) {
-	        return DOM.events(event)['let'](maybeDebounce(events[event]));
-	    });
-	}
-	
-	function calculateProps(key, type, value, props) {
-	    if (type === 'checkbox') {
-	        return _Object$assign({
-	            key: key,
-	            type: type,
-	            value: key,
-	            checked: value
-	        }, props || {});
-	    } else {
-	        return _Object$assign({
-	            key: key,
-	            type: type,
-	            value: value
-	        }, props || {});
-	    }
-	}
-	
-	function input(key, type, _ref) {
-	    var DOM = _ref.DOM;
-	    var inputValue$ = _ref.value$;
-	    var _ref$props$ = _ref.props$;
-	    var props$ = _ref$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref$props$;
-	
-	    var selector = 'input.' + key;
-	
-	    var newValue$ = eventsByType(DOM.select(selector), type).map(function (ev) {
-	        return ev.target.value;
-	    }).map(typeToConverter[type] || identity);
-	
-	    var value$ = inputValue$.merge(newValue$).distinctUntilChanged().shareReplay(1);
-	
-	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(value$, props$, function (value, props) {
-	        return (0, _cycleDom.h)(selector, calculateProps(key, type, value, props));
-	    });
-	
-	    return {
-	        DOM: vtree$,
-	        value$: value$
-	    };
-	}
-	
-	module.exports = exports['default'];
+	module.exports = { "default": __webpack_require__(197), __esModule: true };
 
 /***/ },
-/* 30 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(152), __esModule: true };
+	var isObject = __webpack_require__(86);
+	module.exports = function(it){
+	  if(!isObject(it))throw TypeError(it + ' is not an object!');
+	  return it;
+	};
 
 /***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var global    = __webpack_require__(33)
-	  , core      = __webpack_require__(8)
-	  , PROTOTYPE = 'prototype';
-	var ctx = function(fn, that){
-	  return function(){
-	    return fn.apply(that, arguments);
-	  };
-	};
-	var $def = function(type, name, source){
-	  var key, own, out, exp
-	    , isGlobal = type & $def.G
-	    , isProto  = type & $def.P
-	    , target   = isGlobal ? global : type & $def.S
-	        ? global[name] : (global[name] || {})[PROTOTYPE]
-	    , exports  = isGlobal ? core : core[name] || (core[name] = {});
-	  if(isGlobal)source = name;
-	  for(key in source){
-	    // contains in native
-	    own = !(type & $def.F) && target && key in target;
-	    if(own && key in exports)continue;
-	    // export native or passed
-	    out = own ? target[key] : source[key];
-	    // prevent global pollution for namespaces
-	    if(isGlobal && typeof target[key] != 'function')exp = source[key];
-	    // bind timers to global for call from export context
-	    else if(type & $def.B && own)exp = ctx(out, global);
-	    // wrap global constructors for prevent change them in library
-	    else if(type & $def.W && target[key] == out)!function(C){
-	      exp = function(param){
-	        return this instanceof C ? new C(param) : C(param);
-	      };
-	      exp[PROTOTYPE] = C[PROTOTYPE];
-	    }(out);
-	    else exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
-	    // export
-	    exports[key] = exp;
-	    if(isProto)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
-	  }
-	};
-	// type bitmap
-	$def.F = 1;  // forced
-	$def.G = 2;  // global
-	$def.S = 4;  // static
-	$def.P = 8;  // proto
-	$def.B = 16; // bind
-	$def.W = 32; // wrap
-	module.exports = $def;
-
-/***/ },
-/* 32 */
+/* 46 */
 /***/ function(module, exports) {
 
 	// 7.2.1 RequireObjectCoercible(argument)
@@ -1058,7 +12257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 33 */
+/* 47 */
 /***/ function(module, exports) {
 
 	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
@@ -1068,508 +12267,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
 
 /***/ },
-/* 34 */
-/***/ function(module, exports) {
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = {
-		"COSMETIC": {
-			"age": 20,
-			"appearance": "",
-			"eyes": "",
-			"hair": "",
-			"name": "",
-			"sex": "",
-			"weight": 150
-		},
-		"PRIMARY_ATTRIBUTES": [
-			"strength",
-			"perception",
-			"endurance",
-			"charisma",
-			"intelligence",
-			"agility",
-			"luck"
-		],
-		"RACE_STATS": {
-			"alphaMutant": {
-				"height": [
-					2.8,
-					3
-				],
-				"levelsPerPerk": 4,
-				"primary": {
-					"agility": [
-						1,
-						8
-					],
-					"charisma": [
-						1,
-						8
-					],
-					"endurance": [
-						3,
-						12
-					],
-					"intelligence": [
-						1,
-						11
-					],
-					"luck": [
-						1,
-						10
-					],
-					"perception": [
-						1,
-						10
-					],
-					"strength": [
-						4,
-						13
-					],
-					"total": 40
-				},
-				"secondary": {
-					"resistGas": [
-						0,
-						35
-					],
-					"resistPoison": 20,
-					"resistRadiation": 10
-				},
-				"weight": [
-					300,
-					400
-				]
-			},
-			"betaMutant": {
-				"height": [
-					2.8,
-					3
-				],
-				"levelsPerPerk": 4,
-				"primary": {
-					"agility": [
-						1,
-						8
-					],
-					"charisma": [
-						1,
-						8
-					],
-					"endurance": [
-						4,
-						12
-					],
-					"intelligence": [
-						1,
-						8
-					],
-					"luck": [
-						1,
-						10
-					],
-					"perception": [
-						1,
-						10
-					],
-					"strength": [
-						5,
-						13
-					],
-					"total": 40
-				},
-				"secondary": {
-					"resistGas": [
-						0,
-						35
-					],
-					"resistPoison": 20,
-					"resistRadiation": 10
-				},
-				"weight": [
-					300,
-					400
-				]
-			},
-			"ghoul": {
-				"height": [
-					1.5,
-					2.5
-				],
-				"hp": -5,
-				"levelsPerPerk": 4,
-				"primary": {
-					"agility": [
-						1,
-						8
-					],
-					"charisma": [
-						1,
-						9
-					],
-					"endurance": [
-						1,
-						10
-					],
-					"intelligence": [
-						2,
-						13
-					],
-					"luck": [
-						5,
-						10
-					],
-					"perception": [
-						4,
-						14
-					],
-					"strength": [
-						1,
-						6
-					],
-					"total": 42
-				},
-				"secondary": {
-					"resistPoison": 10,
-					"resistRadiation": 40
-				},
-				"weight": [
-					80,
-					160
-				]
-			},
-			"human": {
-				"height": [
-					1.5,
-					2.5
-				],
-				"hp": 0,
-				"levelsPerPerk": 3,
-				"primary": {
-					"agility": [
-						1,
-						10
-					],
-					"charisma": [
-						1,
-						10
-					],
-					"endurance": [
-						1,
-						10
-					],
-					"intelligence": [
-						1,
-						10
-					],
-					"luck": [
-						1,
-						10
-					],
-					"perception": [
-						1,
-						10
-					],
-					"strength": [
-						1,
-						10
-					],
-					"total": 40
-				},
-				"secondary": {
-					"resistElectricity": 10
-				},
-				"weight": [
-					110,
-					280
-				]
-			}
-		},
-		"SKILLS": {
-			"medicine": {
-				"chems": {
-					"base": 10,
-					"intelligence": 2
-				},
-				"doctor": {
-					"base": 10,
-					"intelligence": 2
-				},
-				"firstAid": {
-					"base": 10,
-					"intelligence": 2
-				}
-			},
-			"rangedWeapons": {
-				"bigGuns": {
-					"endurance": 2,
-					"perception": 1,
-					"strength": 1
-				},
-				"energyWeapons": {
-					"base": 10,
-					"perception": 2
-				},
-				"explosives": {
-					"base": 10,
-					"perception": 2
-				},
-				"smallGuns": {
-					"agility": 1,
-					"base": 10,
-					"perception": 1
-				}
-			},
-			"simpleWeapons": {
-				"melee": {
-					"base": 10,
-					"strength": 2
-				},
-				"throwing": {
-					"agility": 4
-				},
-				"unarmed": {
-					"agility": 2,
-					"base": 10,
-					"strength": 1
-				}
-			},
-			"social": {
-				"barter": {
-					"base": 10,
-					"charisma": 2
-				},
-				"gambling": {
-					"base": 10,
-					"luck": 1,
-					"perception": 1
-				},
-				"speech": {
-					"base": 10,
-					"charisma": 2
-				}
-			},
-			"survival": {
-				"climb": {
-					"base": 10,
-					"endurance": 1,
-					"strength": 1
-				},
-				"jump": {
-					"agility": 1,
-					"base": 10,
-					"strength": 1
-				},
-				"outdoorsman": {
-					"base": 10,
-					"endurance": 2
-				},
-				"swim": {
-					"base": 10,
-					"endurance": 1,
-					"strength": 1
-				}
-			},
-			"technical": {
-				"pilot": {
-					"agility": 2,
-					"base": 10
-				},
-				"repair": {
-					"base": 10,
-					"intelligence": 2
-				},
-				"science": {
-					"base": 10,
-					"intelligence": 2
-				}
-			},
-			"thieving": {
-				"disguise": {
-					"base": 10,
-					"charisma": 1,
-					"perception": 1
-				},
-				"lockpick": {
-					"base": 10,
-					"perception": 2
-				},
-				"sneak": {
-					"agility": 2,
-					"base": 10
-				},
-				"steal": {
-					"agility": 1,
-					"base": 10,
-					"luck": 1
-				}
-			}
-		},
-		"TRAITS": {
-			"bloodyMess": {},
-			"bruiser": {
-				"actionPoints": -2,
-				"raceBlacklist": [
-					"ghoul"
-				],
-				"strength": 2
-			},
-			"chemReliant": {
-				"addictionChance": 2,
-				"addictionRecovery": 2
-			},
-			"chemResistant": {
-				"addictionChance": 0.5,
-				"chemDuration": 0.5
-			},
-			"fastMetabolism": {
-				"healingRate": 2,
-				"poisonResistance": 0,
-				"raceBlacklist": [
-					"ghoul"
-				],
-				"radiationResistance": 0
-			},
-			"fastShot": {
-				"actionBlacklist": [
-					"targetedShot"
-				],
-				"actionPointCost": -1
-			},
-			"fearTheReaper": {
-				"levelsPerPerk": -1,
-				"raceWhitelist": [
-					"ghoul"
-				]
-			},
-			"finesse": {
-				"criticalChance": 10,
-				"damage": -0.25
-			},
-			"gifted": {
-				"primaryTotal": 5,
-				"skillPenalty": 10,
-				"skillPointsPerLevel": -5
-			},
-			"glowingOne": {
-				"effectBlacklist": [
-					"light"
-				],
-				"nearby": {
-					"radsPerHour": 10
-				},
-				"raceWhitelist": [
-					"ghoul"
-				],
-				"radiationResistance": 50
-			},
-			"goodNatured": {
-				"barter": 20,
-				"bigGuns": -10,
-				"doctor": 20,
-				"energyWeapons": -10,
-				"explosives": -10,
-				"firstAid": 20,
-				"melee": -10,
-				"smallGuns": -10,
-				"speech": 20,
-				"throwing": -10,
-				"unarmed": -10
-			},
-			"hamFisted": {
-				"bigGuns": -20,
-				"doctor": -20,
-				"energyWeapons": -20,
-				"firstAid": -20,
-				"lockpick": -20,
-				"raceWhitelist": [
-					"alphaMutant",
-					"betaMutant"
-				],
-				"repair": -20,
-				"science": -20,
-				"smallGuns": -20,
-				"tag": "unarmed"
-			},
-			"jinxed": {
-				"criticalFailureChance": 50
-			},
-			"kamikaze": {
-				"armorClass": 0,
-				"sequence": 5
-			},
-			"nightPerson": {
-				"daytime": {
-					"intelligence": -1,
-					"perception": -1
-				},
-				"nighttime": {
-					"intelligence": 1,
-					"perception": 1
-				}
-			},
-			"oneHander": {
-				"oneHandedWeapons": 20,
-				"twoHandedWeapons": -40
-			},
-			"sexAppeal": {
-				"attractedSex": {
-					"barter": 40,
-					"charisma": 1,
-					"speech": 40
-				},
-				"raceWhitelist": [
-					"human"
-				],
-				"unattractedSex": {
-					"barter": -40,
-					"charisma": -1,
-					"speech": -40
-				}
-			},
-			"skilled": {
-				"levelsPerPerk": 1,
-				"skillPointsPerLevel": 5
-			},
-			"smallFrame": {
-				"agility": 1,
-				"carryWeight": 0,
-				"raceBlacklist": [
-					"alphaMutant",
-					"betaMutant"
-				]
-			},
-			"techWizard": {
-				"lockpick": 15,
-				"perception": -1,
-				"raceBlacklist": [
-					"betaMutant"
-				],
-				"repair": 15,
-				"science": 15
-			},
-			"vatSkin": {
-				"armorClass": 10,
-				"nearby": {
-					"perception": -1
-				},
-				"raceWhitelist": [
-					"alphaMutant",
-					"betaMutant"
-				]
-			}
-		}
-	}
+	// to indexed object, toObject with fallback for non-array-like ES3 strings
+	var IObject = __webpack_require__(85)
+	  , defined = __webpack_require__(46);
+	module.exports = function(it){
+	  return IObject(defined(it));
+	};
 
 /***/ },
-/* 35 */
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 7.1.13 ToObject(argument)
+	var defined = __webpack_require__(46);
+	module.exports = function(it){
+	  return Object(defined(it));
+	};
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $at  = __webpack_require__(216)(true);
+	
+	// 21.1.3.27 String.prototype[@@iterator]()
+	__webpack_require__(87)(String, 'String', function(iterated){
+	  this._t = String(iterated); // target
+	  this._i = 0;                // next index
+	// 21.1.5.2.1 %StringIteratorPrototype%.next()
+	}, function(){
+	  var O     = this._t
+	    , index = this._i
+	    , point;
+	  if(index >= O.length)return {value: undefined, done: true};
+	  point = $at(O, index);
+	  this._i += point.length;
+	  return {value: point, done: false};
+	});
+
+/***/ },
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
-	var _require = __webpack_require__(1);
+	var _require = __webpack_require__(2);
 	
 	var Rx = _require.Rx;
 	
@@ -1715,7 +12463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function makeInit(tagName, definitionFn) {
-	  var _require2 = __webpack_require__(37);
+	  var _require2 = __webpack_require__(53);
 	
 	  var makeDOMDriverWithRegistry = _require2.makeDOMDriverWithRegistry;
 	
@@ -1836,16 +12584,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 36 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var _require = __webpack_require__(35);
+	var _require = __webpack_require__(51);
 	
 	var makeWidgetClass = _require.makeWidgetClass;
 	
-	var Map = Map || __webpack_require__(70); // eslint-disable-line no-native-reassign
+	var Map = Map || __webpack_require__(97); // eslint-disable-line no-native-reassign
 	
 	function replaceCustomElementsWithSomething(vtree, registry, toSomethingFn) {
 	  // Silently ignore corner cases
@@ -1883,37 +12631,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 37 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 	
-	var _require = __webpack_require__(1);
+	var _require = __webpack_require__(2);
 	
 	var Rx = _require.Rx;
 	
 	var VDOM = {
-	  h: __webpack_require__(39),
-	  diff: __webpack_require__(125),
-	  patch: __webpack_require__(130),
-	  parse: typeof window !== "undefined" ? __webpack_require__(111) : function () {}
+	  h: __webpack_require__(55),
+	  diff: __webpack_require__(152),
+	  patch: __webpack_require__(157),
+	  parse: typeof window !== "undefined" ? __webpack_require__(138) : function () {}
 	};
 	
-	var _require2 = __webpack_require__(36);
+	var _require2 = __webpack_require__(52);
 	
 	var replaceCustomElementsWithSomething = _require2.replaceCustomElementsWithSomething;
 	var makeCustomElementsRegistry = _require2.makeCustomElementsRegistry;
 	
-	var _require3 = __webpack_require__(38);
+	var _require3 = __webpack_require__(54);
 	
 	var transposeVTree = _require3.transposeVTree;
 	
 	var matchesSelector = undefined;
 	// Try-catch to prevent unnecessary import of DOM-specifics in Node.js env:
 	try {
-	  matchesSelector = __webpack_require__(110);
+	  matchesSelector = __webpack_require__(137);
 	} catch (err) {
 	  matchesSelector = function () {};
 	}
@@ -2175,16 +12923,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 38 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var _require = __webpack_require__(1);
+	var _require = __webpack_require__(2);
 	
 	var Rx = _require.Rx;
 	
-	var VirtualNode = __webpack_require__(19);
+	var VirtualNode = __webpack_require__(35);
 	
 	/**
 	 * Converts a tree of VirtualNode|Observable<VirtualNode> into
@@ -2215,25 +12963,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 39 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint-disable */
 	'use strict';
 	
-	var isArray = __webpack_require__(14);
+	var isArray = __webpack_require__(32);
 	
-	var VNode = __webpack_require__(19);
-	var VText = __webpack_require__(28);
-	var isVNode = __webpack_require__(7);
-	var isVText = __webpack_require__(10);
-	var isWidget = __webpack_require__(3);
-	var isHook = __webpack_require__(12);
-	var isVThunk = __webpack_require__(9);
+	var VNode = __webpack_require__(35);
+	var VText = __webpack_require__(43);
+	var isVNode = __webpack_require__(15);
+	var isVText = __webpack_require__(22);
+	var isWidget = __webpack_require__(8);
+	var isHook = __webpack_require__(30);
+	var isVThunk = __webpack_require__(21);
 	
-	var parseTag = __webpack_require__(53);
-	var softSetHook = __webpack_require__(27);
-	var evHook = __webpack_require__(52);
+	var parseTag = __webpack_require__(69);
+	var softSetHook = __webpack_require__(42);
+	var evHook = __webpack_require__(68);
 	
 	module.exports = h;
 	
@@ -2352,7 +13100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* eslint-enable */
 
 /***/ },
-/* 40 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Inspired by Google Closure:
@@ -2361,7 +13109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var value = __webpack_require__(2);
+	var value = __webpack_require__(7);
 	
 	module.exports = function () {
 		value(this).length = 0;
@@ -2370,7 +13118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 57 */
 /***/ function(module, exports) {
 
 	// Deprecated
@@ -2381,7 +13129,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 58 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2398,7 +13146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Big thanks to @WebReflection for sorting this out
@@ -2406,8 +13154,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var isObject      = __webpack_require__(88)
-	  , value         = __webpack_require__(2)
+	var isObject      = __webpack_require__(115)
+	  , value         = __webpack_require__(7)
 	
 	  , isPrototypeOf = Object.prototype.isPrototypeOf
 	  , defineProperty = Object.defineProperty
@@ -2473,27 +13221,27 @@ return /******/ (function(modules) { // webpackBootstrap
 		return false;
 	}())));
 	
-	__webpack_require__(86);
+	__webpack_require__(113);
 
 
 /***/ },
-/* 44 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(95)()
+	module.exports = __webpack_require__(122)()
 		? String.prototype.contains
-		: __webpack_require__(96);
+		: __webpack_require__(123);
 
 
 /***/ },
-/* 45 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isIterable = __webpack_require__(100);
+	var isIterable = __webpack_require__(127);
 	
 	module.exports = function (value) {
 		if (!isIterable(value)) throw new TypeError(value + " is not iterable");
@@ -2502,9 +13250,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
-[180, 106, 107],
-/* 47 */
+/* 62 */
+[234, 133, 134],
+/* 63 */
 /***/ function(module, exports) {
 
 	/*!
@@ -2539,12 +13287,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(179);
+	var minDoc = __webpack_require__(233);
 	
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -2561,7 +13309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 49 */
+/* 65 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2572,11 +13320,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(49)
-	var isHook = __webpack_require__(12)
+	var isObject = __webpack_require__(65)
+	var isHook = __webpack_require__(30)
 	
 	module.exports = applyProperties
 	
@@ -2675,7 +13423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 67 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2716,12 +13464,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var EvStore = __webpack_require__(127);
+	var EvStore = __webpack_require__(154);
 	
 	module.exports = EvHook;
 	
@@ -2749,12 +13497,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var split = __webpack_require__(126);
+	var split = __webpack_require__(153);
 	
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -2809,13 +13557,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(7)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(3)
-	var isThunk = __webpack_require__(9)
+	var isVNode = __webpack_require__(15)
+	var isVText = __webpack_require__(22)
+	var isWidget = __webpack_require__(8)
+	var isThunk = __webpack_require__(21)
 	
 	module.exports = handleThunk
 	
@@ -2855,10 +13603,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 55 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(13)
+	var version = __webpack_require__(31)
 	
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -2883,62 +13631,616 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _interopRequireWildcard = __webpack_require__(191)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var _localize = __webpack_require__(177);
+	
+	var localize = _interopRequireWildcard(_localize);
+	
+	var _combineLatestObject = __webpack_require__(23);
+	
+	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
+	
+	var _modelsWhen = __webpack_require__(76);
+	
+	var _modelsWhen2 = _interopRequireDefault(_modelsWhen);
+	
+	var _modelsEquation = __webpack_require__(36);
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var owns = Object.prototype.hasOwnProperty;
+	
+	function renderUnary(name, value, operator, operand, equation) {
+	    return (0, _cycleDom.h)('span.' + name + '.unary', {
+	        title: (equation || '').toString() + ' = ' + value
+	    }, [(0, _cycleDom.h)('span.' + name + '--operator.unary--operator', [operator]), (0, _cycleDom.h)('span.' + name + '--operand.unary--operand', [operand])]);
+	}
+	function renderBinary(name, value, operator, left, right, equation) {
+	    return (0, _cycleDom.h)('span.' + name + '.binary', {
+	        title: (equation || '').toString() + ' = ' + value
+	    }, [(0, _cycleDom.h)('span.' + name + '--left.binary--left.' + name + '--operand.binary--operand', [left]), (0, _cycleDom.h)('span.' + name + '--operator.binary--operator', [operator]), (0, _cycleDom.h)('span.' + name + '--right.binary--right.' + name + '--operand.binary--operand', [right])]);
+	}
+	
+	var operatorToName = {
+	    '+': 'add',
+	    '-': 'sub',
+	    '*': 'mul',
+	    '/': 'div',
+	    '=': 'eq',
+	    '^': 'pow',
+	    or: 'or',
+	    and: 'and',
+	    max: 'max',
+	    min: 'min'
+	};
+	var operationsByOperator = {
+	    '+': function _(x, y) {
+	        return +x + +y;
+	    },
+	    '-': function _(x, y) {
+	        return x - y;
+	    },
+	    '*': function _(x, y) {
+	        return x * y;
+	    },
+	    '/': function _(x, y) {
+	        return x / y;
+	    },
+	    '=': function _(x, y) {
+	        return x === y;
+	    },
+	    '^': function _(x, y) {
+	        return Math.pow(x, y);
+	    },
+	    or: function or(x, y) {
+	        return x || y;
+	    },
+	    and: function and(x, y) {
+	        return x && y;
+	    },
+	    max: function max(x, y) {
+	        return y > x ? y : x;
+	    },
+	    min: function min(x, y) {
+	        return y < x ? y : x;
+	    }
+	};
+	var rightIdentity = {
+	    '+': 0,
+	    '-': 0,
+	    '*': 1,
+	    '/': 1,
+	    '^': 1
+	};
+	var leftIdentity = {
+	    '+': 0,
+	    '*': 1
+	};
+	
+	function calculateBinary(equation, calculations) {
+	    var operator = equation.type;
+	    if (!owns.call(operationsByOperator, operator)) {
+	        throw new Error('Unknown operator: \'' + operator + '\'');
+	    }
+	    var name = operatorToName[operator];
+	    var operation = operationsByOperator[operator];
+	    var leftView = calculateAlgorithm(equation.left, calculations);
+	    var rightView = calculateAlgorithm(equation.right, calculations);
+	    var value$ = leftView.value$.combineLatest(rightView.value$, operation).distinctUntilChanged().shareReplay(1);
+	    var equation$ = Rx.Observable.merge(leftView.equation$.map(function (eq) {
+	        return function (acc) {
+	            return acc.set('left', eq);
+	        };
+	    }), rightView.equation$.map(function (eq) {
+	        return function (acc) {
+	            return acc.set('right', eq);
+	        };
+	    })).startWith(equation).scan(function (equation, modifier) {
+	        return modifier(equation);
+	    }).distinctUntilChanged(undefined, _immutable2['default'].is).shareReplay(1);
+	    return {
+	        DOM: leftView.DOM.combineLatest(rightView.DOM, value$.startWith('(calculating)'), equation$, function (left, right, value, equation) {
+	            if (operator === '^' && equation.right === 0.5) {
+	                return renderUnary(name, value, '√', left, equation);
+	            }
+	            if (rightIdentity[operator] === equation.right) {
+	                return left;
+	            }
+	            if (leftIdentity[operator] === equation.left) {
+	                return right;
+	            }
+	            return renderBinary(name, value, operator, left, right, equation);
+	        }),
+	        value$: value$,
+	        equation$: equation$
+	    };
+	}
+	
+	var unaryOperatorToName = {
+	    not: 'not',
+	    floor: 'floor',
+	    ceil: 'ceil'
+	};
+	var unaryOperationsByOperator = {
+	    not: function not(x) {
+	        return !x;
+	    },
+	    floor: Math.floor,
+	    ceil: Math.ceil
+	};
+	function calculateUnary(equation, calculations) {
+	    var operator = equation.type;
+	    if (!owns.call(unaryOperationsByOperator, operator)) {
+	        throw new Error('Unknown operator: \'' + operator + '\'');
+	    }
+	    var name = unaryOperatorToName[operator];
+	    var operation = unaryOperationsByOperator[operator];
+	    var operandView = calculateAlgorithm(equation.value, calculations);
+	    var value$ = operandView.value$.map(operation).distinctUntilChanged().shareReplay(1);
+	    var equation$ = operandView.equation$.startWith(equation).scan(function (equation, operand) {
+	        return equation.set('value', operand);
+	    }).distinctUntilChanged(undefined, _immutable2['default'].is).shareReplay(1);
+	    return {
+	        DOM: operandView.DOM.combineLatest(value$.startWith('(calculating)'), equation$, function (operand, value, equation) {
+	            return renderUnary(name, value, operator, operand, equation);
+	        }),
+	        value$: value$,
+	        equation$: equation$
+	    };
+	}
+	
+	function calculateWhen(equation, calculations) {
+	    var otherwiseView = calculateAlgorithm(equation.otherwise, calculations);
+	    var possibilities = equation.conditions.toKeyedSeq().map(function (value, condition) {
+	        var operandView = calculateAlgorithm(value, calculations);
+	        return {
+	            condition$: calculations.get(condition),
+	            DOM: operandView.DOM,
+	            value$: operandView.value$,
+	            equation$: operandView.equation$
+	        };
+	    }).toArray().concat([{
+	        condition$: Rx.Observable['return'](true),
+	        DOM: otherwiseView.DOM,
+	        value$: otherwiseView.value$,
+	        equation$: otherwiseView.equation$
+	    }]);
+	
+	    var result = Rx.Observable.combineLatest(possibilities.map(function (_ref) {
+	        var condition$ = _ref.condition$;
+	        var DOM = _ref.DOM;
+	        var value$ = _ref.value$;
+	        var equation$ = _ref.equation$;
+	        return Rx.Observable.combineLatest(condition$, DOM, value$, equation$, function (condition, vTree, value, equation) {
+	            if (!condition) {
+	                return null;
+	            }
+	            return {
+	                vTree: vTree,
+	                value: value,
+	                equation: equation
+	            };
+	        });
+	    })).map(function (values) {
+	        return values.find(function (x) {
+	            return x;
+	        });
+	    }).share();
+	    return {
+	        DOM: result.pluck('vTree'),
+	        value$: result.pluck('value').distinctUntilChanged().shareReplay(1),
+	        equation$: result.pluck('equation').distinctUntilChanged(undefined, _immutable2['default'].is).shareReplay(1)
+	    };
+	}
+	
+	function calculateNumber(number) {
+	    return {
+	        DOM: Rx.Observable['return']((0, _cycleDom.h)('span.number', ['' + number])),
+	        value$: Rx.Observable['return'](number),
+	        equation$: Rx.Observable['return'](number)
+	    };
+	}
+	
+	function calculateBoolean(boolean) {
+	    return {
+	        DOM: Rx.Observable['return']((0, _cycleDom.h)('span.boolean.boolean-' + boolean, ['' + boolean])),
+	        value$: Rx.Observable['return'](boolean),
+	        equation$: Rx.Observable['return'](boolean)
+	    };
+	}
+	
+	function calculateString(key, calculations) {
+	    return {
+	        DOM: Rx.Observable['return'](null).map(function () {
+	            var name = localize.name(key);
+	            var abbr = localize.abbr(key);
+	            var vTree = name === abbr ? (0, _cycleDom.h)('span.ref-' + key, [name]) : (0, _cycleDom.h)('abbr.ref-' + key, {
+	                title: name
+	            }, [abbr]);
+	            return vTree;
+	        }),
+	        value$: calculations.get(key),
+	        equation$: Rx.Observable['return'](key)
+	    };
+	}
+	
+	function calculateAlgorithm(equation, calculations) {
+	    if (typeof equation === 'number') {
+	        return calculateNumber(equation);
+	    } else if (typeof equation === 'boolean') {
+	        return calculateBoolean(equation);
+	    } else if (typeof equation === 'string') {
+	        return calculateString(equation, calculations);
+	    } else if (equation instanceof _modelsEquation.BinaryOperation) {
+	        return calculateBinary(equation, calculations);
+	    } else if (equation instanceof _modelsEquation.UnaryOperation) {
+	        return calculateUnary(equation, calculations);
+	    } else if (equation instanceof _modelsWhen2['default']) {
+	        return calculateWhen(equation, calculations);
+	    } else {
+	        throw new Error('Unknown equation: ' + equation);
+	    }
+	}
+	
+	exports['default'] = function (_ref2) {
+	    var equation$ = _ref2.equation$;
+	    var calculations = _ref2.calculations;
+	
+	    if (!calculations) {
+	        throw new TypeError('Expected calculations to be non-null');
+	    }
+	    var result = equation$.map(function (equation) {
+	        return calculateAlgorithm(equation, calculations);
+	    }).shareReplay(1);
+	    return {
+	        DOM: result.flatMapLatest(function (x) {
+	            return x.DOM;
+	        }).distinctUntilChanged().startWith('(calculating)').map(function (vTree) {
+	            return (0, _cycleDom.h)('div.algorithm', [vTree]);
+	        }),
+	        value$: result.flatMapLatest(function (x) {
+	            return x.value$;
+	        }).distinctUntilChanged().share()
+	    };
+	};
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 73 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _Array$from = __webpack_require__(77)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = select;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var FALLBACK_KEY = 'SELECT_FALLBACK';
+	
+	function renderOptions(options, value, fallback) {
+	    var hasSelected = false;
+	    var optionsVTree = _Array$from(options).map(function (_ref) {
+	        var optionValue = _ref.value;
+	        var text = _ref.text;
+	
+	        var selected = value === optionValue;
+	        hasSelected = hasSelected || selected;
+	        return (0, _cycleDom.h)('option', {
+	            key: optionValue,
+	            value: optionValue,
+	            selected: selected
+	        }, [text]);
+	    });
+	    if (fallback && !hasSelected) {
+	        optionsVTree.unshift((0, _cycleDom.h)('option', {
+	            key: FALLBACK_KEY,
+	            selected: true
+	        }, [fallback]));
+	    }
+	    return optionsVTree;
+	}
+	
+	function select(key, _ref2) {
+	    var DOM = _ref2.DOM;
+	    var inputValue$ = _ref2.value$;
+	    var options$ = _ref2.options$;
+	    var _ref2$props$ = _ref2.props$;
+	    var props$ = _ref2$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref2$props$;
+	
+	    inputValue$ = inputValue$.shareReplay(1);
+	    var selector = 'select.' + key;
+	
+	    var newValue$ = DOM.select(selector).events('change').map(function (ev) {
+	        return ev.target.value;
+	    });
+	
+	    var value$ = inputValue$.first().concat(inputValue$.skip(1).merge(newValue$)).distinctUntilChanged().shareReplay(1);
+	
+	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(options$, value$, props$, function (options, value, props) {
+	        return (0, _cycleDom.h)(selector, _Object$assign({
+	            key: key
+	        }, props, {
+	            fallback: undefined
+	        }), renderOptions(options, value, props.fallback));
+	    });
+	
+	    return {
+	        DOM: vtree$,
+	        value$: value$
+	    };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(new _immutable2['default'].Record({
+	    key: '',
+	    order: 0
+	}, 'PrimaryStatistic')), {
+	    get: function get(key) {
+	        var stats = _constantsJson.PRIMARY_STATISTICS[key];
+	        if (!stats) {
+	            return null;
+	        }
+	        return new this({
+	            key: key
+	        }).mergeDeep(stats);
+	    },
+	    all: function all() {
+	        var _this = this;
+	
+	        return new _immutable2['default'].List(_Object$keys(_constantsJson.PRIMARY_STATISTICS).map(function (key) {
+	            return _this.get(key);
+	        }).sort(function (x, y) {
+	            return x.order - y.order;
+	        }));
+	    }
+	}));
+	module.exports = exports['default'];
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _Range = __webpack_require__(179);
+	
+	var _Range2 = _interopRequireDefault(_Range);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var fields = {
+	    key: '',
+	    height: new _Range2['default'](0.1, 20),
+	    weight: new _Range2['default'](25, 500),
+	    levelsPerPerk: 4,
+	    primaryTotal: 40
+	};
+	_Object$entries(_constantsJson.PRIMARY_STATISTICS).sort().forEach(function (_ref) {
+	    var _ref2 = _slicedToArray(_ref, 2);
+	
+	    var key = _ref2[0];
+	    var value = _ref2[1];
+	
+	    fields[key] = new _Range2['default'](1, 10);
+	});
+	_Object$entries(_constantsJson.SECONDARY_STATISTICS).sort().forEach(function (_ref3) {
+	    var _ref32 = _slicedToArray(_ref3, 2);
+	
+	    var key = _ref32[0];
+	    var value = _ref32[1];
+	
+	    fields[key] = 0;
+	});
+	
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'Race')), {
+	    get: function get(key) {
+	        var stats = _constantsJson.RACES[key];
+	        if (!stats) {
+	            return null;
+	        }
+	        return new this({
+	            key: key
+	        }).mergeDeep(stats);
+	    },
+	    getOrDefault: function getOrDefault(key) {
+	        return this.get(key) || new this();
+	    },
+	    all: function all() {
+	        var _this = this;
+	
+	        return _immutable2['default'].Set(_Object$keys(_constantsJson.RACES).map(function (key) {
+	            return _this.get(key);
+	        }));
+	    }
+	}), fields);
+	module.exports = exports['default'];
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _createClass = __webpack_require__(26)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var WhenRecord = new _immutable2['default'].Record({
+	    conditions: new _immutable2['default'].Map(),
+	    otherwise: 0
+	});
+	
+	var When = (function (_WhenRecord) {
+	    _inherits(When, _WhenRecord);
+	
+	    function When() {
+	        _classCallCheck(this, When);
+	
+	        _get(Object.getPrototypeOf(When.prototype), 'constructor', this).apply(this, arguments);
+	    }
+	
+	    _createClass(When, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return 'when(' + this.conditions.entrySeq().map(function (_ref) {
+	                var _ref2 = _slicedToArray(_ref, 2);
+	
+	                var key = _ref2[0];
+	                var value = _ref2[1];
+	
+	                return key + ' => ' + value;
+	            }).concat(['otherwise => ' + this.otherwise]).join('; ') + ')';
+	        }
+	    }]);
+	
+	    return When;
+	})(WhenRecord);
+	
+	exports['default'] = When;
+	module.exports = exports['default'];
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(192), __esModule: true };
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(202), __esModule: true };
+
+/***/ },
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var _getIterator = __webpack_require__(148)["default"];
+	var _Array$from = __webpack_require__(77)["default"];
 	
-	var _isIterable = __webpack_require__(149)["default"];
+	exports["default"] = function (arr) {
+	  if (Array.isArray(arr)) {
+	    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 	
-	exports["default"] = (function () {
-	  function sliceIterator(arr, i) {
-	    var _arr = [];
-	    var _n = true;
-	    var _d = false;
-	    var _e = undefined;
-	
-	    try {
-	      for (var _i = _getIterator(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
-	        _arr.push(_s.value);
-	
-	        if (i && _arr.length === i) break;
-	      }
-	    } catch (err) {
-	      _d = true;
-	      _e = err;
-	    } finally {
-	      try {
-	        if (!_n && _i["return"]) _i["return"]();
-	      } finally {
-	        if (_d) throw _e;
-	      }
-	    }
-	
-	    return _arr;
+	    return arr2;
+	  } else {
+	    return _Array$from(arr);
 	  }
-	
-	  return function (arr, i) {
-	    if (Array.isArray(arr)) {
-	      return arr;
-	    } else if (_isIterable(Object(arr))) {
-	      return sliceIterator(arr, i);
-	    } else {
-	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-	    }
-	  };
-	})();
+	};
 	
 	exports.__esModule = true;
 
 /***/ },
-/* 57 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// getting tag from 19.1.3.6 Object.prototype.toString()
-	var cof = __webpack_require__(58)
-	  , TAG = __webpack_require__(11)('toStringTag')
+	var cof = __webpack_require__(81)
+	  , TAG = __webpack_require__(13)('toStringTag')
 	  // ES3 wrong here
 	  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
 	
@@ -2954,7 +14256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 58 */
+/* 81 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -2964,7 +14266,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 59 */
+/* 82 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// optional / simple context binding
+	var aFunction = __webpack_require__(203);
+	module.exports = function(fn, that, length){
+	  aFunction(fn);
+	  if(that === undefined)return fn;
+	  switch(length){
+	    case 1: return function(a){
+	      return fn.call(that, a);
+	    };
+	    case 2: return function(a, b){
+	      return fn.call(that, a, b);
+	    };
+	    case 3: return function(a, b, c){
+	      return fn.call(that, a, b, c);
+	    };
+	  } return function(/* ...args */){
+	      return fn.apply(that, arguments);
+	    };
+	};
+
+/***/ },
+/* 83 */
 /***/ function(module, exports) {
 
 	module.exports = function(exec){
@@ -2976,7 +14302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 60 */
+/* 84 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = {}.hasOwnProperty;
@@ -2985,33 +14311,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 61 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// indexed object, fallback for non-array-like ES3 strings
-	var cof = __webpack_require__(58);
+	var cof = __webpack_require__(81);
 	module.exports = 0 in Object('z') ? Object : function(it){
 	  return cof(it) == 'String' ? it.split('') : Object(it);
 	};
 
 /***/ },
-/* 62 */
+/* 86 */
+/***/ function(module, exports) {
+
+	// http://jsperf.com/core-js-isobject
+	module.exports = function(it){
+	  return it !== null && (typeof it == 'object' || typeof it == 'function');
+	};
+
+/***/ },
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY         = __webpack_require__(161)
-	  , $def            = __webpack_require__(31)
-	  , $redef          = __webpack_require__(163)
-	  , hide            = __webpack_require__(21)
-	  , has             = __webpack_require__(60)
-	  , SYMBOL_ITERATOR = __webpack_require__(11)('iterator')
-	  , Iterators       = __webpack_require__(17)
+	var LIBRARY         = __webpack_require__(212)
+	  , $def            = __webpack_require__(20)
+	  , $redef          = __webpack_require__(213)
+	  , hide            = __webpack_require__(37)
+	  , has             = __webpack_require__(84)
+	  , SYMBOL_ITERATOR = __webpack_require__(13)('iterator')
+	  , Iterators       = __webpack_require__(29)
 	  , FF_ITERATOR     = '@@iterator'
 	  , KEYS            = 'keys'
 	  , VALUES          = 'values';
 	var returnThis = function(){ return this; };
 	module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE){
-	  __webpack_require__(159)(Constructor, NAME, next);
+	  __webpack_require__(209)(Constructor, NAME, next);
 	  var createMethod = function(kind){
 	    switch(kind){
 	      case KEYS: return function keys(){ return new Constructor(this, kind); };
@@ -3025,9 +14360,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    , methods, key;
 	  // Fix native
 	  if(_native){
-	    var IteratorPrototype = __webpack_require__(22).getProto(_default.call(new Base));
+	    var IteratorPrototype = __webpack_require__(9).getProto(_default.call(new Base));
 	    // Set @@toStringTag to native iterators
-	    __webpack_require__(64)(IteratorPrototype, TAG, true);
+	    __webpack_require__(91)(IteratorPrototype, TAG, true);
 	    // FF fix
 	    if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
 	  }
@@ -3044,12 +14379,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    if(FORCE)for(key in methods){
 	      if(!(key in proto))$redef(proto, key, methods[key]);
-	    } else $def($def.P + $def.F * __webpack_require__(158), NAME, methods);
+	    } else $def($def.P + $def.F * __webpack_require__(207), NAME, methods);
 	  }
 	};
 
 /***/ },
-/* 63 */
+/* 88 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// most Object methods by ES6 should accept primitives
+	module.exports = function(KEY, exec){
+	  var $def = __webpack_require__(20)
+	    , fn   = (__webpack_require__(4).Object || {})[KEY] || Object[KEY]
+	    , exp  = {};
+	  exp[KEY] = exec(fn);
+	  $def($def.S + $def.F * __webpack_require__(83)(function(){ fn(1); }), 'Object', exp);
+	};
+
+/***/ },
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $         = __webpack_require__(9)
+	  , toIObject = __webpack_require__(48);
+	module.exports = function(isEntries){
+	  return function(it){
+	    var O      = toIObject(it)
+	      , keys   = $.getKeys(O)
+	      , length = keys.length
+	      , i      = 0
+	      , result = Array(length)
+	      , key;
+	    if(isEntries)while(length > i)result[i] = [key = keys[i++], O[key]];
+	    else while(length > i)result[i] = O[keys[i++]];
+	    return result;
+	  };
+	};
+
+/***/ },
+/* 90 */
 /***/ function(module, exports) {
 
 	module.exports = function(bitmap, value){
@@ -3062,59 +14430,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 64 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var has  = __webpack_require__(60)
-	  , hide = __webpack_require__(21)
-	  , TAG  = __webpack_require__(11)('toStringTag');
+	var has  = __webpack_require__(84)
+	  , hide = __webpack_require__(37)
+	  , TAG  = __webpack_require__(13)('toStringTag');
 	
 	module.exports = function(it, tag, stat){
 	  if(it && !has(it = stat ? it : it.prototype, TAG))hide(it, TAG, tag);
 	};
 
 /***/ },
-/* 65 */
-/***/ function(module, exports, __webpack_require__) {
+/* 92 */
+/***/ function(module, exports) {
 
-	// 7.1.13 ToObject(argument)
-	var defined = __webpack_require__(32);
+	// 7.1.4 ToInteger
+	var ceil  = Math.ceil
+	  , floor = Math.floor;
 	module.exports = function(it){
-	  return Object(defined(it));
+	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 	};
 
 /***/ },
-/* 66 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-	var $at  = __webpack_require__(165)(true);
-	
-	// 21.1.3.27 String.prototype[@@iterator]()
-	__webpack_require__(62)(String, 'String', function(iterated){
-	  this._t = String(iterated); // target
-	  this._i = 0;                // next index
-	// 21.1.5.2.1 %StringIteratorPrototype%.next()
-	}, function(){
-	  var O     = this._t
-	    , index = this._i
-	    , point;
-	  if(index >= O.length)return {value: undefined, done: true};
-	  point = $at(O, index);
-	  this._i += point.length;
-	  return {value: point, done: false};
-	});
+	var classof   = __webpack_require__(80)
+	  , ITERATOR  = __webpack_require__(13)('iterator')
+	  , Iterators = __webpack_require__(29);
+	module.exports = __webpack_require__(4).getIteratorMethod = function(it){
+	  if(it != undefined)return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+	};
 
 /***/ },
-/* 67 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(174);
-	var Iterators = __webpack_require__(17);
+	__webpack_require__(224);
+	var Iterators = __webpack_require__(29);
 	Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
 
 /***/ },
-/* 68 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global, process) {// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
@@ -13516,31 +24874,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(177)(module), (function() { return this; }()), __webpack_require__(178)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(231)(module), (function() { return this; }()), __webpack_require__(232)))
 
 /***/ },
-/* 69 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	var _require = __webpack_require__(1);
+	var _require = __webpack_require__(2);
 	
 	var Rx = _require.Rx;
 	
-	var toHTML = __webpack_require__(115);
+	var toHTML = __webpack_require__(142);
 	
-	var _require2 = __webpack_require__(36);
+	var _require2 = __webpack_require__(52);
 	
 	var replaceCustomElementsWithSomething = _require2.replaceCustomElementsWithSomething;
 	var makeCustomElementsRegistry = _require2.makeCustomElementsRegistry;
 	
-	var _require3 = __webpack_require__(35);
+	var _require3 = __webpack_require__(51);
 	
 	var makeCustomElementInput = _require3.makeCustomElementInput;
 	var ALL_PROPS = _require3.ALL_PROPS;
 	
-	var _require4 = __webpack_require__(38);
+	var _require4 = __webpack_require__(54);
 	
 	var transposeVTree = _require4.transposeVTree;
 	
@@ -13613,16 +24971,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 70 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(71)() ? Map : __webpack_require__(109);
+	module.exports = __webpack_require__(98)() ? Map : __webpack_require__(136);
 
 
 /***/ },
-/* 71 */
+/* 98 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13658,7 +25016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 72 */
+/* 99 */
 /***/ function(module, exports) {
 
 	// Exports true if environment provides native `Map` implementation,
@@ -13673,26 +25031,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 73 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(94)('key',
+	module.exports = __webpack_require__(121)('key',
 		'value', 'key+value');
 
 
 /***/ },
-/* 74 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var setPrototypeOf    = __webpack_require__(18)
-	  , d                 = __webpack_require__(4)
-	  , Iterator          = __webpack_require__(25)
-	  , toStringTagSymbol = __webpack_require__(46).toStringTag
-	  , kinds             = __webpack_require__(73)
+	var setPrototypeOf    = __webpack_require__(34)
+	  , d                 = __webpack_require__(11)
+	  , Iterator          = __webpack_require__(40)
+	  , toStringTagSymbol = __webpack_require__(62).toStringTag
+	  , kinds             = __webpack_require__(100)
 	
 	  , defineProperties = Object.defineProperties
 	  , unBind = Iterator.prototype._unBind
@@ -13727,15 +25085,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 75 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var copy       = __webpack_require__(85)
-	  , map        = __webpack_require__(92)
-	  , callable   = __webpack_require__(6)
-	  , validValue = __webpack_require__(2)
+	var copy       = __webpack_require__(112)
+	  , map        = __webpack_require__(119)
+	  , callable   = __webpack_require__(14)
+	  , validValue = __webpack_require__(7)
 	
 	  , bind = Function.prototype.bind, defineProperty = Object.defineProperty
 	  , hasOwnProperty = Object.prototype.hasOwnProperty
@@ -13764,13 +25122,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var toPosInt = __webpack_require__(81)
-	  , value    = __webpack_require__(2)
+	var toPosInt = __webpack_require__(108)
+	  , value    = __webpack_require__(7)
 	
 	  , indexOf = Array.prototype.indexOf
 	  , hasOwnProperty = Object.prototype.hasOwnProperty
@@ -13799,18 +25157,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(78)()
+	module.exports = __webpack_require__(105)()
 		? Math.sign
-		: __webpack_require__(79);
+		: __webpack_require__(106);
 
 
 /***/ },
-/* 78 */
+/* 105 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13823,7 +25181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 79 */
+/* 106 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13836,12 +25194,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var sign = __webpack_require__(77)
+	var sign = __webpack_require__(104)
 	
 	  , abs = Math.abs, floor = Math.floor;
 	
@@ -13854,12 +25212,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 81 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var toInteger = __webpack_require__(80)
+	var toInteger = __webpack_require__(107)
 	
 	  , max = Math.max;
 	
@@ -13867,7 +25225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 82 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Internal method, used by iteration functions.
@@ -13876,9 +25234,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var isCallable = __webpack_require__(41)
-	  , callable   = __webpack_require__(6)
-	  , value      = __webpack_require__(2)
+	var isCallable = __webpack_require__(57)
+	  , callable   = __webpack_require__(14)
+	  , value      = __webpack_require__(7)
 	
 	  , call = Function.prototype.call, keys = Object.keys
 	  , propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
@@ -13902,7 +25260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 83 */
+/* 110 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -13917,13 +25275,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 84 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var keys  = __webpack_require__(89)
-	  , value = __webpack_require__(2)
+	var keys  = __webpack_require__(116)
+	  , value = __webpack_require__(7)
 	
 	  , max = Math.max;
 	
@@ -13945,13 +25303,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 85 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var assign = __webpack_require__(23)
-	  , value  = __webpack_require__(2);
+	var assign = __webpack_require__(38)
+	  , value  = __webpack_require__(7);
 	
 	module.exports = function (obj) {
 		var copy = Object(value(obj));
@@ -13961,7 +25319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 86 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Workaround for http://code.google.com/p/v8/issues/detail?id=2804
@@ -13970,8 +25328,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var create = Object.create, shim;
 	
-	if (!__webpack_require__(42)()) {
-		shim = __webpack_require__(43);
+	if (!__webpack_require__(58)()) {
+		shim = __webpack_require__(59);
 	}
 	
 	module.exports = (function () {
@@ -14003,16 +25361,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 87 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(82)('forEach');
+	module.exports = __webpack_require__(109)('forEach');
 
 
 /***/ },
-/* 88 */
+/* 115 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14025,18 +25383,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 89 */
+/* 116 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(90)()
+	module.exports = __webpack_require__(117)()
 		? Object.keys
-		: __webpack_require__(91);
+		: __webpack_require__(118);
 
 
 /***/ },
-/* 90 */
+/* 117 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14050,7 +25408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 91 */
+/* 118 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14063,13 +25421,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 92 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var callable = __webpack_require__(6)
-	  , forEach  = __webpack_require__(87)
+	var callable = __webpack_require__(14)
+	  , forEach  = __webpack_require__(114)
 	
 	  , call = Function.prototype.call;
 	
@@ -14084,7 +25442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 93 */
+/* 120 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14107,7 +25465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 94 */
+/* 121 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14122,7 +25480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 95 */
+/* 122 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14136,7 +25494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 96 */
+/* 123 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14149,15 +25507,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 97 */
+/* 124 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var setPrototypeOf = __webpack_require__(18)
-	  , contains       = __webpack_require__(44)
-	  , d              = __webpack_require__(4)
-	  , Iterator       = __webpack_require__(25)
+	var setPrototypeOf = __webpack_require__(34)
+	  , contains       = __webpack_require__(60)
+	  , d              = __webpack_require__(11)
+	  , Iterator       = __webpack_require__(40)
 	
 	  , defineProperty = Object.defineProperty
 	  , ArrayIterator;
@@ -14185,14 +25543,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 98 */
+/* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var callable = __webpack_require__(6)
-	  , isString = __webpack_require__(24)
-	  , get      = __webpack_require__(99)
+	var callable = __webpack_require__(14)
+	  , isString = __webpack_require__(39)
+	  , get      = __webpack_require__(126)
 	
 	  , isArray = Array.isArray, call = Function.prototype.call;
 	
@@ -14235,16 +25593,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 99 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isString = __webpack_require__(24)
-	  , ArrayIterator  = __webpack_require__(97)
-	  , StringIterator = __webpack_require__(105)
-	  , iterable       = __webpack_require__(45)
-	  , iteratorSymbol = __webpack_require__(26).iterator;
+	var isString = __webpack_require__(39)
+	  , ArrayIterator  = __webpack_require__(124)
+	  , StringIterator = __webpack_require__(132)
+	  , iterable       = __webpack_require__(61)
+	  , iteratorSymbol = __webpack_require__(41).iterator;
 	
 	module.exports = function (obj) {
 		if (typeof iterable(obj)[iteratorSymbol] === 'function') return obj[iteratorSymbol]();
@@ -14254,13 +25612,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 100 */
+/* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isString       = __webpack_require__(24)
-	  , iteratorSymbol = __webpack_require__(26).iterator
+	var isString       = __webpack_require__(39)
+	  , iteratorSymbol = __webpack_require__(41).iterator
 	
 	  , isArray = Array.isArray;
 	
@@ -14273,7 +25631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 101 */
+/* 128 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14297,7 +25655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 102 */
+/* 129 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14308,13 +25666,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 103 */
+/* 130 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var d              = __webpack_require__(4)
-	  , validateSymbol = __webpack_require__(104)
+	var d              = __webpack_require__(11)
+	  , validateSymbol = __webpack_require__(131)
 	
 	  , create = Object.create, defineProperties = Object.defineProperties
 	  , defineProperty = Object.defineProperty, objPrototype = Object.prototype
@@ -14391,12 +25749,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 104 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isSymbol = __webpack_require__(102);
+	var isSymbol = __webpack_require__(129);
 	
 	module.exports = function (value) {
 		if (!isSymbol(value)) throw new TypeError(value + " is not a symbol");
@@ -14405,7 +25763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 105 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Thanks @mathiasbynens
@@ -14413,9 +25771,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var setPrototypeOf = __webpack_require__(18)
-	  , d              = __webpack_require__(4)
-	  , Iterator       = __webpack_require__(25)
+	var setPrototypeOf = __webpack_require__(34)
+	  , d              = __webpack_require__(11)
+	  , Iterator       = __webpack_require__(40)
 	
 	  , defineProperty = Object.defineProperty
 	  , StringIterator;
@@ -14448,7 +25806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 106 */
+/* 133 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14473,12 +25831,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 107 */
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var d = __webpack_require__(4)
+	var d = __webpack_require__(11)
 	
 	  , create = Object.create, defineProperties = Object.defineProperties
 	  , generateName, Symbol;
@@ -14532,13 +25890,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 108 */
+/* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var d        = __webpack_require__(4)
-	  , callable = __webpack_require__(6)
+	var d        = __webpack_require__(11)
+	  , callable = __webpack_require__(14)
 	
 	  , apply = Function.prototype.apply, call = Function.prototype.call
 	  , create = Object.create, defineProperty = Object.defineProperty
@@ -14670,23 +26028,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 109 */
+/* 136 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var clear          = __webpack_require__(40)
-	  , eIndexOf       = __webpack_require__(76)
-	  , setPrototypeOf = __webpack_require__(18)
-	  , callable       = __webpack_require__(6)
-	  , validValue     = __webpack_require__(2)
-	  , d              = __webpack_require__(4)
-	  , ee             = __webpack_require__(108)
-	  , Symbol         = __webpack_require__(46)
-	  , iterator       = __webpack_require__(45)
-	  , forOf          = __webpack_require__(98)
-	  , Iterator       = __webpack_require__(74)
-	  , isNative       = __webpack_require__(72)
+	var clear          = __webpack_require__(56)
+	  , eIndexOf       = __webpack_require__(103)
+	  , setPrototypeOf = __webpack_require__(34)
+	  , callable       = __webpack_require__(14)
+	  , validValue     = __webpack_require__(7)
+	  , d              = __webpack_require__(11)
+	  , ee             = __webpack_require__(135)
+	  , Symbol         = __webpack_require__(62)
+	  , iterator       = __webpack_require__(61)
+	  , forOf          = __webpack_require__(125)
+	  , Iterator       = __webpack_require__(101)
+	  , isNative       = __webpack_require__(99)
 	
 	  , call = Function.prototype.call, defineProperties = Object.defineProperties
 	  , MapPoly;
@@ -14776,7 +26134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 110 */
+/* 137 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14810,7 +26168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 111 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -14822,12 +26180,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var VNode = __webpack_require__(19);
-	var VText = __webpack_require__(28);
+	var VNode = __webpack_require__(35);
+	var VText = __webpack_require__(43);
 	var domParser = new DOMParser();
 	
-	var propertyMap = __webpack_require__(113);
-	var namespaceMap = __webpack_require__(112);
+	var propertyMap = __webpack_require__(140);
+	var namespaceMap = __webpack_require__(139);
 	
 	var HTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
 	
@@ -15051,7 +26409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 112 */
+/* 139 */
 /***/ function(module, exports) {
 
 	
@@ -15370,7 +26728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 113 */
+/* 140 */
 /***/ function(module, exports) {
 
 	
@@ -15512,11 +26870,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 114 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var escape = __webpack_require__(47);
-	var propConfig = __webpack_require__(123);
+	var escape = __webpack_require__(63);
+	var propConfig = __webpack_require__(150);
 	var types = propConfig.attributeTypes;
 	var properties = propConfig.properties;
 	var attributeNames = propConfig.attributeNames;
@@ -15586,20 +26944,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 115 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var escape = __webpack_require__(47);
-	var extend = __webpack_require__(122);
-	var isVNode = __webpack_require__(7);
-	var isVText = __webpack_require__(10);
-	var isThunk = __webpack_require__(9);
-	var isWidget = __webpack_require__(3);
-	var softHook = __webpack_require__(27);
-	var attrHook = __webpack_require__(51);
-	var paramCase = __webpack_require__(121);
-	var createAttribute = __webpack_require__(114);
-	var voidElements = __webpack_require__(124);
+	var escape = __webpack_require__(63);
+	var extend = __webpack_require__(149);
+	var isVNode = __webpack_require__(15);
+	var isVText = __webpack_require__(22);
+	var isThunk = __webpack_require__(21);
+	var isWidget = __webpack_require__(8);
+	var softHook = __webpack_require__(42);
+	var attrHook = __webpack_require__(67);
+	var paramCase = __webpack_require__(148);
+	var createAttribute = __webpack_require__(141);
+	var voidElements = __webpack_require__(151);
 	
 	module.exports = toHTML;
 	
@@ -15682,7 +27040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 116 */
+/* 143 */
 /***/ function(module, exports) {
 
 	/**
@@ -15742,14 +27100,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 117 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var lowerCase = __webpack_require__(116)
+	var lowerCase = __webpack_require__(143)
 	
-	var NON_WORD_REGEXP = __webpack_require__(119)
-	var CAMEL_CASE_REGEXP = __webpack_require__(118)
-	var TRAILING_DIGIT_REGEXP = __webpack_require__(120)
+	var NON_WORD_REGEXP = __webpack_require__(146)
+	var CAMEL_CASE_REGEXP = __webpack_require__(145)
+	var TRAILING_DIGIT_REGEXP = __webpack_require__(147)
 	
 	/**
 	 * Sentence case a string.
@@ -15788,31 +27146,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 118 */
+/* 145 */
 /***/ function(module, exports) {
 
 	module.exports = /([\u0061-\u007A\u00B5\u00DF-\u00F6\u00F8-\u00FF\u0101\u0103\u0105\u0107\u0109\u010B\u010D\u010F\u0111\u0113\u0115\u0117\u0119\u011B\u011D\u011F\u0121\u0123\u0125\u0127\u0129\u012B\u012D\u012F\u0131\u0133\u0135\u0137\u0138\u013A\u013C\u013E\u0140\u0142\u0144\u0146\u0148\u0149\u014B\u014D\u014F\u0151\u0153\u0155\u0157\u0159\u015B\u015D\u015F\u0161\u0163\u0165\u0167\u0169\u016B\u016D\u016F\u0171\u0173\u0175\u0177\u017A\u017C\u017E-\u0180\u0183\u0185\u0188\u018C\u018D\u0192\u0195\u0199-\u019B\u019E\u01A1\u01A3\u01A5\u01A8\u01AA\u01AB\u01AD\u01B0\u01B4\u01B6\u01B9\u01BA\u01BD-\u01BF\u01C6\u01C9\u01CC\u01CE\u01D0\u01D2\u01D4\u01D6\u01D8\u01DA\u01DC\u01DD\u01DF\u01E1\u01E3\u01E5\u01E7\u01E9\u01EB\u01ED\u01EF\u01F0\u01F3\u01F5\u01F9\u01FB\u01FD\u01FF\u0201\u0203\u0205\u0207\u0209\u020B\u020D\u020F\u0211\u0213\u0215\u0217\u0219\u021B\u021D\u021F\u0221\u0223\u0225\u0227\u0229\u022B\u022D\u022F\u0231\u0233-\u0239\u023C\u023F\u0240\u0242\u0247\u0249\u024B\u024D\u024F-\u0293\u0295-\u02AF\u0371\u0373\u0377\u037B-\u037D\u0390\u03AC-\u03CE\u03D0\u03D1\u03D5-\u03D7\u03D9\u03DB\u03DD\u03DF\u03E1\u03E3\u03E5\u03E7\u03E9\u03EB\u03ED\u03EF-\u03F3\u03F5\u03F8\u03FB\u03FC\u0430-\u045F\u0461\u0463\u0465\u0467\u0469\u046B\u046D\u046F\u0471\u0473\u0475\u0477\u0479\u047B\u047D\u047F\u0481\u048B\u048D\u048F\u0491\u0493\u0495\u0497\u0499\u049B\u049D\u049F\u04A1\u04A3\u04A5\u04A7\u04A9\u04AB\u04AD\u04AF\u04B1\u04B3\u04B5\u04B7\u04B9\u04BB\u04BD\u04BF\u04C2\u04C4\u04C6\u04C8\u04CA\u04CC\u04CE\u04CF\u04D1\u04D3\u04D5\u04D7\u04D9\u04DB\u04DD\u04DF\u04E1\u04E3\u04E5\u04E7\u04E9\u04EB\u04ED\u04EF\u04F1\u04F3\u04F5\u04F7\u04F9\u04FB\u04FD\u04FF\u0501\u0503\u0505\u0507\u0509\u050B\u050D\u050F\u0511\u0513\u0515\u0517\u0519\u051B\u051D\u051F\u0521\u0523\u0525\u0527\u0561-\u0587\u1D00-\u1D2B\u1D6B-\u1D77\u1D79-\u1D9A\u1E01\u1E03\u1E05\u1E07\u1E09\u1E0B\u1E0D\u1E0F\u1E11\u1E13\u1E15\u1E17\u1E19\u1E1B\u1E1D\u1E1F\u1E21\u1E23\u1E25\u1E27\u1E29\u1E2B\u1E2D\u1E2F\u1E31\u1E33\u1E35\u1E37\u1E39\u1E3B\u1E3D\u1E3F\u1E41\u1E43\u1E45\u1E47\u1E49\u1E4B\u1E4D\u1E4F\u1E51\u1E53\u1E55\u1E57\u1E59\u1E5B\u1E5D\u1E5F\u1E61\u1E63\u1E65\u1E67\u1E69\u1E6B\u1E6D\u1E6F\u1E71\u1E73\u1E75\u1E77\u1E79\u1E7B\u1E7D\u1E7F\u1E81\u1E83\u1E85\u1E87\u1E89\u1E8B\u1E8D\u1E8F\u1E91\u1E93\u1E95-\u1E9D\u1E9F\u1EA1\u1EA3\u1EA5\u1EA7\u1EA9\u1EAB\u1EAD\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF-\u1F07\u1F10-\u1F15\u1F20-\u1F27\u1F30-\u1F37\u1F40-\u1F45\u1F50-\u1F57\u1F60-\u1F67\u1F70-\u1F7D\u1F80-\u1F87\u1F90-\u1F97\u1FA0-\u1FA7\u1FB0-\u1FB4\u1FB6\u1FB7\u1FBE\u1FC2-\u1FC4\u1FC6\u1FC7\u1FD0-\u1FD3\u1FD6\u1FD7\u1FE0-\u1FE7\u1FF2-\u1FF4\u1FF6\u1FF7\u210A\u210E\u210F\u2113\u212F\u2134\u2139\u213C\u213D\u2146-\u2149\u214E\u2184\u2C30-\u2C5E\u2C61\u2C65\u2C66\u2C68\u2C6A\u2C6C\u2C71\u2C73\u2C74\u2C76-\u2C7B\u2C81\u2C83\u2C85\u2C87\u2C89\u2C8B\u2C8D\u2C8F\u2C91\u2C93\u2C95\u2C97\u2C99\u2C9B\u2C9D\u2C9F\u2CA1\u2CA3\u2CA5\u2CA7\u2CA9\u2CAB\u2CAD\u2CAF\u2CB1\u2CB3\u2CB5\u2CB7\u2CB9\u2CBB\u2CBD\u2CBF\u2CC1\u2CC3\u2CC5\u2CC7\u2CC9\u2CCB\u2CCD\u2CCF\u2CD1\u2CD3\u2CD5\u2CD7\u2CD9\u2CDB\u2CDD\u2CDF\u2CE1\u2CE3\u2CE4\u2CEC\u2CEE\u2CF3\u2D00-\u2D25\u2D27\u2D2D\uA641\uA643\uA645\uA647\uA649\uA64B\uA64D\uA64F\uA651\uA653\uA655\uA657\uA659\uA65B\uA65D\uA65F\uA661\uA663\uA665\uA667\uA669\uA66B\uA66D\uA681\uA683\uA685\uA687\uA689\uA68B\uA68D\uA68F\uA691\uA693\uA695\uA697\uA723\uA725\uA727\uA729\uA72B\uA72D\uA72F-\uA731\uA733\uA735\uA737\uA739\uA73B\uA73D\uA73F\uA741\uA743\uA745\uA747\uA749\uA74B\uA74D\uA74F\uA751\uA753\uA755\uA757\uA759\uA75B\uA75D\uA75F\uA761\uA763\uA765\uA767\uA769\uA76B\uA76D\uA76F\uA771-\uA778\uA77A\uA77C\uA77F\uA781\uA783\uA785\uA787\uA78C\uA78E\uA791\uA793\uA7A1\uA7A3\uA7A5\uA7A7\uA7A9\uA7FA\uFB00-\uFB06\uFB13-\uFB17\uFF41-\uFF5A])([\u0041-\u005A\u00C0-\u00D6\u00D8-\u00DE\u0100\u0102\u0104\u0106\u0108\u010A\u010C\u010E\u0110\u0112\u0114\u0116\u0118\u011A\u011C\u011E\u0120\u0122\u0124\u0126\u0128\u012A\u012C\u012E\u0130\u0132\u0134\u0136\u0139\u013B\u013D\u013F\u0141\u0143\u0145\u0147\u014A\u014C\u014E\u0150\u0152\u0154\u0156\u0158\u015A\u015C\u015E\u0160\u0162\u0164\u0166\u0168\u016A\u016C\u016E\u0170\u0172\u0174\u0176\u0178\u0179\u017B\u017D\u0181\u0182\u0184\u0186\u0187\u0189-\u018B\u018E-\u0191\u0193\u0194\u0196-\u0198\u019C\u019D\u019F\u01A0\u01A2\u01A4\u01A6\u01A7\u01A9\u01AC\u01AE\u01AF\u01B1-\u01B3\u01B5\u01B7\u01B8\u01BC\u01C4\u01C7\u01CA\u01CD\u01CF\u01D1\u01D3\u01D5\u01D7\u01D9\u01DB\u01DE\u01E0\u01E2\u01E4\u01E6\u01E8\u01EA\u01EC\u01EE\u01F1\u01F4\u01F6-\u01F8\u01FA\u01FC\u01FE\u0200\u0202\u0204\u0206\u0208\u020A\u020C\u020E\u0210\u0212\u0214\u0216\u0218\u021A\u021C\u021E\u0220\u0222\u0224\u0226\u0228\u022A\u022C\u022E\u0230\u0232\u023A\u023B\u023D\u023E\u0241\u0243-\u0246\u0248\u024A\u024C\u024E\u0370\u0372\u0376\u0386\u0388-\u038A\u038C\u038E\u038F\u0391-\u03A1\u03A3-\u03AB\u03CF\u03D2-\u03D4\u03D8\u03DA\u03DC\u03DE\u03E0\u03E2\u03E4\u03E6\u03E8\u03EA\u03EC\u03EE\u03F4\u03F7\u03F9\u03FA\u03FD-\u042F\u0460\u0462\u0464\u0466\u0468\u046A\u046C\u046E\u0470\u0472\u0474\u0476\u0478\u047A\u047C\u047E\u0480\u048A\u048C\u048E\u0490\u0492\u0494\u0496\u0498\u049A\u049C\u049E\u04A0\u04A2\u04A4\u04A6\u04A8\u04AA\u04AC\u04AE\u04B0\u04B2\u04B4\u04B6\u04B8\u04BA\u04BC\u04BE\u04C0\u04C1\u04C3\u04C5\u04C7\u04C9\u04CB\u04CD\u04D0\u04D2\u04D4\u04D6\u04D8\u04DA\u04DC\u04DE\u04E0\u04E2\u04E4\u04E6\u04E8\u04EA\u04EC\u04EE\u04F0\u04F2\u04F4\u04F6\u04F8\u04FA\u04FC\u04FE\u0500\u0502\u0504\u0506\u0508\u050A\u050C\u050E\u0510\u0512\u0514\u0516\u0518\u051A\u051C\u051E\u0520\u0522\u0524\u0526\u0531-\u0556\u10A0-\u10C5\u10C7\u10CD\u1E00\u1E02\u1E04\u1E06\u1E08\u1E0A\u1E0C\u1E0E\u1E10\u1E12\u1E14\u1E16\u1E18\u1E1A\u1E1C\u1E1E\u1E20\u1E22\u1E24\u1E26\u1E28\u1E2A\u1E2C\u1E2E\u1E30\u1E32\u1E34\u1E36\u1E38\u1E3A\u1E3C\u1E3E\u1E40\u1E42\u1E44\u1E46\u1E48\u1E4A\u1E4C\u1E4E\u1E50\u1E52\u1E54\u1E56\u1E58\u1E5A\u1E5C\u1E5E\u1E60\u1E62\u1E64\u1E66\u1E68\u1E6A\u1E6C\u1E6E\u1E70\u1E72\u1E74\u1E76\u1E78\u1E7A\u1E7C\u1E7E\u1E80\u1E82\u1E84\u1E86\u1E88\u1E8A\u1E8C\u1E8E\u1E90\u1E92\u1E94\u1E9E\u1EA0\u1EA2\u1EA4\u1EA6\u1EA8\u1EAA\u1EAC\u1EAE\u1EB0\u1EB2\u1EB4\u1EB6\u1EB8\u1EBA\u1EBC\u1EBE\u1EC0\u1EC2\u1EC4\u1EC6\u1EC8\u1ECA\u1ECC\u1ECE\u1ED0\u1ED2\u1ED4\u1ED6\u1ED8\u1EDA\u1EDC\u1EDE\u1EE0\u1EE2\u1EE4\u1EE6\u1EE8\u1EEA\u1EEC\u1EEE\u1EF0\u1EF2\u1EF4\u1EF6\u1EF8\u1EFA\u1EFC\u1EFE\u1F08-\u1F0F\u1F18-\u1F1D\u1F28-\u1F2F\u1F38-\u1F3F\u1F48-\u1F4D\u1F59\u1F5B\u1F5D\u1F5F\u1F68-\u1F6F\u1FB8-\u1FBB\u1FC8-\u1FCB\u1FD8-\u1FDB\u1FE8-\u1FEC\u1FF8-\u1FFB\u2102\u2107\u210B-\u210D\u2110-\u2112\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u2130-\u2133\u213E\u213F\u2145\u2183\u2C00-\u2C2E\u2C60\u2C62-\u2C64\u2C67\u2C69\u2C6B\u2C6D-\u2C70\u2C72\u2C75\u2C7E-\u2C80\u2C82\u2C84\u2C86\u2C88\u2C8A\u2C8C\u2C8E\u2C90\u2C92\u2C94\u2C96\u2C98\u2C9A\u2C9C\u2C9E\u2CA0\u2CA2\u2CA4\u2CA6\u2CA8\u2CAA\u2CAC\u2CAE\u2CB0\u2CB2\u2CB4\u2CB6\u2CB8\u2CBA\u2CBC\u2CBE\u2CC0\u2CC2\u2CC4\u2CC6\u2CC8\u2CCA\u2CCC\u2CCE\u2CD0\u2CD2\u2CD4\u2CD6\u2CD8\u2CDA\u2CDC\u2CDE\u2CE0\u2CE2\u2CEB\u2CED\u2CF2\uA640\uA642\uA644\uA646\uA648\uA64A\uA64C\uA64E\uA650\uA652\uA654\uA656\uA658\uA65A\uA65C\uA65E\uA660\uA662\uA664\uA666\uA668\uA66A\uA66C\uA680\uA682\uA684\uA686\uA688\uA68A\uA68C\uA68E\uA690\uA692\uA694\uA696\uA722\uA724\uA726\uA728\uA72A\uA72C\uA72E\uA732\uA734\uA736\uA738\uA73A\uA73C\uA73E\uA740\uA742\uA744\uA746\uA748\uA74A\uA74C\uA74E\uA750\uA752\uA754\uA756\uA758\uA75A\uA75C\uA75E\uA760\uA762\uA764\uA766\uA768\uA76A\uA76C\uA76E\uA779\uA77B\uA77D\uA77E\uA780\uA782\uA784\uA786\uA78B\uA78D\uA790\uA792\uA7A0\uA7A2\uA7A4\uA7A6\uA7A8\uA7AA\uFF21-\uFF3A\u0030-\u0039\u00B2\u00B3\u00B9\u00BC-\u00BE\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u09F4-\u09F9\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0B72-\u0B77\u0BE6-\u0BF2\u0C66-\u0C6F\u0C78-\u0C7E\u0CE6-\u0CEF\u0D66-\u0D75\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F33\u1040-\u1049\u1090-\u1099\u1369-\u137C\u16EE-\u16F0\u17E0-\u17E9\u17F0-\u17F9\u1810-\u1819\u1946-\u194F\u19D0-\u19DA\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\u2070\u2074-\u2079\u2080-\u2089\u2150-\u2182\u2185-\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3007\u3021-\u3029\u3038-\u303A\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA620-\uA629\uA6E6-\uA6EF\uA830-\uA835\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19])/g
 
 
 /***/ },
-/* 119 */
+/* 146 */
 /***/ function(module, exports) {
 
 	module.exports = /[^\u0041-\u005A\u0061-\u007A\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0\u08A2-\u08AC\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097F\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D\u0C58\u0C59\u0C60\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D60\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191C\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19C1-\u19C7\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183\u2184\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005\u3006\u3031-\u3035\u303B\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FCC\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA697\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA78E\uA790-\uA793\uA7A0-\uA7AA\uA7F8-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA80-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uABC0-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC\u0030-\u0039\u00B2\u00B3\u00B9\u00BC-\u00BE\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u09F4-\u09F9\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0B72-\u0B77\u0BE6-\u0BF2\u0C66-\u0C6F\u0C78-\u0C7E\u0CE6-\u0CEF\u0D66-\u0D75\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F33\u1040-\u1049\u1090-\u1099\u1369-\u137C\u16EE-\u16F0\u17E0-\u17E9\u17F0-\u17F9\u1810-\u1819\u1946-\u194F\u19D0-\u19DA\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\u2070\u2074-\u2079\u2080-\u2089\u2150-\u2182\u2185-\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3007\u3021-\u3029\u3038-\u303A\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA620-\uA629\uA6E6-\uA6EF\uA830-\uA835\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19]+/g
 
 
 /***/ },
-/* 120 */
+/* 147 */
 /***/ function(module, exports) {
 
 	module.exports = /([\u0030-\u0039\u00B2\u00B3\u00B9\u00BC-\u00BE\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u09F4-\u09F9\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0B72-\u0B77\u0BE6-\u0BF2\u0C66-\u0C6F\u0C78-\u0C7E\u0CE6-\u0CEF\u0D66-\u0D75\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F33\u1040-\u1049\u1090-\u1099\u1369-\u137C\u16EE-\u16F0\u17E0-\u17E9\u17F0-\u17F9\u1810-\u1819\u1946-\u194F\u19D0-\u19DA\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\u2070\u2074-\u2079\u2080-\u2089\u2150-\u2182\u2185-\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3007\u3021-\u3029\u3038-\u303A\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA620-\uA629\uA6E6-\uA6EF\uA830-\uA835\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19])([^\u0030-\u0039\u00B2\u00B3\u00B9\u00BC-\u00BE\u0660-\u0669\u06F0-\u06F9\u07C0-\u07C9\u0966-\u096F\u09E6-\u09EF\u09F4-\u09F9\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0B72-\u0B77\u0BE6-\u0BF2\u0C66-\u0C6F\u0C78-\u0C7E\u0CE6-\u0CEF\u0D66-\u0D75\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F33\u1040-\u1049\u1090-\u1099\u1369-\u137C\u16EE-\u16F0\u17E0-\u17E9\u17F0-\u17F9\u1810-\u1819\u1946-\u194F\u19D0-\u19DA\u1A80-\u1A89\u1A90-\u1A99\u1B50-\u1B59\u1BB0-\u1BB9\u1C40-\u1C49\u1C50-\u1C59\u2070\u2074-\u2079\u2080-\u2089\u2150-\u2182\u2185-\u2189\u2460-\u249B\u24EA-\u24FF\u2776-\u2793\u2CFD\u3007\u3021-\u3029\u3038-\u303A\u3192-\u3195\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\uA620-\uA629\uA6E6-\uA6EF\uA830-\uA835\uA8D0-\uA8D9\uA900-\uA909\uA9D0-\uA9D9\uAA50-\uAA59\uABF0-\uABF9\uFF10-\uFF19])/g
 
 
 /***/ },
-/* 121 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var sentenceCase = __webpack_require__(117);
+	var sentenceCase = __webpack_require__(144);
 	
 	/**
 	 * Param case a string.
@@ -15827,7 +27185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 122 */
+/* 149 */
 /***/ function(module, exports) {
 
 	module.exports = extend
@@ -15850,7 +27208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 123 */
+/* 150 */
 /***/ function(module, exports) {
 
 	/**
@@ -16016,7 +27374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 124 */
+/* 151 */
 /***/ function(module, exports) {
 
 	
@@ -16045,16 +27403,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 125 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(140)
+	var diff = __webpack_require__(167)
 	
 	module.exports = diff
 
 
 /***/ },
-/* 126 */
+/* 153 */
 /***/ function(module, exports) {
 
 	/*!
@@ -16166,12 +27524,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 127 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var OneVersionConstraint = __webpack_require__(129);
+	var OneVersionConstraint = __webpack_require__(156);
 	
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -16192,7 +27550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 128 */
+/* 155 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -16218,12 +27576,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 129 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Individual = __webpack_require__(128);
+	var Individual = __webpack_require__(155);
 	
 	module.exports = OneVersion;
 	
@@ -16246,26 +27604,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 130 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(134)
+	var patch = __webpack_require__(161)
 	
 	module.exports = patch
 
 
 /***/ },
-/* 131 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(48)
+	var document = __webpack_require__(64)
 	
-	var applyProperties = __webpack_require__(50)
+	var applyProperties = __webpack_require__(66)
 	
-	var isVNode = __webpack_require__(7)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(3)
-	var handleThunk = __webpack_require__(54)
+	var isVNode = __webpack_require__(15)
+	var isVText = __webpack_require__(22)
+	var isWidget = __webpack_require__(8)
+	var handleThunk = __webpack_require__(70)
 	
 	module.exports = createElement
 	
@@ -16307,7 +27665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 132 */
+/* 159 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -16398,15 +27756,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 133 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(50)
+	var applyProperties = __webpack_require__(66)
 	
-	var isWidget = __webpack_require__(3)
-	var VPatch = __webpack_require__(55)
+	var isWidget = __webpack_require__(8)
+	var VPatch = __webpack_require__(71)
 	
-	var updateWidget = __webpack_require__(135)
+	var updateWidget = __webpack_require__(162)
 	
 	module.exports = applyPatch
 	
@@ -16555,15 +27913,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 134 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(48)
-	var isArray = __webpack_require__(14)
+	var document = __webpack_require__(64)
+	var isArray = __webpack_require__(32)
 	
-	var render = __webpack_require__(131)
-	var domIndex = __webpack_require__(132)
-	var patchOp = __webpack_require__(133)
+	var render = __webpack_require__(158)
+	var domIndex = __webpack_require__(159)
+	var patchOp = __webpack_require__(160)
 	module.exports = patch
 	
 	function patch(rootNode, patches, renderOptions) {
@@ -16641,10 +27999,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 135 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(3)
+	var isWidget = __webpack_require__(8)
 	
 	module.exports = updateWidget
 	
@@ -16662,24 +28020,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 136 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isArray = __webpack_require__(14);
+	var isArray = __webpack_require__(32);
 	
-	var VNode = __webpack_require__(19);
-	var VText = __webpack_require__(28);
-	var isVNode = __webpack_require__(7);
-	var isVText = __webpack_require__(10);
-	var isWidget = __webpack_require__(3);
-	var isHook = __webpack_require__(12);
-	var isVThunk = __webpack_require__(9);
+	var VNode = __webpack_require__(35);
+	var VText = __webpack_require__(43);
+	var isVNode = __webpack_require__(15);
+	var isVText = __webpack_require__(22);
+	var isWidget = __webpack_require__(8);
+	var isHook = __webpack_require__(30);
+	var isVThunk = __webpack_require__(21);
 	
-	var parseTag = __webpack_require__(53);
-	var softSetHook = __webpack_require__(27);
-	var evHook = __webpack_require__(52);
+	var parseTag = __webpack_require__(69);
+	var softSetHook = __webpack_require__(42);
+	var evHook = __webpack_require__(68);
 	
 	module.exports = h;
 	
@@ -16805,7 +28163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 137 */
+/* 164 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17124,18 +28482,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 138 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isArray = __webpack_require__(14);
+	var isArray = __webpack_require__(32);
 	
-	var h = __webpack_require__(136);
+	var h = __webpack_require__(163);
 	
 	
-	var SVGAttributeNamespace = __webpack_require__(137);
-	var attributeHook = __webpack_require__(51);
+	var SVGAttributeNamespace = __webpack_require__(164);
+	var attributeHook = __webpack_require__(67);
 	
 	var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 	
@@ -17192,11 +28550,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 139 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(49)
-	var isHook = __webpack_require__(12)
+	var isObject = __webpack_require__(65)
+	var isHook = __webpack_require__(30)
 	
 	module.exports = diffProps
 	
@@ -17256,19 +28614,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 140 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(14)
+	var isArray = __webpack_require__(32)
 	
-	var VPatch = __webpack_require__(55)
-	var isVNode = __webpack_require__(7)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(3)
-	var isThunk = __webpack_require__(9)
-	var handleThunk = __webpack_require__(54)
+	var VPatch = __webpack_require__(71)
+	var isVNode = __webpack_require__(15)
+	var isVText = __webpack_require__(22)
+	var isWidget = __webpack_require__(8)
+	var isThunk = __webpack_require__(21)
+	var handleThunk = __webpack_require__(70)
 	
-	var diffProps = __webpack_require__(139)
+	var diffProps = __webpack_require__(166)
 	
 	module.exports = diff
 	
@@ -17689,121 +29047,172 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 141 */
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _createClass = __webpack_require__(26)["default"];
+	
+	var _classCallCheck = __webpack_require__(19)["default"];
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var owns = Object.prototype.hasOwnProperty;
+	
+	var Calculations = (function () {
+	    function Calculations() {
+	        var values = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	        _classCallCheck(this, Calculations);
+	
+	        this.values = values;
+	    }
+	
+	    _createClass(Calculations, [{
+	        key: "set",
+	        value: function set(key, value) {
+	            if (owns.call(this.values, key)) {
+	                throw new Error("Key already set: " + key);
+	            }
+	            return this.values[key] = value;
+	        }
+	    }, {
+	        key: "get",
+	        value: function get(key) {
+	            if (!owns.call(this.values, key)) {
+	                throw new Error("Unknown key: " + key);
+	            }
+	            return this.values[key];
+	        }
+	    }]);
+	
+	    return Calculations;
+	})();
+	
+	exports["default"] = Calculations;
+	module.exports = exports["default"];
+
+/***/ },
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _slicedToArray = __webpack_require__(56)['default'];
+	var _slicedToArray = __webpack_require__(12)['default'];
 	
-	var _Object$assign = __webpack_require__(30)['default'];
+	var _Object$entries = __webpack_require__(18)['default'];
 	
-	var _Object$keys = __webpack_require__(15)['default'];
+	var _Object$keys = __webpack_require__(3)['default'];
 	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	var _interopRequireWildcard = __webpack_require__(191)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	exports['default'] = cosmetic;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var _input = __webpack_require__(29);
+	var _input = __webpack_require__(33);
 	
 	var _input2 = _interopRequireDefault(_input);
 	
-	var _select = __webpack_require__(145);
+	var _select = __webpack_require__(73);
 	
 	var _select2 = _interopRequireDefault(_select);
 	
-	var _combineLatestObject = __webpack_require__(20);
+	var _combineLatestObject = __webpack_require__(23);
 	
 	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
 	
-	var _constantsJson = __webpack_require__(34);
+	var _constantsJson = __webpack_require__(10);
+	
+	var _localize = __webpack_require__(177);
+	
+	var localize = _interopRequireWildcard(_localize);
 	
 	function makeInput(key, type, defaultValue, DOM, value$, props$) {
 	    return (0, _input2['default'])(key, type, {
 	        DOM: DOM,
 	        value$: value$.map(function (value) {
 	            return value[key] || defaultValue;
-	        }),
+	        }).startWith(defaultValue),
 	        props$: props$ || _cycleCore.Rx.Observable['return']({
 	            placeholder: key
 	        })
 	    });
 	}
 	
-	function makeBox(selector, object, extra) {
-	    return _Object$assign({
+	function makeBox(selector, object, calculations) {
+	    _Object$entries(object).filter(function (_ref) {
+	        var _ref2 = _slicedToArray(_ref, 2);
+	
+	        var key = _ref2[0];
+	        var value = _ref2[1];
+	        return value.value$;
+	    }).forEach(function (_ref3) {
+	        var _ref32 = _slicedToArray(_ref3, 2);
+	
+	        var key = _ref32[0];
+	        var value = _ref32[1];
+	        return calculations.set(key, value.value$);
+	    });
+	    return {
 	        DOM: _cycleCore.Rx.Observable.combineLatest(_Object$keys(object).map(function (key) {
-	            return object[key].DOM;
+	            return object[key].DOM.startWith(null).filter(function (x) {
+	                return x;
+	            }).map(function (vTree) {
+	                return (0, _cycleDom.h)('label.' + key + '-label', {
+	                    key: key
+	                }, [localize.name(key), ' ', vTree]);
+	            });
 	        })).map(function (vTrees) {
 	            return (0, _cycleDom.h)(selector, vTrees);
 	        }),
 	        value$: (0, _combineLatestObject2['default'])(_Object$keys(object).reduce(function (acc, key) {
-	            acc[key] = object[key].value$;
+	            var value$ = object[key].value$;
+	            if (value$) {
+	                acc[key] = value$;
+	            }
 	            return acc;
-	        }, {}))
-	    }, extra || {});
+	        }, {})).share()
+	    };
 	}
 	
-	function cosmetic(_ref) {
-	    var DOM = _ref.DOM;
-	    var value$ = _ref.value$;
+	function cosmetic(_ref4) {
+	    var DOM = _ref4.DOM;
+	    var value$ = _ref4.value$;
+	    var raceDOM = _ref4.raceDOM;
+	    var calculations = _ref4.calculations;
 	
-	    var raceSelect = (0, _select2['default'])('race', {
-	        DOM: DOM,
-	        value$: value$.map(function (value) {
-	            return value.race || '';
-	        }),
-	        options$: _cycleCore.Rx.Observable['return'](_Object$keys(_constantsJson.RACE_STATS).map(function (race) {
-	            return {
-	                value: race,
-	                text: race
-	            };
-	        })),
-	        props$: _cycleCore.Rx.Observable['return']({
-	            fallback: '— Race —'
-	        })
-	    });
-	    var race$ = raceSelect.value$;
-	
-	    return makeBox('div.cosmetic', {
+	    return makeBox('section.cosmetic', {
 	        name: makeInput('name', 'text', '', DOM, value$),
 	        age: makeInput('age', 'number', 20, DOM, value$, _cycleCore.Rx.Observable['return']({
 	            min: 0,
 	            placeholder: 'Age'
 	        })),
 	        sex: makeInput('sex', 'text', '', DOM, value$),
-	        race: raceSelect,
-	        weight: makeInput('weight', 'number', 150, DOM, value$, race$.map(function (race) {
-	            return _constantsJson.RACE_STATS[race || 'human'] || {};
-	        }).map(function (raceStats) {
-	            return raceStats.weight || [100, 400];
-	        }).map(function (_ref2) {
-	            var _ref22 = _slicedToArray(_ref2, 2);
-	
-	            var min = _ref22[0];
-	            var max = _ref22[1];
+	        race: {
+	            DOM: raceDOM
+	        },
+	        weight: makeInput('weight', 'number', 150, DOM, value$, calculations.get('race').pluck('weight').map(function (_ref5) {
+	            var min = _ref5.min;
+	            var max = _ref5.max;
 	            return {
 	                min: min,
 	                max: max,
 	                placeholder: 'Weight'
 	            };
 	        })),
-	        height: makeInput('height', 'number', 1.8, DOM, value$, race$.map(function (race) {
-	            return _constantsJson.RACE_STATS[race || 'human'] || {};
-	        }).map(function (raceStats) {
-	            return raceStats.height || [1, 3];
-	        }).map(function (_ref3) {
-	            var _ref32 = _slicedToArray(_ref3, 2);
-	
-	            var min = _ref32[0];
-	            var max = _ref32[1];
+	        height: makeInput('height', 'number', 1.8, DOM, value$, calculations.get('race').pluck('height').map(function (_ref6) {
+	            var min = _ref6.min;
+	            var max = _ref6.max;
 	            return {
 	                min: min,
 	                max: max,
@@ -17813,52 +29222,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	        })),
 	        eyes: makeInput('eyes', 'text', '', DOM, value$),
 	        hair: makeInput('hair', 'text', '', DOM, value$),
-	        appearance: makeInput('appearance', 'text', '', DOM, value$)
-	    }, {
-	        race$: race$
-	    });
+	        appearance: makeInput('appearance', 'textarea', '', DOM, value$)
+	    }, calculations);
 	}
 	
 	module.exports = exports['default'];
 
 /***/ },
-/* 142 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _Object$keys = __webpack_require__(15)['default'];
+	var _Object$keys = __webpack_require__(3)['default'];
 	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	exports['default'] = characterSheet;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var _cosmetic = __webpack_require__(141);
+	var _race = __webpack_require__(172);
+	
+	var _race2 = _interopRequireDefault(_race);
+	
+	var _cosmetic = __webpack_require__(169);
 	
 	var _cosmetic2 = _interopRequireDefault(_cosmetic);
 	
-	var _primaryAttributeChart = __webpack_require__(143);
+	var _primaryStatisticChart = __webpack_require__(171);
 	
-	var _primaryAttributeChart2 = _interopRequireDefault(_primaryAttributeChart);
+	var _primaryStatisticChart2 = _interopRequireDefault(_primaryStatisticChart);
 	
-	var _skills = __webpack_require__(144);
+	var _secondaryStatisticChart = __webpack_require__(173);
+	
+	var _secondaryStatisticChart2 = _interopRequireDefault(_secondaryStatisticChart);
+	
+	var _skills = __webpack_require__(174);
 	
 	var _skills2 = _interopRequireDefault(_skills);
 	
-	var _traits = __webpack_require__(181);
+	var _traits = __webpack_require__(175);
 	
 	var _traits2 = _interopRequireDefault(_traits);
 	
-	var _combineLatestObject = __webpack_require__(20);
+	var _combineLatestObject = __webpack_require__(23);
 	
 	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
+	
+	var _modelsCondition = __webpack_require__(235);
+	
+	var _modelsCondition2 = _interopRequireDefault(_modelsCondition);
+	
+	var _Calculations = __webpack_require__(168);
+	
+	var _Calculations2 = _interopRequireDefault(_Calculations);
+	
+	var _requestAnimationFrameScheduler = __webpack_require__(184);
+	
+	var _requestAnimationFrameScheduler2 = _interopRequireDefault(_requestAnimationFrameScheduler);
+	
+	var _constantsJson = __webpack_require__(10);
 	
 	function safeParseJSON(value) {
 	    try {
@@ -17895,86 +29324,306 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var DOM = _ref.DOM;
 	    var localStorageSource = _ref.localStorageSource;
 	
-	    var deserializedSavedData$ = localStorageSource.map(safeParseJSON);
+	    var calculations = new _Calculations2['default']();
+	    _modelsCondition2['default'].all().forEach(function (condition) {
+	        return calculations.set(condition.key, _cycleCore.Rx.Observable['return'](false));
+	    });
+	    _Object$keys(_constantsJson.MISCELLANEOUS).forEach(function (key) {
+	        return calculations.set(key, _cycleCore.Rx.Observable['return'](0));
+	    });
+	    var deserializedSavedData$ = localStorageSource.map(safeParseJSON).shareReplay(1);
+	    var raceView = (0, _race2['default'])({
+	        DOM: DOM,
+	        value$: deserializedSavedData$.map(function (x) {
+	            return x.race || '';
+	        }),
+	        calculations: calculations
+	    });
 	    var cosmeticView = (0, _cosmetic2['default'])({
 	        DOM: DOM,
 	        value$: deserializedSavedData$.map(function (x) {
 	            return x.cosmetic || {};
-	        })
+	        }),
+	        raceDOM: raceView.DOM,
+	        calculations: calculations
 	    });
-	    var primaryAttributeView = (0, _primaryAttributeChart2['default'])({
+	    var primaryStatisticView = (0, _primaryStatisticChart2['default'])({
 	        DOM: DOM,
 	        value$: deserializedSavedData$.map(function (x) {
 	            return x.primary || {};
 	        }),
-	        race$: cosmeticView.race$
+	        calculations: calculations
+	    });
+	    var secondaryStatisticView = (0, _secondaryStatisticChart2['default'])({
+	        DOM: DOM,
+	        value$: deserializedSavedData$.map(function (x) {
+	            return x.secondary || {};
+	        }),
+	        calculations: calculations
 	    });
 	    var skillsView = (0, _skills2['default'])({
 	        DOM: DOM,
 	        value$: deserializedSavedData$.map(function (x) {
 	            return x.skills || {};
 	        }),
-	        attributes$: primaryAttributeView.value$
+	        calculations: calculations
 	    });
 	    var traitsView = (0, _traits2['default'])({
 	        DOM: DOM,
 	        value$: deserializedSavedData$.map(function (x) {
 	            return x.traits || {};
 	        }),
-	        race$: cosmeticView.race$
+	        calculations: calculations
 	    });
 	    return {
 	        DOM: (0, _combineLatestObject2['default'])({
-	            cosmetic: cosmeticView.DOM,
-	            primary: primaryAttributeView.DOM,
-	            skills: skillsView.DOM,
-	            traits: traitsView.DOM
+	            cosmetic: cosmeticView.DOM.startWith('-Cosmetic-'),
+	            primary: primaryStatisticView.DOM.startWith('-Primary-'),
+	            secondary: secondaryStatisticView.DOM.startWith('-Secondary-'),
+	            skills: skillsView.DOM.startWith('-Skills-'),
+	            traits: traitsView.DOM.startWith('-Traits-')
 	        }).map(function (_ref2) {
 	            var cosmetic = _ref2.cosmetic;
 	            var primary = _ref2.primary;
+	            var secondary = _ref2.secondary;
 	            var skills = _ref2.skills;
 	            var traits = _ref2.traits;
-	            return (0, _cycleDom.h)('section', [cosmetic, primary, skills, traits]);
-	        }),
-	        localStorageSink: (0, _combineLatestObject2['default'])({
+	            return (0, _cycleDom.h)('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits]);
+	        }).sample(0, _requestAnimationFrameScheduler2['default']),
+	        localStorageSink: localStorageSource.first().concat((0, _combineLatestObject2['default'])({
+	            race: raceView.value$,
 	            cosmetic: cosmeticView.value$.startWith({}),
-	            primary: primaryAttributeView.value$.startWith({}),
+	            primary: primaryStatisticView.value$.startWith({}),
+	            secondary: secondaryStatisticView.value$.startWith({}),
 	            skills: skillsView.value$,
 	            traits: traitsView.value$
-	        }).throttle(200).map(removeEmptyValues).map(JSON.stringify.bind(JSON))
+	        }).throttle(200).map(removeEmptyValues).map(JSON.stringify.bind(JSON))).distinctUntilChanged().skip(1)
 	    };
 	}
 	
 	module.exports = exports['default'];
 
 /***/ },
-/* 143 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _slicedToArray = __webpack_require__(56)['default'];
-	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	exports['default'] = primaryAttributeChart;
+	exports['default'] = primaryStatisticChart;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var _input = __webpack_require__(29);
+	var _input = __webpack_require__(33);
 	
 	var _input2 = _interopRequireDefault(_input);
 	
-	var _combineLatestObject = __webpack_require__(20);
+	var _combineLatestObject = __webpack_require__(23);
 	
 	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
 	
-	var _constantsJson = __webpack_require__(34);
+	var _modelsPrimaryStatistic = __webpack_require__(74);
+	
+	var _modelsPrimaryStatistic2 = _interopRequireDefault(_modelsPrimaryStatistic);
+	
+	function toExtrema(range) {
+	    return {
+	        min: range.min,
+	        max: range.max
+	    };
+	}
+	
+	function primaryStatisticEntry(stat, _ref) {
+	    var DOM = _ref.DOM;
+	    var value$ = _ref.value$;
+	    var calculations = _ref.calculations;
+	
+	    var raceExtrema$ = calculations.get('race').pluck(stat.key);
+	    var inputView = (0, _input2['default'])(stat.key, 'number', {
+	        DOM: DOM,
+	        value$: value$.map(function (value) {
+	            return value[stat.key] || 5;
+	        }).startWith(5),
+	        props$: raceExtrema$.map(function (_ref2) {
+	            var min = _ref2.min;
+	            var max = _ref2.max;
+	            return {
+	                min: min,
+	                max: max,
+	                className: 'stat-input'
+	            };
+	        })
+	    });
+	    var extremaVTree$ = raceExtrema$.map(function (_ref3) {
+	        var min = _ref3.min;
+	        var max = _ref3.max;
+	        return (0, _cycleDom.h)('span.stat-extrema', [min, '/', max]);
+	    });
+	    calculations.set(stat.key, inputView.value$);
+	
+	    return {
+	        DOM: (0, _combineLatestObject2['default'])({
+	            input: inputView.DOM,
+	            extrema: extremaVTree$
+	        }).map(function (_ref4) {
+	            var input = _ref4.input;
+	            var extrema = _ref4.extrema;
+	            return (0, _cycleDom.h)('div.primary-statistic.primary-statistic-' + stat.key, [(0, _cycleDom.h)('abbr.stat-label', {
+	                title: stat.name
+	            }, [stat.abbr]), input, extrema]);
+	        }),
+	        value$: inputView.value$
+	    };
+	}
+	
+	function primaryStatisticChart(_ref5) {
+	    var DOM = _ref5.DOM;
+	    var value$ = _ref5.value$;
+	    var calculations = _ref5.calculations;
+	
+	    var statistics = _modelsPrimaryStatistic2['default'].all().toArray();
+	    var statisticEntries = statistics.map(function (stat) {
+	        return primaryStatisticEntry(stat, {
+	            DOM: DOM,
+	            value$: value$,
+	            calculations: calculations
+	        });
+	    });
+	
+	    var sum$ = _cycleCore.Rx.Observable.combineLatest(statisticEntries.map(function (a) {
+	        return a.value$;
+	    })).map(function (values) {
+	        return values.reduce(function (x, y) {
+	            return x + y;
+	        }, 0);
+	    });
+	
+	    var primaryTotal$ = calculations.get('race').pluck('primaryTotal');
+	
+	    var summaryVTree$ = _cycleCore.Rx.Observable.combineLatest(sum$, primaryTotal$, function (sum, primaryTotal) {
+	        return (0, _cycleDom.h)('div', {
+	            className: 'primary-total ' + (sum === primaryTotal ? 'primary-total--same' : '')
+	        }, [sum, '/', primaryTotal]);
+	    });
+	
+	    return {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(statisticEntries.map(function (a) {
+	            return a.DOM;
+	        }).concat([summaryVTree$])).map(function (inputVTrees) {
+	            return (0, _cycleDom.h)('section.primary', inputVTrees);
+	        }),
+	        value$: (0, _combineLatestObject2['default'])(statistics.reduce(function (acc, stat, i) {
+	            acc[stat.key] = statisticEntries[i].value$;
+	            return acc;
+	        }, {})).share()
+	    };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = race;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var _select = __webpack_require__(73);
+	
+	var _select2 = _interopRequireDefault(_select);
+	
+	var _modelsRace = __webpack_require__(75);
+	
+	var _modelsRace2 = _interopRequireDefault(_modelsRace);
+	
+	function race(_ref) {
+	    var DOM = _ref.DOM;
+	    var value$ = _ref.value$;
+	    var calculations = _ref.calculations;
+	
+	    var raceSelect = (0, _select2['default'])('race', {
+	        DOM: DOM,
+	        value$: value$,
+	        options$: _cycleCore.Rx.Observable['return'](_modelsRace2['default'].all().map(function (race) {
+	            return {
+	                value: race.key,
+	                text: race.name
+	            };
+	        })),
+	        props$: _cycleCore.Rx.Observable['return']({
+	            fallback: '— Race —'
+	        })
+	    });
+	    var race$ = raceSelect.value$;
+	    var model$ = race$.map(function (race) {
+	        return _modelsRace2['default'].getOrDefault(race);
+	    }).distinctUntilChanged().share();
+	
+	    calculations.set('race', model$);
+	    _modelsRace2['default'].all().forEach(function (race) {
+	        return calculations.set(race.key, _cycleCore.Rx.Observable['return'](race));
+	    });
+	
+	    return {
+	        DOM: raceSelect.DOM,
+	        value$: race$
+	    };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = secondaryStatisticChart;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var _input = __webpack_require__(33);
+	
+	var _input2 = _interopRequireDefault(_input);
+	
+	var _combineLatestObject = __webpack_require__(23);
+	
+	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
+	
+	var _modelsSecondaryStatistic = __webpack_require__(180);
+	
+	var _modelsSecondaryStatistic2 = _interopRequireDefault(_modelsSecondaryStatistic);
+	
+	var _algorithm = __webpack_require__(72);
+	
+	var _algorithm2 = _interopRequireDefault(_algorithm);
+	
+	var _renderRef = __webpack_require__(236);
+	
+	var _renderRef2 = _interopRequireDefault(_renderRef);
 	
 	function makeInput(key, type, defaultValue, DOM, value$, props$) {
 	    return (0, _input2['default'])(key, type, {
@@ -17986,88 +29635,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
-	function primaryAttribute(attribute, _ref) {
-	    var DOM = _ref.DOM;
-	    var value$ = _ref.value$;
-	    var racePrimary$ = _ref.racePrimary$;
-	
-	    var raceExtrema$ = racePrimary$.map(function (primary) {
-	        return primary[attribute] || [1, 10];
-	    }).map(function (_ref2) {
-	        var _ref22 = _slicedToArray(_ref2, 2);
-	
-	        var min = _ref22[0];
-	        var max = _ref22[1];
-	        return {
-	            min: min,
-	            max: max
-	        };
-	    }).share();
-	    var input = makeInput(attribute, 'number', 5, DOM, value$, raceExtrema$);
-	    var extremaVTree$ = raceExtrema$.map(function (_ref3) {
-	        var min = _ref3.min;
-	        var max = _ref3.max;
-	        return (0, _cycleDom.h)('span', [min, '/', max]);
-	    });
-	
+	function toExtrema(range) {
 	    return {
-	        DOM: (0, _combineLatestObject2['default'])({
-	            input: input.DOM,
-	            extrema: extremaVTree$
-	        }).map(function (_ref4) {
-	            var input = _ref4.input;
-	            var extrema = _ref4.extrema;
-	            return (0, _cycleDom.h)('div.' + attribute + '-attribute', [attribute, input, extrema]);
-	        }),
-	        value$: input.value$
+	        min: range.min,
+	        max: range.max
 	    };
 	}
 	
-	function primaryAttributeChart(_ref5) {
-	    var DOM = _ref5.DOM;
-	    var value$ = _ref5.value$;
-	    var race$ = _ref5.race$;
+	function secondaryStatisticEntry(stat, _ref) {
+	    var DOM = _ref.DOM;
+	    var value$ = _ref.value$;
+	    var calculations = _ref.calculations;
 	
-	    var racePrimary$ = race$.map(function (race) {
-	        return _constantsJson.RACE_STATS[race || 'human'] || {};
-	    }).map(function (raceStats) {
-	        return raceStats.primary || {};
-	    }).share();
+	    // const inputView = makeInput(stat.key, 'number', 5, DOM, value$, raceExtrema$.map(toExtrema));
+	    // const extremaVTree$ = raceExtrema$
+	    //     .map(({min, max}) => h('span', [min, '/', max]));
+	    var valueView = (0, _algorithm2['default'])({
+	        equation$: _cycleCore.Rx.Observable['return'](stat.value),
+	        calculations: calculations
+	    });
+	    calculations.set(stat.key, valueView.value$);
 	
-	    var attributes = _constantsJson.PRIMARY_ATTRIBUTES.map(function (attribute) {
-	        return primaryAttribute(attribute, {
+	    return {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(valueView.DOM, valueView.value$.startWith('poo'), function (vTree, value) {
+	            return (0, _cycleDom.h)('div.secondary-statistic.secondary-statistic-' + stat.key + (stat.percent ? '.secondary-statistic-percent' : ''), [(0, _renderRef2['default'])(stat.key, 'stat-label'), (0, _cycleDom.h)('span.stat-value', [value]), vTree]);
+	        }),
+	        value$: valueView.value$
+	    };
+	}
+	
+	function secondaryStatisticChart(_ref2) {
+	    var DOM = _ref2.DOM;
+	    var value$ = _ref2.value$;
+	    var calculations = _ref2.calculations;
+	
+	    var statistics = _modelsSecondaryStatistic2['default'].all().toArray();
+	    var statisticEntries = statistics.map(function (stat) {
+	        return secondaryStatisticEntry(stat, {
 	            DOM: DOM,
 	            value$: value$,
-	            racePrimary$: racePrimary$
+	            calculations: calculations
 	        });
 	    });
 	
-	    var sum$ = _cycleCore.Rx.Observable.combineLatest(attributes.map(function (a) {
-	        return a.value$;
-	    })).map(function (values) {
-	        return values.reduce(function (x, y) {
-	            return x + y;
-	        }, 0);
-	    });
-	
-	    var primaryTotal$ = racePrimary$.map(function (primary) {
-	        return primary.total || 40;
-	    });
-	
-	    var summaryVTree$ = _cycleCore.Rx.Observable.combineLatest(sum$, primaryTotal$, function (sum, primaryTotal) {
-	        return (0, _cycleDom.h)('span', {
-	            className: sum === primaryTotal ? 'same-total' : ''
-	        }, [sum, '/', primaryTotal]);
-	    });
-	
 	    return {
-	        DOM: _cycleCore.Rx.Observable.combineLatest(attributes.map(function (a) {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(statisticEntries.map(function (a) {
 	            return a.DOM;
-	        }).concat([summaryVTree$])).map(function (inputVTrees) {
-	            return (0, _cycleDom.h)('div.primary', inputVTrees);
+	        })).map(function (inputVTrees) {
+	            return (0, _cycleDom.h)('section.secondary', inputVTrees);
 	        }),
-	        value$: (0, _combineLatestObject2['default'])(_constantsJson.PRIMARY_ATTRIBUTES.reduce(function (acc, attribute, i) {
-	            acc[attribute] = attributes[i].value$;
+	        value$: (0, _combineLatestObject2['default'])(statistics.reduce(function (acc, stat, i) {
+	            acc[stat.key] = statisticEntries[i].value$;
 	            return acc;
 	        }, {})).share()
 	    };
@@ -18076,152 +29694,350 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 144 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _Object$keys = __webpack_require__(15)['default'];
-	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	exports['default'] = skills;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var _input = __webpack_require__(29);
+	var _input = __webpack_require__(33);
 	
 	var _input2 = _interopRequireDefault(_input);
 	
-	var _combineLatestObject = __webpack_require__(20);
+	var _combineLatestObject = __webpack_require__(23);
 	
 	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
 	
-	var _constantsJson = __webpack_require__(34);
+	var _modelsPrimaryStatistic = __webpack_require__(74);
 	
-	var _localization = __webpack_require__(147);
+	var _modelsPrimaryStatistic2 = _interopRequireDefault(_modelsPrimaryStatistic);
 	
-	var _localization2 = _interopRequireDefault(_localization);
+	var _modelsSkillCategory = __webpack_require__(182);
 	
-	function toReadableAlgorithm(skill) {
-	    return [skill.base].concat(_constantsJson.PRIMARY_ATTRIBUTES.map(function (attribute) {
-	        var multiplier = skill[attribute];
-	        if (multiplier) {
-	            if (multiplier === 1) {
-	                return (0, _localization2['default'])(attribute);
-	            } else {
-	                return multiplier + '*' + (0, _localization2['default'])(attribute);
-	            }
-	        }
-	    })).filter(function (x) {
-	        return x;
-	    }).join(' + ');
-	}
+	var _modelsSkillCategory2 = _interopRequireDefault(_modelsSkillCategory);
 	
-	function calculateSkill(attributes, skill) {
-	    return [skill.base || 0].concat(_constantsJson.PRIMARY_ATTRIBUTES.map(function (attribute) {
-	        var multiplier = skill[attribute] || 0;
-	        return attributes[attribute] * multiplier;
-	    })).reduce(function (x, y) {
-	        return x + y;
-	    }, 0);
-	}
+	var _algorithm = __webpack_require__(72);
 	
-	function skills(_ref) {
+	var _algorithm2 = _interopRequireDefault(_algorithm);
+	
+	var _modelsEquation = __webpack_require__(36);
+	
+	var _modelsWhen = __webpack_require__(76);
+	
+	var _modelsWhen2 = _interopRequireDefault(_modelsWhen);
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	function makeSkillView(skill, _ref) {
 	    var DOM = _ref.DOM;
-	    var value$ = _ref.value$;
-	    var attributes$ = _ref.attributes$;
+	    var inputTags$ = _ref.inputTags$;
+	    var inputIncrease$ = _ref.inputIncrease$;
+	    var calculations = _ref.calculations;
 	
-	    return {
-	        DOM: attributes$.map(function (attributes) {
-	            return _Object$keys(_constantsJson.SKILLS).map(function (categoryKey) {
-	                var category = _constantsJson.SKILLS[categoryKey];
-	                return (0, _cycleDom.h)('section.skill-category.skill-category-' + categoryKey, [categoryKey].concat(_Object$keys(category).map(function (skillKey) {
-	                    var skill = category[skillKey];
-	                    return (0, _cycleDom.h)('div.skill.skill-' + skillKey, [skillKey, ' ', calculateSkill(attributes, skill), ' ', toReadableAlgorithm(skill)]);
-	                })));
-	            });
-	        }).map(function (vTrees) {
-	            return (0, _cycleDom.h)('div.skills', vTrees);
+	    var tagInput = (0, _input2['default'])('skill-tag-' + skill.key, 'checkbox', {
+	        DOM: DOM,
+	        value$: inputTags$.map(function (tag) {
+	            return tag.indexOf(skill.key) !== -1;
 	        }),
-	        value$: _cycleCore.Rx.Observable['return']({})
+	        props$: _cycleCore.Rx.Observable['return']({
+	            className: 'skill-tag'
+	        })
+	    });
+	    var tagEquation$ = tagInput.value$.map(function (isTagged) {
+	        return new _modelsEquation.BinaryOperation({
+	            type: '+',
+	            left: skill.value,
+	            right: isTagged ? 15 : 0
+	        });
+	    });
+	    var increaseView = (0, _input2['default'])('skill-increase-' + skill.key, 'number', {
+	        DOM: DOM,
+	        value$: inputIncrease$.map(function (increase) {
+	            return increase[skill.key] || 0;
+	        }).startWith(0),
+	        props$: _cycleCore.Rx.Observable['return']({
+	            min: 0,
+	            max: 999,
+	            className: 'skill-increase'
+	        })
+	    });
+	    var equation$ = tagEquation$.combineLatest(increaseView.value$, function (eq, value) {
+	        return new _modelsEquation.BinaryOperation({
+	            type: '+',
+	            left: eq,
+	            right: value
+	        });
+	    });
+	
+	    var algorithmView = (0, _algorithm2['default'])({
+	        equation$: equation$,
+	        calculations: calculations
+	    });
+	    return {
+	        skill: skill,
+	        DOM: _cycleCore.Rx.Observable.combineLatest(algorithmView.DOM, algorithmView.value$, increaseView.DOM, tagInput.DOM, tagInput.value$, function (algorithmDOM, algorithmValue, increase, tag, tagValue) {
+	            return (0, _cycleDom.h)('div.skill.skill-' + skill.key, {
+	                className: tagValue ? 'skill-tagged' : 'skill-untagged'
+	            }, [tag, (0, _cycleDom.h)('span.skill-name', [skill.name]), (0, _cycleDom.h)('span.skill-value', [algorithmValue + '']), increase, algorithmDOM]);
+	        }),
+	        tagged$: tagInput.value$,
+	        increase$: increaseView.value$
+	    };
+	}
+	
+	function makeSkillCategoryView(category, input) {
+	    var skillViews = category.skills.valueSeq().map(function (skill) {
+	        return makeSkillView(skill, input);
+	    }).toArray();
+	    return {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(skillViews.map(function (o) {
+	            return o.DOM;
+	        })).startWith([]).map(function (skillVTrees) {
+	            return (0, _cycleDom.h)('section.skill-category.skill-category-' + category.key, [(0, _cycleDom.h)('span.skill-category-title', [category.name])].concat(skillVTrees));
+	        }),
+	        tagged$: _cycleCore.Rx.Observable.from(skillViews).flatMap(function (_ref2) {
+	            var tagged$ = _ref2.tagged$;
+	            var key = _ref2.skill.key;
+	            return tagged$.map(function (value) {
+	                return function (o) {
+	                    return o.set(key, value);
+	                };
+	            });
+	        }).startWith(_immutable2['default'].Map()).scan(function (acc, modifier) {
+	            return modifier(acc);
+	        }),
+	        increase$: _cycleCore.Rx.Observable.from(skillViews).flatMap(function (_ref3) {
+	            var increase$ = _ref3.increase$;
+	            var key = _ref3.skill.key;
+	            return increase$.map(function (value) {
+	                return function (o) {
+	                    return o.set(key, value);
+	                };
+	            });
+	        }).startWith(_immutable2['default'].Map()).scan(function (acc, modifier) {
+	            return modifier(acc);
+	        })
+	    };
+	}
+	
+	function skills(_ref4) {
+	    var DOM = _ref4.DOM;
+	    var inputValue$ = _ref4.value$;
+	    var calculations = _ref4.calculations;
+	
+	    var inputTags$ = inputValue$.map(function (value) {
+	        return value.tag || [];
+	    }).share();
+	    var inputIncrease$ = inputValue$.map(function (value) {
+	        return value.increase || {};
+	    }).share();
+	    var skillCategoryViews = _modelsSkillCategory2['default'].all().map(function (category) {
+	        return makeSkillCategoryView(category, {
+	            DOM: DOM,
+	            inputTags$: inputTags$,
+	            inputIncrease$: inputIncrease$,
+	            calculations: calculations
+	        });
+	    }).toArray();
+	    return {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(skillCategoryViews.map(function (o) {
+	            return o.DOM;
+	        })).map(function (vTrees) {
+	            return (0, _cycleDom.h)('section.skills', vTrees);
+	        }),
+	        value$: _cycleCore.Rx.Observable.from(skillCategoryViews).flatMap(function (_ref5) {
+	            var tagged$ = _ref5.tagged$;
+	            var increase$ = _ref5.increase$;
+	            return _cycleCore.Rx.Observable.merge(tagged$.map(function (tagged) {
+	                return function (o) {
+	                    return {
+	                        tag: o.tag.merge(tagged),
+	                        increase: o.increase
+	                    };
+	                };
+	            }), increase$.map(function (increase) {
+	                return function (o) {
+	                    return {
+	                        tag: o.tag,
+	                        increase: o.increase.merge(increase)
+	                    };
+	                };
+	            }));
+	        }).startWith({
+	            tag: _immutable2['default'].Map(),
+	            increase: _immutable2['default'].Map()
+	        }).scan(function (acc, modifier) {
+	            return modifier(acc);
+	        }).map(function (_ref6) {
+	            var tag = _ref6.tag;
+	            var increase = _ref6.increase;
+	            return {
+	                tag: tag.toKeyedSeq().filter(function (value) {
+	                    return value;
+	                }).map(function (value, key) {
+	                    return key;
+	                }).sort().toArray(),
+	                increase: increase.toJS()
+	            };
+	        })
 	    };
 	}
 	
 	module.exports = exports['default'];
 
 /***/ },
-/* 145 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _Object$assign = __webpack_require__(30)['default'];
+	var _defineProperty = __webpack_require__(190)['default'];
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	exports['default'] = select;
+	exports['default'] = traits;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _cycleDom = __webpack_require__(6);
 	
-	var FALLBACK_KEY = 'SELECT_FALLBACK';
+	var _input = __webpack_require__(33);
 	
-	function renderOptions(options, value, fallback) {
-	    var hasSelected = false;
-	    var optionsVTree = options.map(function (_ref) {
-	        var optionValue = _ref.value;
-	        var text = _ref.text;
+	var _input2 = _interopRequireDefault(_input);
 	
-	        var selected = value === optionValue;
-	        hasSelected = hasSelected || selected;
-	        return (0, _cycleDom.h)('option', {
-	            key: optionValue,
-	            value: optionValue,
-	            selected: selected
-	        }, [text]);
-	    });
-	    if (fallback && !hasSelected) {
-	        optionsVTree.unshift((0, _cycleDom.h)('option', {
-	            key: FALLBACK_KEY,
-	            selected: true
-	        }, [fallback]));
-	    }
-	    return optionsVTree;
+	var _combineLatestObject = __webpack_require__(23);
+	
+	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
+	
+	var _modelsTrait = __webpack_require__(183);
+	
+	var _modelsTrait2 = _interopRequireDefault(_modelsTrait);
+	
+	var _algorithm = __webpack_require__(72);
+	
+	var _algorithm2 = _interopRequireDefault(_algorithm);
+	
+	var _modelsRace = __webpack_require__(75);
+	
+	var _modelsRace2 = _interopRequireDefault(_modelsRace);
+	
+	// import { TRAITS, PRIMARY_ATTRIBUTES } from '../../constants.json';
+	// import localize from '../../localization';
+	
+	function isTraitChoosable(trait, calculations) {
+	    return (0, _algorithm2['default'])({
+	        equation$: _cycleCore.Rx.Observable['return'](trait.requirements),
+	        calculations: calculations
+	    }).value$;
 	}
 	
-	function select(key, _ref2) {
+	function makeTraitView(trait, value$, DOM, calculations) {
+	    var isChoosable$ = isTraitChoosable(trait, calculations);
+	    var chosenTraitInput = (0, _input2['default'])(trait.key, 'checkbox', {
+	        DOM: DOM,
+	        value$: value$.combineLatest(isChoosable$, function (data, enabled) {
+	            return enabled && data[trait.key] || false;
+	        }),
+	        props$: isChoosable$.map(function (enabled) {
+	            return {
+	                disabled: !enabled
+	            };
+	        })
+	    });
+	    return {
+	        key: trait.key,
+	        DOM: chosenTraitInput.DOM.map(function (inputVTree) {
+	            return (0, _cycleDom.h)('section.trait.trait-' + trait.key, [inputVTree, trait.key, ' - ', getTraitDescription(trait)]);
+	        }),
+	        value$: chosenTraitInput.value$
+	    };
+	}
+	//
+	// function gainLose(name, count) {
+	//     if (count > 0) {
+	//         return 'Gain ' + count + ' ' + name;
+	//     } else if (count < 0) {
+	//         return 'Lose ' + (-count) + ' ' + name;
+	//     } else {
+	//         return '';
+	//     }
+	// }
+	//
+	// const partKeyToDescriptor = {
+	//     actionPoints(value) {
+	//         return gainLose('Action Points', value);
+	//     },
+	//     raceWhitelist(value) {
+	//         return 'Only ' + value.join(', ') + ' can choose this trait';
+	//     },
+	//     raceBlacklist(value) {
+	//         return value.join(', ') + ' cannot choose this trait';
+	//     },
+	// };
+	// PRIMARY_ATTRIBUTES.forEach(attribute => {
+	//     partKeyToDescriptor[attribute] = (value) => gainLose(attribute, value);
+	// });
+	//
+	// function getTraitDescriptionPart(key, value) {
+	//     const descriptor = partKeyToDescriptor[key];
+	//     if (descriptor) {
+	//         return descriptor(value);
+	//     } else {
+	//         return JSON.stringify({
+	//             [key]: value,
+	//         });
+	//     }
+	// }
+	//
+	function getTraitDescription(trait) {
+	    return trait.toString();
+	    return _Object$keys(trait).map(function (key) {
+	        return getTraitDescriptionPart(key, trait[key]);
+	    }).filter(function (x) {
+	        return x;
+	    }).join(', ');
+	}
+	
+	function traits(_ref2) {
 	    var DOM = _ref2.DOM;
 	    var inputValue$ = _ref2.value$;
-	    var options$ = _ref2.options$;
-	    var _ref2$props$ = _ref2.props$;
-	    var props$ = _ref2$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref2$props$;
+	    var calculations = _ref2.calculations;
 	
-	    var selector = 'select.' + key;
-	
-	    var newValue$ = DOM.select(selector).events('change').map(function (ev) {
-	        return ev.target.value;
+	    var allTraitViews = _modelsTrait2['default'].all().toArray().map(function (trait) {
+	        return makeTraitView(trait, inputValue$, DOM, calculations);
 	    });
-	
-	    var value$ = inputValue$.merge(newValue$).distinctUntilChanged().shareReplay(1);
-	
-	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(options$, value$, props$, function (options, value, props) {
-	        return (0, _cycleDom.h)(selector, _Object$assign({
-	            key: key
-	        }, props, {
-	            fallback: undefined
-	        }), renderOptions(options, value, props.fallback));
-	    });
-	
+	    var value$ = _cycleCore.Rx.Observable.from(allTraitViews).flatMap(function (traitView) {
+	        return traitView.value$.map(function (value) {
+	            return _defineProperty({}, traitView.key, !!value);
+	        });
+	    }).merge(inputValue$).scan(function (acc, modifier) {
+	        return _Object$assign({}, acc, modifier);
+	    }, {}).share();
 	    return {
-	        DOM: vtree$,
+	        DOM: _cycleCore.Rx.Observable.combineLatest(allTraitViews.map(function (t) {
+	            return t.DOM;
+	        })).map(function (vTrees) {
+	            return (0, _cycleDom.h)('div.traits', vTrees);
+	        }),
 	        value$: value$
 	    };
 	}
@@ -18229,7 +30045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 146 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18238,17 +30054,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _cycleCore = __webpack_require__(1);
+	var _cycleCore = __webpack_require__(2);
 	
 	function makeLocalStorageSourceDriver(keyName) {
 	    return function () {
-	        return _cycleCore.Rx.Observable.just(localStorage.getItem(keyName));
+	        return _cycleCore.Rx.Observable['return'](localStorage.getItem(keyName));
 	    };
 	}
 	
 	function makeLocalStorageSinkDriver(keyName) {
 	    return function (keyValue$) {
 	        keyValue$.subscribe(function (keyValue) {
+	            console.log('setting to ', keyValue);
 	            localStorage.setItem(keyName, keyValue);
 	        });
 	    };
@@ -18261,113 +30078,815 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 147 */
-/***/ function(module, exports) {
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	var LOCALIZATIONS = {
-	    name: 'Name',
-	    age: 'Age',
-	    race: 'Race',
-	    sex: 'Sex',
-	    weight: 'Weight',
-	    height: 'Height',
-	    eyes: 'Eyes',
-	    hair: 'Hair',
-	    appearance: 'Appearance',
+	exports.name = name;
+	exports.plural = plural;
+	exports.abbr = abbr;
+	exports.description = description;
 	
-	    human: 'Human',
-	    ghoul: 'Ghoul',
-	    alphaMutant: 'Mutant (Alpha)',
-	    betaMutant: 'Mutant (Beta)',
+	var _constants = __webpack_require__(10);
 	
-	    strength: 'STR',
-	    perception: 'PER',
-	    endurance: 'END',
-	    charisma: 'CHA',
-	    intelligence: 'INT',
-	    agility: 'AGI',
-	    luck: 'LCK'
-	};
+	var LOCALE = _constants.LOCALIZATION['en-US'];
 	
-	function localize(key) {
+	function assertString(key) {
 	    if (typeof key !== 'string') {
-	        throw new TypeError(key + ' must be a string');
+	        throw new TypeError('Expected ' + key + ' to be a string');
 	    }
-	    var result = LOCALIZATIONS[key];
-	    if (!result) {
-	        throw new Error('Unknown localization: ' + key);
-	    }
-	    return result;
 	}
 	
-	exports['default'] = localize;
+	function getTranslationGroup(key) {
+	    if (!key) {
+	        return '';
+	    }
+	    assertString(key);
+	    var value = LOCALE[key];
+	    if (!value) {
+	        throw new Error('Unknown localization: "' + key + '"');
+	    }
+	    return value;
+	}
+	
+	function name(key) {
+	    var translation = getTranslationGroup(key);
+	    if (typeof translation === 'string') {
+	        return translation;
+	    }
+	    return translation.name;
+	}
+	
+	function plural(key) {
+	    var translation = getTranslationGroup(key);
+	    if (typeof translation === 'string') {
+	        return translation;
+	    }
+	    return translation.plural || translation.name;
+	}
+	
+	function abbr(key) {
+	    var translation = getTranslationGroup(key);
+	    if (typeof translation === 'string') {
+	        return translation;
+	    }
+	    return translation.abbr || translation.name;
+	}
+	
+	function description(key) {
+	    var translation = getTranslationGroup(key);
+	    if (typeof translation === 'string') {
+	        return '';
+	    }
+	    return translation.description || '';
+	}
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _toConsumableArray = __webpack_require__(79)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$values = __webpack_require__(78)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _ref, _ref2;
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var _When = __webpack_require__(76);
+	
+	var _When2 = _interopRequireDefault(_When);
+	
+	var _Equation = __webpack_require__(36);
+	
+	var _Equation2 = _interopRequireDefault(_Equation);
+	
+	var effectFields = {
+	    $when: null,
+	    $nearby: null
+	};
+	(_ref = ['poisonTypeA', 'poisonTypeB', 'poisonTypeD', 'rads', 'fire']).concat.apply(_ref, [_Object$keys(_constantsJson.PRIMARY_STATISTICS), _Object$keys(_constantsJson.SECONDARY_STATISTICS), _Object$keys(_constantsJson.SKILLS)].concat(_toConsumableArray(_Object$values(_constantsJson.SKILLS).map(function (skill) {
+	    return _Object$keys(skill);
+	})), [_Object$keys(_constantsJson.MISCELLANEOUS)])).forEach(function (key) {
+	    effectFields[key] = 'value';
+	});
+	
+	var VALID_KEYS = (_ref2 = []).concat.apply(_ref2, [_Object$keys(_constantsJson.PRIMARY_STATISTICS), _Object$keys(_constantsJson.SECONDARY_STATISTICS), _Object$keys(_constantsJson.SKILLS)].concat(_toConsumableArray(_Object$values(_constantsJson.SKILLS).map(function (skill) {
+	    return _Object$keys(skill);
+	})), [_Object$keys(_constantsJson.MISCELLANEOUS)])).reduce(function (acc, key) {
+	    acc[key] = 'number';
+	    return acc;
+	}, {
+	    race: 'string',
+	    value: 'number'
+	});
+	
+	function convertEffectValue(key, value, path) {
+	    if (key === '$when') {
+	        return new _When2['default']().mergeDeep({
+	            conditions: _Object$entries(value).filter(function (_ref3) {
+	                var _ref32 = _slicedToArray(_ref3, 1);
+	
+	                var conditionKey = _ref32[0];
+	                return conditionKey !== 'otherwise';
+	            }).reduce(function (acc, _ref4) {
+	                var _ref42 = _slicedToArray(_ref4, 2);
+	
+	                var conditionKey = _ref42[0];
+	                var conditionValue = _ref42[1];
+	
+	                acc[conditionKey] = Effect.from(conditionValue, path + '.' + conditionKey);
+	                return acc;
+	            }, {}),
+	            otherwise: value.otherwise || new Effect()
+	        });
+	    }
+	    if (key === '$nearby') {
+	        return Effect.from(value, path);
+	    }
+	    if (!VALID_KEYS[key]) {
+	        throw new Error('Unknown key: \'' + key + '\' at ' + path);
+	    }
+	    return (0, _Equation2['default'])(value, path, VALID_KEYS, VALID_KEYS[key]);
+	}
+	
+	var Effect = (0, _withNiceToString2['default'])(_immutable2['default'].Record(effectFields, 'Effect'), effectFields);
+	Effect.from = function (object, path) {
+	    return new Effect().mergeDeep(_Object$entries(object || {}).reduce(function (acc, _ref5) {
+	        var _ref52 = _slicedToArray(_ref5, 2);
+	
+	        var key = _ref52[0];
+	        var value = _ref52[1];
+	
+	        acc[key] = convertEffectValue(key, value, path + '.' + key);
+	        return acc;
+	    }, {}));
+	};
+	exports['default'] = Effect;
 	module.exports = exports['default'];
 
 /***/ },
-/* 148 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(150), __esModule: true };
+	'use strict';
+	
+	var _get = __webpack_require__(27)['default'];
+	
+	var _inherits = __webpack_require__(28)['default'];
+	
+	var _createClass = __webpack_require__(26)['default'];
+	
+	var _classCallCheck = __webpack_require__(19)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var RangeRecord = new _immutable2['default'].Record({
+	    min: 0,
+	    max: 0
+	});
+	
+	var Range = (function (_RangeRecord) {
+	    _inherits(Range, _RangeRecord);
+	
+	    function Range(min, max) {
+	        _classCallCheck(this, Range);
+	
+	        _get(Object.getPrototypeOf(Range.prototype), 'constructor', this).call(this, {
+	            min: min,
+	            max: max
+	        });
+	    }
+	
+	    _createClass(Range, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return this.min + '..' + this.max;
+	        }
+	    }]);
+	
+	    return Range;
+	})(RangeRecord);
+	
+	exports['default'] = Range;
+	module.exports = exports['default'];
 
 /***/ },
-/* 149 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(151), __esModule: true };
+	'use strict';
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _Equation = __webpack_require__(36);
+	
+	var _Equation2 = _interopRequireDefault(_Equation);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var fields = {
+	    key: '',
+	    value: 0,
+	    percent: false
+	};
+	
+	var VALID_KEYS = [].concat(_Object$keys(_constantsJson.PRIMARY_STATISTICS), _Object$keys(_constantsJson.SECONDARY_STATISTICS), _Object$keys(_constantsJson.MISCELLANEOUS)).reduce(function (acc, key) {
+	    acc[key] = 'number';
+	    return acc;
+	}, {});
+	
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'SecondaryStatistic')), {
+	    get: function get(key) {
+	        var stats = _constantsJson.SECONDARY_STATISTICS[key];
+	        if (!stats) {
+	            return null;
+	        }
+	        stats = _Object$assign({}, stats);
+	        stats.value = (0, _Equation2['default'])(stats.value, 'SECONDARY_STATISTICS.' + key, VALID_KEYS, 'number');
+	        return new this({
+	            key: key
+	        }).mergeDeep(stats);
+	    },
+	    all: function all() {
+	        var _this = this;
+	
+	        return _immutable2['default'].Set(_Object$keys(_constantsJson.SECONDARY_STATISTICS).map(function (key) {
+	            return _this.get(key);
+	        }));
+	    }
+	}), fields);
+	module.exports = exports['default'];
 
 /***/ },
-/* 150 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(67);
-	__webpack_require__(66);
-	module.exports = __webpack_require__(172);
+	'use strict';
+	
+	var _toConsumableArray = __webpack_require__(79)['default'];
+	
+	var _slicedToArray = __webpack_require__(12)['default'];
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$values = __webpack_require__(78)['default'];
+	
+	var _Object$entries = __webpack_require__(18)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _Equation = __webpack_require__(36);
+	
+	var _Equation2 = _interopRequireDefault(_Equation);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var fields = {
+	    key: '',
+	    value: 0,
+	    percent: false
+	};
+	
+	var VALID_KEYS = [].concat(_Object$keys(_constantsJson.SKILLS), _Object$keys(_constantsJson.PRIMARY_STATISTICS)).reduce(function (acc, key) {
+	    acc[key] = 'number';
+	    return acc;
+	}, {});
+	
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'Skill')), {
+	    get: function get(key) {
+	        var _ref,
+	            _this = this;
+	
+	        return (_ref = []).concat.apply(_ref, _toConsumableArray(_Object$values(_constantsJson.SKILLS).map(function (category) {
+	            return _Object$entries(category);
+	        }))).filter(function (_ref2) {
+	            var _ref22 = _slicedToArray(_ref2, 1);
+	
+	            var skillName = _ref22[0];
+	            return skillName === key;
+	        }).map(function (_ref3) {
+	            var _ref32 = _slicedToArray(_ref3, 2);
+	
+	            var skillName = _ref32[0];
+	            var skill = _ref32[1];
+	            return skill;
+	        }).map(function (skill) {
+	            skill = _Object$assign({}, skill);
+	            skill.value = (0, _Equation2['default'])(skill.value, 'SKILLS.' + key + '.value', VALID_KEYS, 'number');
+	            return new _this({
+	                key: key
+	            }).mergeDeep(skill);
+	        })[0] || null;
+	    },
+	    all: function all() {
+	        var _ref4,
+	            _this2 = this;
+	
+	        return _immutable2['default'].Set((_ref4 = []).concat.apply(_ref4, _toConsumableArray(_Object$values(_constantsJson.SKILLS).map(function (category) {
+	            return _Object$keys(category);
+	        }))).map(function (key) {
+	            return _this2.get(key);
+	        }));
+	    }
+	}), fields);
+	module.exports = exports['default'];
 
 /***/ },
-/* 151 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(67);
-	__webpack_require__(66);
-	module.exports = __webpack_require__(173);
+	'use strict';
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _Skill = __webpack_require__(181);
+	
+	var _Skill2 = _interopRequireDefault(_Skill);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var fields = {
+	    key: '',
+	    skills: _immutable2['default'].Map()
+	};
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'SkillCategory')), {
+	    get: function get(key) {
+	        var category = _constantsJson.SKILLS[key];
+	        if (!category) {
+	            return null;
+	        }
+	        return new this({
+	            key: key
+	        }).mergeDeep({
+	            skills: _Object$keys(category).reduce(function (acc, key) {
+	                acc[key] = _Skill2['default'].get(key);
+	                return acc;
+	            }, {})
+	        });
+	    },
+	    all: function all() {
+	        var _this = this;
+	
+	        return _immutable2['default'].Set(_Object$keys(_constantsJson.SKILLS).map(function (key) {
+	            return _this.get(key);
+	        }));
+	    }
+	}), fields);
+	module.exports = exports['default'];
 
 /***/ },
-/* 152 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(175);
-	module.exports = __webpack_require__(8).Object.assign;
+	'use strict';
+	
+	var _Object$keys = __webpack_require__(3)['default'];
+	
+	var _Object$assign = __webpack_require__(17)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _immutable = __webpack_require__(5);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
+	var _withLocalization = __webpack_require__(24);
+	
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
+	
+	var _withLookup = __webpack_require__(25);
+	
+	var _withLookup2 = _interopRequireDefault(_withLookup);
+	
+	var _withNiceToString = __webpack_require__(16);
+	
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
+	
+	var _Equation = __webpack_require__(36);
+	
+	var _Equation2 = _interopRequireDefault(_Equation);
+	
+	var _constantsJson = __webpack_require__(10);
+	
+	var _Effect = __webpack_require__(178);
+	
+	var _Effect2 = _interopRequireDefault(_Effect);
+	
+	var fields = {
+	    key: '',
+	    meta: '',
+	    requirements: true,
+	    effect: new _Effect2['default']()
+	};
+	
+	var VALID_KEYS = [].concat().reduce(function (acc, key) {
+	    acc[key] = 'number';
+	    return acc;
+	}, ['race'].concat(_Object$keys(_constantsJson.RACES)).reduce(function (acc, key) {
+	    acc[key] = 'string';
+	    return acc;
+	}, {}));
+	
+	exports['default'] = (0, _withNiceToString2['default'])((0, _withLookup2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'Trait')), {
+	    get: function get(key) {
+	        var trait = _constantsJson.TRAITS[key];
+	        if (!trait) {
+	            return null;
+	        }
+	        trait = _Object$assign({}, trait);
+	        var path = 'TRAITS.' + key;
+	        var requirements = (0, _Equation2['default'])(trait.requirements, path + '.requirements', VALID_KEYS, 'boolean');
+	        delete trait.requirements;
+	        var meta = trait.meta || fields.meta;
+	        delete trait.meta;
+	        var effect = _Effect2['default'].from(trait, path);
+	        return new this({
+	            key: key
+	        }).mergeDeep({
+	            requirements: requirements,
+	            effect: effect,
+	            meta: meta
+	        });
+	    },
+	    all: function all() {
+	        var _this = this;
+	
+	        return _immutable2['default'].Set(_Object$keys(_constantsJson.TRAITS).map(function (key) {
+	            return _this.get(key);
+	        }));
+	    }
+	}), fields);
+	module.exports = exports['default'];
 
 /***/ },
-/* 153 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(176);
-	module.exports = __webpack_require__(8).Object.keys;
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	// Get the right animation frame method
+	var requestAnimFrame = undefined;
+	var cancelAnimFrame = undefined;
+	var root = window;
+	if (root.requestAnimationFrame) {
+	    requestAnimFrame = root.requestAnimationFrame;
+	    cancelAnimFrame = root.cancelAnimationFrame;
+	} else if (root.mozRequestAnimationFrame) {
+	    requestAnimFrame = root.mozRequestAnimationFrame;
+	    cancelAnimFrame = root.mozCancelAnimationFrame;
+	} else if (root.webkitRequestAnimationFrame) {
+	    requestAnimFrame = root.webkitRequestAnimationFrame;
+	    cancelAnimFrame = root.webkitCancelAnimationFrame;
+	} else if (root.msRequestAnimationFrame) {
+	    requestAnimFrame = root.msRequestAnimationFrame;
+	    cancelAnimFrame = root.msCancelAnimationFrame;
+	} else if (root.oRequestAnimationFrame) {
+	    requestAnimFrame = root.oRequestAnimationFrame;
+	    cancelAnimFrame = root.oCancelAnimationFrame;
+	} else {
+	    requestAnimFrame = function (cb) {
+	        root.setTimeout(cb, 1000 / 60);
+	    };
+	    cancelAnimFrame = root.clearTimeout;
+	}
+	
+	exports['default'] = (function () {
+	
+	    var currentTimer = null;
+	    function scheduleNow(state, action) {
+	        var scheduler = this;
+	        var disposable = new _cycleCore.Rx.SingleAssignmentDisposable();
+	        var id = requestAnimFrame(function () {
+	            !disposable.isDisposed && disposable.setDisposable(action(scheduler, state));
+	        });
+	        return new _cycleCore.Rx.CompositeDisposable(disposable, _cycleCore.Rx.Disposable.create(function () {
+	            cancelAnimFrame(id);
+	        }));
+	    }
+	
+	    function scheduleRelative(state, dueTime, action) {
+	        var scheduler = this;
+	        var dt = _cycleCore.Rx.Scheduler.normalize(dueTime);
+	        if (dt === 0) {
+	            return scheduler.scheduleWithState(state, action);
+	        }
+	        var disposable = new _cycleCore.Rx.SingleAssignmentDisposable();
+	        var id = root.setTimeout(function () {
+	            if (!disposable.isDisposed) {
+	                disposable.setDisposable(action(scheduler, state));
+	            }
+	        }, dt);
+	        return new _cycleCore.Rx.CompositeDisposable(disposable, _cycleCore.Rx.Disposable.create(function () {
+	            root.clearTimeout(id);
+	        }));
+	    }
+	
+	    function scheduleAbsolute(state, dueTime, action) {
+	        return this.scheduleWithRelativeAndState(state, dueTime - this.now(), action);
+	    }
+	
+	    return new _cycleCore.Rx.Scheduler(Date.now, scheduleNow, scheduleRelative, scheduleAbsolute);
+	})();
+	
+	module.exports = exports['default'];
 
 /***/ },
-/* 154 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(157);
+	module.exports = { "default": __webpack_require__(193), __esModule: true };
+
+/***/ },
+/* 186 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(194), __esModule: true };
+
+/***/ },
+/* 187 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(196), __esModule: true };
+
+/***/ },
+/* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(199), __esModule: true };
+
+/***/ },
+/* 189 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(201), __esModule: true };
+
+/***/ },
+/* 190 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$defineProperty = __webpack_require__(44)["default"];
+	
+	exports["default"] = function (obj, key, value) {
+	  if (key in obj) {
+	    _Object$defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+	
+	  return obj;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 191 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports["default"] = function (obj) {
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};
+	
+	    if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }
+	
+	    newObj["default"] = obj;
+	    return newObj;
+	  }
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 192 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(50);
+	__webpack_require__(223);
+	module.exports = __webpack_require__(4).Array.from;
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(94);
+	__webpack_require__(50);
+	module.exports = __webpack_require__(221);
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(94);
+	__webpack_require__(50);
+	module.exports = __webpack_require__(222);
+
+/***/ },
+/* 195 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(225);
+	module.exports = __webpack_require__(4).Object.assign;
+
+/***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(9);
+	module.exports = function create(P, D){
+	  return $.create(P, D);
+	};
+
+/***/ },
+/* 197 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(9);
+	module.exports = function defineProperty(it, key, desc){
+	  return $.setDesc(it, key, desc);
+	};
+
+/***/ },
+/* 198 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(229);
+	module.exports = __webpack_require__(4).Object.entries;
+
+/***/ },
+/* 199 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(9);
+	__webpack_require__(226);
+	module.exports = function getOwnPropertyDescriptor(it, key){
+	  return $.getDesc(it, key);
+	};
+
+/***/ },
+/* 200 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(227);
+	module.exports = __webpack_require__(4).Object.keys;
+
+/***/ },
+/* 201 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(228);
+	module.exports = __webpack_require__(4).Object.setPrototypeOf;
+
+/***/ },
+/* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(230);
+	module.exports = __webpack_require__(4).Object.values;
+
+/***/ },
+/* 203 */
+/***/ function(module, exports) {
+
 	module.exports = function(it){
-	  if(!isObject(it))throw TypeError(it + ' is not an object!');
+	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
 	  return it;
 	};
 
 /***/ },
-/* 155 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.1 Object.assign(target, source, ...)
-	var toObject = __webpack_require__(65)
-	  , IObject  = __webpack_require__(61)
-	  , enumKeys = __webpack_require__(156);
+	var toObject = __webpack_require__(49)
+	  , IObject  = __webpack_require__(85)
+	  , enumKeys = __webpack_require__(205);
 	/* eslint-disable no-unused-vars */
 	module.exports = Object.assign || function assign(target, source){
 	/* eslint-enable no-unused-vars */
@@ -18386,11 +30905,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 156 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// all enumerable object keys, includes symbols
-	var $ = __webpack_require__(22);
+	var $ = __webpack_require__(9);
 	module.exports = function(it){
 	  var keys       = $.getKeys(it)
 	    , getSymbols = $.getSymbols;
@@ -18405,39 +30924,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 157 */
-/***/ function(module, exports) {
+/* 206 */
+/***/ function(module, exports, __webpack_require__) {
 
-	// http://jsperf.com/core-js-isobject
+	// check on default Array iterator
+	var Iterators = __webpack_require__(29)
+	  , ITERATOR  = __webpack_require__(13)('iterator');
 	module.exports = function(it){
-	  return it !== null && (typeof it == 'object' || typeof it == 'function');
+	  return (Iterators.Array || Array.prototype[ITERATOR]) === it;
 	};
 
 /***/ },
-/* 158 */
+/* 207 */
 /***/ function(module, exports) {
 
 	// Safari has buggy iterators w/o `next`
 	module.exports = 'keys' in [] && !('next' in [].keys());
 
 /***/ },
-/* 159 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-	var $ = __webpack_require__(22)
-	  , IteratorPrototype = {};
-	
-	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-	__webpack_require__(21)(IteratorPrototype, __webpack_require__(11)('iterator'), function(){ return this; });
-	
-	module.exports = function(Constructor, NAME, next){
-	  Constructor.prototype = $.create(IteratorPrototype, {next: __webpack_require__(63)(1,next)});
-	  __webpack_require__(64)(Constructor, NAME + ' Iterator');
+	// call something on iterator step with safe closing on error
+	var anObject = __webpack_require__(45);
+	module.exports = function(iterator, fn, value, entries){
+	  try {
+	    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+	  // 7.4.6 IteratorClose(iterator, completion)
+	  } catch(e){
+	    var ret = iterator['return'];
+	    if(ret !== undefined)anObject(ret.call(iterator));
+	    throw e;
+	  }
 	};
 
 /***/ },
-/* 160 */
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $ = __webpack_require__(9)
+	  , IteratorPrototype = {};
+	
+	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+	__webpack_require__(37)(IteratorPrototype, __webpack_require__(13)('iterator'), function(){ return this; });
+	
+	module.exports = function(Constructor, NAME, next){
+	  Constructor.prototype = $.create(IteratorPrototype, {next: __webpack_require__(90)(1,next)});
+	  __webpack_require__(91)(Constructor, NAME + ' Iterator');
+	};
+
+/***/ },
+/* 210 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var SYMBOL_ITERATOR = __webpack_require__(13)('iterator')
+	  , SAFE_CLOSING    = false;
+	try {
+	  var riter = [7][SYMBOL_ITERATOR]();
+	  riter['return'] = function(){ SAFE_CLOSING = true; };
+	  Array.from(riter, function(){ throw 2; });
+	} catch(e){ /* empty */ }
+	module.exports = function(exec){
+	  if(!SAFE_CLOSING)return false;
+	  var safe = false;
+	  try {
+	    var arr  = [7]
+	      , iter = arr[SYMBOL_ITERATOR]();
+	    iter.next = function(){ safe = true; };
+	    arr[SYMBOL_ITERATOR] = function(){ return iter; };
+	    exec(arr);
+	  } catch(e){ /* empty */ }
+	  return safe;
+	};
+
+/***/ },
+/* 211 */
 /***/ function(module, exports) {
 
 	module.exports = function(done, value){
@@ -18445,35 +31007,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 161 */
+/* 212 */
 /***/ function(module, exports) {
 
 	module.exports = true;
 
 /***/ },
-/* 162 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// most Object methods by ES6 should accept primitives
-	module.exports = function(KEY, exec){
-	  var $def = __webpack_require__(31)
-	    , fn   = (__webpack_require__(8).Object || {})[KEY] || Object[KEY]
-	    , exp  = {};
-	  exp[KEY] = exec(fn);
-	  $def($def.S + $def.F * __webpack_require__(59)(function(){ fn(1); }), 'Object', exp);
+	module.exports = __webpack_require__(37);
+
+/***/ },
+/* 214 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Works with __proto__ only. Old v8 can't work with null proto objects.
+	/* eslint-disable no-proto */
+	var getDesc  = __webpack_require__(9).getDesc
+	  , isObject = __webpack_require__(86)
+	  , anObject = __webpack_require__(45);
+	var check = function(O, proto){
+	  anObject(O);
+	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
+	};
+	module.exports = {
+	  set: Object.setPrototypeOf || ('__proto__' in {} // eslint-disable-line
+	    ? function(buggy, set){
+	        try {
+	          set = __webpack_require__(82)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+	          set({}, []);
+	        } catch(e){ buggy = true; }
+	        return function setPrototypeOf(O, proto){
+	          check(O, proto);
+	          if(buggy)O.__proto__ = proto;
+	          else set(O, proto);
+	          return O;
+	        };
+	      }()
+	    : undefined),
+	  check: check
 	};
 
 /***/ },
-/* 163 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(21);
-
-/***/ },
-/* 164 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var global = __webpack_require__(33)
+	var global = __webpack_require__(47)
 	  , SHARED = '__core-js_shared__'
 	  , store  = global[SHARED] || (global[SHARED] = {});
 	module.exports = function(key){
@@ -18481,13 +31061,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 165 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// true  -> String#at
 	// false -> String#codePointAt
-	var toInteger = __webpack_require__(167)
-	  , defined   = __webpack_require__(32);
+	var toInteger = __webpack_require__(92)
+	  , defined   = __webpack_require__(46);
 	module.exports = function(TO_STRING){
 	  return function(that, pos){
 	    var s = String(defined(that))
@@ -18504,38 +31084,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 166 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Thank's IE8 for his funny defineProperty
-	module.exports = !__webpack_require__(59)(function(){
+	module.exports = !__webpack_require__(83)(function(){
 	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 	});
 
 /***/ },
-/* 167 */
-/***/ function(module, exports) {
-
-	// 7.1.4 ToInteger
-	var ceil  = Math.ceil
-	  , floor = Math.floor;
-	module.exports = function(it){
-	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-	};
-
-/***/ },
-/* 168 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// to indexed object, toObject with fallback for non-array-like ES3 strings
-	var IObject = __webpack_require__(61)
-	  , defined = __webpack_require__(32);
+	// 7.1.15 ToLength
+	var toInteger = __webpack_require__(92)
+	  , min       = Math.min;
 	module.exports = function(it){
-	  return IObject(defined(it));
+	  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 	};
 
 /***/ },
-/* 169 */
+/* 219 */
 /***/ function(module, exports) {
 
 	var id = 0
@@ -18545,61 +31114,88 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 170 */
+/* 220 */
 /***/ function(module, exports) {
 
 	module.exports = function(){ /* empty */ };
 
 /***/ },
-/* 171 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var classof   = __webpack_require__(57)
-	  , ITERATOR  = __webpack_require__(11)('iterator')
-	  , Iterators = __webpack_require__(17);
-	module.exports = __webpack_require__(8).getIteratorMethod = function(it){
-	  if(it != undefined)return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
-	};
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var anObject = __webpack_require__(154)
-	  , get      = __webpack_require__(171);
-	module.exports = __webpack_require__(8).getIterator = function(it){
+	var anObject = __webpack_require__(45)
+	  , get      = __webpack_require__(93);
+	module.exports = __webpack_require__(4).getIterator = function(it){
 	  var iterFn = get(it);
 	  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
 	  return anObject(iterFn.call(it));
 	};
 
 /***/ },
-/* 173 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var classof   = __webpack_require__(57)
-	  , ITERATOR  = __webpack_require__(11)('iterator')
-	  , Iterators = __webpack_require__(17);
-	module.exports = __webpack_require__(8).isIterable = function(it){
+	var classof   = __webpack_require__(80)
+	  , ITERATOR  = __webpack_require__(13)('iterator')
+	  , Iterators = __webpack_require__(29);
+	module.exports = __webpack_require__(4).isIterable = function(it){
 	  var O = Object(it);
 	  return ITERATOR in O || '@@iterator' in O || Iterators.hasOwnProperty(classof(O));
 	};
 
 /***/ },
-/* 174 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var setUnscope = __webpack_require__(170)
-	  , step       = __webpack_require__(160)
-	  , Iterators  = __webpack_require__(17)
-	  , toIObject  = __webpack_require__(168);
+	var ctx         = __webpack_require__(82)
+	  , $def        = __webpack_require__(20)
+	  , toObject    = __webpack_require__(49)
+	  , call        = __webpack_require__(208)
+	  , isArrayIter = __webpack_require__(206)
+	  , toLength    = __webpack_require__(218)
+	  , getIterFn   = __webpack_require__(93);
+	$def($def.S + $def.F * !__webpack_require__(210)(function(iter){ Array.from(iter); }), 'Array', {
+	  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+	  from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
+	    var O       = toObject(arrayLike)
+	      , C       = typeof this == 'function' ? this : Array
+	      , mapfn   = arguments[1]
+	      , mapping = mapfn !== undefined
+	      , index   = 0
+	      , iterFn  = getIterFn(O)
+	      , length, result, step, iterator;
+	    if(mapping)mapfn = ctx(mapfn, arguments[2], 2);
+	    // if object isn't iterable or it's array with default iterator - use simple case
+	    if(iterFn != undefined && !(C == Array && isArrayIter(iterFn))){
+	      for(iterator = iterFn.call(O), result = new C; !(step = iterator.next()).done; index++){
+	        result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
+	      }
+	    } else {
+	      for(result = new C(length = toLength(O.length)); length > index; index++){
+	        result[index] = mapping ? mapfn(O[index], index) : O[index];
+	      }
+	    }
+	    result.length = index;
+	    return result;
+	  }
+	});
+
+/***/ },
+/* 224 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var setUnscope = __webpack_require__(220)
+	  , step       = __webpack_require__(211)
+	  , Iterators  = __webpack_require__(29)
+	  , toIObject  = __webpack_require__(48);
 	
 	// 22.1.3.4 Array.prototype.entries()
 	// 22.1.3.13 Array.prototype.keys()
 	// 22.1.3.29 Array.prototype.values()
 	// 22.1.3.30 Array.prototype[@@iterator]()
-	__webpack_require__(62)(Array, 'Array', function(iterated, kind){
+	__webpack_require__(87)(Array, 'Array', function(iterated, kind){
 	  this._t = toIObject(iterated); // target
 	  this._i = 0;                   // next index
 	  this._k = kind;                // kind
@@ -18625,28 +31221,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	setUnscope('entries');
 
 /***/ },
-/* 175 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
-	var $def = __webpack_require__(31);
-	$def($def.S, 'Object', {assign: __webpack_require__(155)});
+	var $def = __webpack_require__(20);
+	$def($def.S, 'Object', {assign: __webpack_require__(204)});
 
 /***/ },
-/* 176 */
+/* 226 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+	var toIObject = __webpack_require__(48);
+	
+	__webpack_require__(88)('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor){
+	  return function getOwnPropertyDescriptor(it, key){
+	    return $getOwnPropertyDescriptor(toIObject(it), key);
+	  };
+	});
+
+/***/ },
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 Object.keys(O)
-	var toObject = __webpack_require__(65);
+	var toObject = __webpack_require__(49);
 	
-	__webpack_require__(162)('keys', function($keys){
+	__webpack_require__(88)('keys', function($keys){
 	  return function keys(it){
 	    return $keys(toObject(it));
 	  };
 	});
 
 /***/ },
-/* 177 */
+/* 228 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.3.19 Object.setPrototypeOf(O, proto)
+	var $def = __webpack_require__(20);
+	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(214).set});
+
+/***/ },
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// http://goo.gl/XkBrjD
+	var $def     = __webpack_require__(20)
+	  , $entries = __webpack_require__(89)(true);
+	
+	$def($def.S, 'Object', {
+	  entries: function entries(it){
+	    return $entries(it);
+	  }
+	});
+
+/***/ },
+/* 230 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// http://goo.gl/XkBrjD
+	var $def    = __webpack_require__(20)
+	  , $values = __webpack_require__(89)(false);
+	
+	$def($def.S, 'Object', {
+	  values: function values(it){
+	    return $values(it);
+	  }
+	});
+
+/***/ },
+/* 231 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -18662,7 +31307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 178 */
+/* 232 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -18758,13 +31403,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 179 */
+/* 233 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 180 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__, __webpack_module_template_argument_0__, __webpack_module_template_argument_1__) {
 
 	'use strict';
@@ -18773,189 +31418,104 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 181 */
+/* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _defineProperty = __webpack_require__(183)['default'];
+	var _Object$keys = __webpack_require__(3)['default'];
 	
-	var _Object$keys = __webpack_require__(15)['default'];
-	
-	var _Object$assign = __webpack_require__(30)['default'];
-	
-	var _interopRequireDefault = __webpack_require__(16)['default'];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 	
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
-	exports['default'] = traits;
 	
-	var _cycleCore = __webpack_require__(1);
+	var _immutable = __webpack_require__(5);
 	
-	var _cycleDom = __webpack_require__(5);
+	var _immutable2 = _interopRequireDefault(_immutable);
 	
-	var _input = __webpack_require__(29);
+	var _Range = __webpack_require__(179);
 	
-	var _input2 = _interopRequireDefault(_input);
+	var _Range2 = _interopRequireDefault(_Range);
 	
-	var _combineLatestObject = __webpack_require__(20);
+	var _withLocalization = __webpack_require__(24);
 	
-	var _combineLatestObject2 = _interopRequireDefault(_combineLatestObject);
+	var _withLocalization2 = _interopRequireDefault(_withLocalization);
 	
-	var _constantsJson = __webpack_require__(34);
+	var _withLookup = __webpack_require__(25);
 	
-	var _localization = __webpack_require__(147);
+	var _withLookup2 = _interopRequireDefault(_withLookup);
 	
-	var _localization2 = _interopRequireDefault(_localization);
+	var _withNiceToString = __webpack_require__(16);
 	
-	function isTraitChoosable(trait, race$) {
-	    if (trait.raceWhitelist) {
-	        return race$.map(function (race) {
-	            return trait.raceWhitelist.indexOf(race) !== -1;
-	        });
-	    }
-	    if (trait.raceBlacklist) {
-	        return race$.map(function (race) {
-	            return trait.raceBlacklist.indexOf(race) === -1;
-	        });
-	    }
-	    return _cycleCore.Rx.Observable['return'](true);
-	}
+	var _withNiceToString2 = _interopRequireDefault(_withNiceToString);
 	
-	function makeTrait(traitKey, value$, DOM, race$) {
-	    var trait = _constantsJson.TRAITS[traitKey];
-	    var chosenTraitInput = (0, _input2['default'])(traitKey, 'checkbox', {
-	        DOM: DOM,
-	        value$: value$.map(function (data) {
-	            return data[traitKey] || false;
-	        }),
-	        props$: isTraitChoosable(trait, race$).map(function (enabled) {
-	            return {
-	                disabled: !enabled
-	            };
-	        })
-	    });
-	    return {
-	        traitKey: traitKey,
-	        DOM: (0, _cycleDom.h)('section.trait.trait-' + traitKey, [chosenTraitInput.DOM, traitKey, ' - ', getTraitDescription(trait)]),
-	        value$: chosenTraitInput.value$
-	    };
-	}
+	var _constantsJson = __webpack_require__(10);
 	
-	function gainLose(name, count) {
-	    if (count > 0) {
-	        return 'Gain ' + count + ' ' + name;
-	    } else if (count < 0) {
-	        return 'Lose ' + -count + ' ' + name;
-	    } else {
-	        return '';
-	    }
-	}
+	var _Equation = __webpack_require__(36);
 	
-	var partKeyToDescriptor = {
-	    actionPoints: function actionPoints(value) {
-	        return gainLose('Action Points', value);
-	    },
-	    raceWhitelist: function raceWhitelist(value) {
-	        return 'Only ' + value.join(', ') + ' can choose this trait';
-	    },
-	    raceBlacklist: function raceBlacklist(value) {
-	        return value.join(', ') + ' cannot choose this trait';
-	    }
+	var _Equation2 = _interopRequireDefault(_Equation);
+	
+	var _Effect = __webpack_require__(178);
+	
+	var _Effect2 = _interopRequireDefault(_Effect);
+	
+	var fields = {
+	    key: ''
 	};
-	_constantsJson.PRIMARY_ATTRIBUTES.forEach(function (attribute) {
-	    partKeyToDescriptor[attribute] = function (value) {
-	        return gainLose(attribute, value);
-	    };
-	});
+	exports['default'] = (0, _withLookup2['default'])((0, _withNiceToString2['default'])((0, _withLocalization2['default'])(_immutable2['default'].Record(fields, 'Condition')), fields), {
+	    get: function get(key) {
+	        var stats = _constantsJson.CONDITIONS[key];
+	        if (!stats) {
+	            return null;
+	        }
+	        return new this({
+	            key: key
+	        }).mergeDeep(stats);
+	    },
+	    getOrDefault: function getOrDefault(key) {
+	        return this.get(key) || new this();
+	    },
+	    all: function all() {
+	        var _this = this;
 	
-	function getTraitDescriptionPart(key, value) {
-	    var descriptor = partKeyToDescriptor[key];
-	    if (descriptor) {
-	        return descriptor(value);
-	    } else {
-	        return JSON.stringify(_defineProperty({}, key, value));
+	        return _immutable2['default'].Set(_Object$keys(_constantsJson.CONDITIONS).map(function (key) {
+	            return _this.get(key);
+	        }));
 	    }
-	}
-	
-	function getTraitDescription(trait) {
-	    return _Object$keys(trait).map(function (key) {
-	        return getTraitDescriptionPart(key, trait[key]);
-	    }).filter(function (x) {
-	        return x;
-	    }).join(', ');
-	}
-	
-	function traits(_ref2) {
-	    var DOM = _ref2.DOM;
-	    var inputValue$ = _ref2.value$;
-	    var race$ = _ref2.race$;
-	
-	    var defaultedRace$ = race$.startWith('');
-	    var allTraits = _Object$keys(_constantsJson.TRAITS).map(function (traitKey) {
-	        return makeTrait(traitKey, inputValue$, DOM, defaultedRace$);
-	    });
-	    var value$ = _cycleCore.Rx.Observable.from(allTraits).flatMap(function (t) {
-	        return t.value$.map(function (value) {
-	            return _defineProperty({}, t.traitKey, !!value);
-	        });
-	    }).merge(inputValue$).scan(function (acc, modifier) {
-	        return _Object$assign({}, acc, modifier);
-	    }, {});
-	    return {
-	        DOM: _cycleCore.Rx.Observable['return'](null).map(function () {
-	            return allTraits.map(function (t) {
-	                return t.DOM;
-	            });
-	        }).map(function (vTrees) {
-	            return (0, _cycleDom.h)('div.traits', vTrees);
-	        }),
-	        value$: value$
-	    };
-	}
-	
+	});
 	module.exports = exports['default'];
 
 /***/ },
-/* 182 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(184), __esModule: true };
-
-/***/ },
-/* 183 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
+	'use strict';
 	
-	var _Object$defineProperty = __webpack_require__(182)["default"];
+	var _interopRequireWildcard = __webpack_require__(191)['default'];
 	
-	exports["default"] = function (obj, key, value) {
-	  if (key in obj) {
-	    _Object$defineProperty(obj, key, {
-	      value: value,
-	      enumerable: true,
-	      configurable: true,
-	      writable: true
-	    });
-	  } else {
-	    obj[key] = value;
-	  }
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
 	
-	  return obj;
+	var _cycleDom = __webpack_require__(6);
+	
+	var _localize = __webpack_require__(177);
+	
+	var localize = _interopRequireWildcard(_localize);
+	
+	exports['default'] = function (key, className) {
+	    var fullClassName = '.ref-' + key + (className ? '.' + className : '');
+	    var name = localize.name(key);
+	    var abbr = localize.abbr(key);
+	    var vTree = name === abbr ? (0, _cycleDom.h)('span' + fullClassName, [name]) : (0, _cycleDom.h)('abbr' + fullClassName, {
+	        title: name
+	    }, [abbr]);
+	    return vTree;
 	};
 	
-	exports.__esModule = true;
-
-/***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(22);
-	module.exports = function defineProperty(it, key, desc){
-	  return $.setDesc(it, key, desc);
-	};
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])))

@@ -3,6 +3,139 @@
 <head>
 	<meta charset="utf-8">
 	<title>Fallout PnP Character Sheet</title>
+	<style>
+	  .algorithm {
+		  display: inline-block;
+	  }
+
+	  .algorithm .binary::before {
+		  content: "("
+	  }
+	  .algorithm .binary::after {
+		  content: ")"
+	  }
+	  .algorithm .binary--operator::before,
+	  .algorithm .binary--operator::after {
+		  content: " "
+	  }
+
+  	  .algorithm > .binary::before,
+  	  .algorithm > .binary::after,
+  	  .binary.add > .add--operand > .binary.add::before,
+  	  .binary.add > .add--operand > .binary.add::after,
+  	  .binary.add > .add--operand > .binary.div::before,
+  	  .binary.add > .add--operand > .binary.div::after,
+  	  .binary.add > .add--operand > .binary.mul::before,
+  	  .binary.add > .add--operand > .binary.mul::after {
+  		  content: ""
+  	  }
+
+	  .character-sheet {
+		  margin: 0 auto;
+		  max-width: 900px;
+	  }
+
+	  .character-sheet-body {
+		  display: flex;
+		  flex-flow: row wrap;
+		  justify-content: space-around;
+	  }
+
+	  .cosmetic {
+		  display: flex;
+		  flex-flow: row wrap;
+		  justify-content: space-around;
+		  max-width: 600px;
+		  align-content: flex-start;
+	  }
+	  .cosmetic > * {
+		  margin-bottom: 1em;
+	  }
+
+	  .appearance-label {
+		  width: 100%;
+	  }
+
+	  .appearance {
+		  width: 100%;
+	  }
+
+	  .primary {
+		  display: flex;
+		  flex-flow: column;
+	  }
+
+	  .primary-statistic {
+		  display: flex;
+		  flex-flow: row;
+		  justify-content: space-between;
+	  }
+
+	  .primary-total {
+		  text-align: center;
+	  }
+
+	  .stat-label {
+		  min-width: 3em;
+		  text-align: right;
+		  padding-right: 1em;
+	  }
+
+	  .stat-input {
+		  min-width: 4em;
+	  }
+
+	  .stat-extrema {
+		  min-width: 2em;
+		  text-align: right;
+		  padding-left: 1em;
+	  }
+
+	  .secondary-statistic {
+		  display: flex;
+	  }
+
+	  .stat-value {
+		  min-width: 2em;
+		  padding-right: 1em;
+		  text-align: center;
+	  }
+
+	  .secondary-statistic-percent .stat-value::after {
+		  content: "%"
+	  }
+
+	  .skills {
+		  display: flex;
+		  flex-flow: column;
+	  }
+
+	  .skill-category-title {
+		  font-size: 1.2em;
+	  }
+
+	  .skill {
+		  padding-left: 1em;
+		  display: flex;
+	  }
+
+	  .skill-name {
+		  min-width: 7em;
+		  margin: 0 .5em;
+	  }
+
+	  .skill-value {
+		  min-width: 2em;
+		  margin: 0 .5em;
+	  }
+	  .skill-value::after {
+		  content: "%"
+	  }
+	  .skill .algorithm {
+		  min-width: 12em;
+		  margin: 0 .5em;
+	  }
+	</style>
 </head>
 <body>
 <section class="character-sheet"></section>

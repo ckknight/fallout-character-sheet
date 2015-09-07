@@ -1,10 +1,16 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
+import race from './race';
 import cosmetic from './cosmetic';
-import primaryAttributeChart from './primaryAttributeChart';
+import primaryStatisticChart from './primaryStatisticChart';
+import secondaryStatisticChart from './secondaryStatisticChart';
 import skills from './skills';
 import traits from './traits';
 import combineLatestObject from '../../combineLatestObject';
+import Condition from '../../models/Condition';
+import Calculations from './Calculations';
+import requestAnimationFrameScheduler from '../../requestAnimationFrameScheduler';
+import { MISCELLANEOUS } from '../../constants.json';
 
 function safeParseJSON(value) {
     try {
@@ -39,43 +45,70 @@ function removeEmptyValues(obj) {
 }
 
 export default function characterSheet({DOM, localStorageSource}) {
+    const calculations = new Calculations();
+    Condition.all()
+        .forEach(condition => calculations.set(condition.key, Rx.Observable.return(false)));
+    Object.keys(MISCELLANEOUS)
+        .forEach(key => calculations.set(key, Rx.Observable.return(0)));
     const deserializedSavedData$ = localStorageSource
-        .map(safeParseJSON);
+        .map(safeParseJSON)
+        .shareReplay(1);
+    const raceView = race({
+        DOM,
+        value$: deserializedSavedData$
+            .map(x => x.race || ''),
+        calculations,
+    });
     const cosmeticView = cosmetic({
         DOM,
-        value$: deserializedSavedData$.map(x => x.cosmetic || {}),
+        value$: deserializedSavedData$
+            .map(x => x.cosmetic || {}),
+        raceDOM: raceView.DOM,
+        calculations,
     });
-    const primaryAttributeView = primaryAttributeChart({
+    const primaryStatisticView = primaryStatisticChart({
         DOM,
         value$: deserializedSavedData$.map(x => x.primary || {}),
-        race$: cosmeticView.race$,
+        calculations,
+    });
+    const secondaryStatisticView = secondaryStatisticChart({
+        DOM,
+        value$: deserializedSavedData$.map(x => x.secondary || {}),
+        calculations,
     });
     const skillsView = skills({
         DOM,
         value$: deserializedSavedData$.map(x => x.skills || {}),
-        attributes$: primaryAttributeView.value$,
+        calculations,
     });
     const traitsView = traits({
         DOM,
         value$: deserializedSavedData$.map(x => x.traits || {}),
-        race$: cosmeticView.race$,
+        calculations,
     });
     return {
         DOM: combineLatestObject({
-            cosmetic: cosmeticView.DOM,
-            primary: primaryAttributeView.DOM,
-            skills: skillsView.DOM,
-            traits: traitsView.DOM,
+            cosmetic: cosmeticView.DOM.startWith('-Cosmetic-'),
+            primary: primaryStatisticView.DOM.startWith('-Primary-'),
+            secondary: secondaryStatisticView.DOM.startWith('-Secondary-'),
+            skills: skillsView.DOM.startWith('-Skills-'),
+            traits: traitsView.DOM.startWith('-Traits-'),
         })
-            .map(({cosmetic, primary, skills, traits}) => h('section', [cosmetic, primary, skills, traits])),
-        localStorageSink: combineLatestObject({
-            cosmetic: cosmeticView.value$.startWith({}),
-            primary: primaryAttributeView.value$.startWith({}),
-            skills: skillsView.value$,
-            traits: traitsView.value$,
-        })
-            .throttle(200)
-            .map(removeEmptyValues)
-            .map(JSON.stringify.bind(JSON)),
+            .map(({cosmetic, primary, secondary, skills, traits}) => h('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits]))
+            .sample(0, requestAnimationFrameScheduler),
+        localStorageSink: localStorageSource.first()
+            .concat(combineLatestObject({
+                race: raceView.value$,
+                cosmetic: cosmeticView.value$.startWith({}),
+                primary: primaryStatisticView.value$.startWith({}),
+                secondary: secondaryStatisticView.value$.startWith({}),
+                skills: skillsView.value$,
+                traits: traitsView.value$,
+            })
+                .throttle(200)
+                .map(removeEmptyValues)
+                .map(JSON.stringify.bind(JSON)))
+            .distinctUntilChanged()
+            .skip(1),
     };
 }
