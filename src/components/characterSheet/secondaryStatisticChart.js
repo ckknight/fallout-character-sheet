@@ -21,12 +21,20 @@ function toExtrema(range) {
     };
 }
 
+function applyEffects(equation, effects$) {
+    return effects$
+        .startWith(null)
+        .map(effects => {
+            console.log(effects);
+            return equation;
+        });
+}
+
 function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
-    // const inputView = makeInput(stat.key, 'number', 5, DOM, value$, raceExtrema$.map(toExtrema));
-    // const extremaVTree$ = raceExtrema$
-    //     .map(({min, max}) => h('span', [min, '/', max]));
+    // calculations.get('effects', true)
+    //     .subscribe(console.log.bind(console, 'effects'));
     const valueView = algorithm({
-        equation$: Rx.Observable.return(stat.value),
+        equation$: stat.value,
         calculations,
     });
     calculations.set(stat.key, valueView.value$);

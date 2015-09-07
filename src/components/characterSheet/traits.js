@@ -8,6 +8,7 @@ import Race from '../../models/Race';
 import Immutable from 'immutable';
 import renderRef from './renderRef';
 import Calculations from './Calculations';
+import Effect from '../../models/Effect';
 // import { TRAITS, PRIMARY_ATTRIBUTES } from '../../constants.json';
 // import localize from '../../localization';
 
@@ -59,6 +60,14 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
                     }, description),
                 ])),
         value$: chosenTraitInput.value$,
+        effect$: chosenTraitInput.value$
+            .map(isChosen => {
+                if (isChosen) {
+                    return trait.effect;
+                } else {
+                    return null;
+                }
+            }),
     };
 }
 //
@@ -107,7 +116,7 @@ function renderEffectEquation(key, equation, calculations) {
 }
 
 function renderEffect(effect, calculations) {
-    return effect.toKeyedSeq()
+    return Rx.Observable.combineLatest(effect.toKeyedSeq()
         .filter((value, key) => {
             if (key.charAt(0) === '$') {
                 return value;
@@ -119,16 +128,17 @@ function renderEffect(effect, calculations) {
             return key.charAt(0) !== '$';
         })
         .map((value, key) => {
-            return h('span.effect', [
-                renderRef(key),
-                ': ',
-                renderEffectEquation(key, value, new Calculations({
-                    value: Rx.Observable.return('value'),
-                    level: calculations.get('level'),
-                })),
-            ]);
+            return renderEffectEquation(key, value, new Calculations({
+                value: Rx.Observable.return('value'),
+                level: calculations.get('level'),
+            }))
+                .map(effect => h('span.effect', [
+                        renderRef(key),
+                        ': ',
+                        effect,
+                    ]));
         })
-        .toArray();
+        .toArray());
 }
 
 function getTraitDescription(trait, calculations) {
@@ -136,9 +146,9 @@ function getTraitDescription(trait, calculations) {
         equation$: Rx.Observable.return(trait.requirements),
         calculations,
     });
-    return Rx.Observable.combineLatest(requirementsView.DOM, requirementsView.equation$,
-        (requirements, equation) => [,
-                renderEffect(trait.effect, calculations),
+    return Rx.Observable.combineLatest(renderEffect(trait.effect, calculations).startWith([]), requirementsView.DOM, requirementsView.equation$,
+        (effect, requirements, equation) => [
+                h('span.trait-effect', effect),
                 trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
                 equation === true ? null : h('span.trait-requirements', [requirements]),
         ]);
@@ -159,6 +169,9 @@ export default function traits({DOM, value$: inputValue$, calculations}) {
     return {
         DOM: Rx.Observable.combineLatest(allTraitViews.map(t => t.DOM))
             .map(vTrees => h('section.traits', vTrees)),
-        value$: value$,
+        value$,
+        effects$: Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$))
+            .map(effects => effects.filter(effect => effect))
+            .share(),
     };
 }

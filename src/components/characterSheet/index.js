@@ -86,14 +86,16 @@ export default function characterSheet({DOM, localStorageSource}) {
         value$: deserializedSavedData$.map(x => x.traits || []),
         calculations,
     });
+    calculations.set('effects', traitsView.effects$);
     return {
         DOM: combineLatestObject({
-            cosmetic: cosmeticView.DOM.startWith('-Cosmetic-'),
-            primary: primaryStatisticView.DOM.startWith('-Primary-'),
-            secondary: secondaryStatisticView.DOM.startWith('-Secondary-'),
-            skills: skillsView.DOM.startWith('-Skills-'),
-            traits: traitsView.DOM.startWith('-Traits-'),
+            cosmetic: cosmeticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Cosmetic-'),
+            primary: primaryStatisticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Primary-'),
+            secondary: secondaryStatisticView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Secondary-'),
+            skills: skillsView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Skills-'),
+            traits: traitsView.DOM.catch(Rx.Observable.return('-Error-')).startWith('-Traits-'),
         })
+            .do(console.log.bind(console))
             .map(({cosmetic, primary, secondary, skills, traits}) => h('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits]))
             .sample(0, requestAnimationFrameScheduler),
         localStorageSink: localStorageSource.first()
