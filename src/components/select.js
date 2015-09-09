@@ -1,5 +1,7 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
+import renderLoading from './characterSheet/renderLoading';
+import renderError from './characterSheet/renderError';
 
 const FALLBACK_KEY = 'SELECT_FALLBACK';
 
@@ -49,7 +51,9 @@ export default function select(key, {DOM, value$: inputValue$, options$, props$ 
         });
 
     return {
-        DOM: vtree$,
+        DOM: vtree$
+            .startWith(renderLoading(key))
+            .catch(renderError.handler(key)),
         value$,
     };
 }

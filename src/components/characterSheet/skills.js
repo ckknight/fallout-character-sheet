@@ -5,6 +5,11 @@ import SkillCategory from '../../models/SkillCategory';
 import algorithm from './algorithm';
 import { BinaryOperation } from '../../models/Equation';
 import Immutable from 'immutable';
+import Effect from '../../models/Effect';
+import { replace as equationReplace } from '../../models/Equation';
+import renderLoading from './renderLoading';
+import renderError from './renderError';
+import * as localize from '../../localize';
 
 function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
     const tagInput = input(`skill-tag-${skill.key}`, 'checkbox', {
@@ -32,39 +37,47 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
             className: 'skill-increase',
         }),
     });
-    const equation$ = tagEquation$.combineLatest(increaseView.value$,
+    const taggedEquation$ = tagEquation$.combineLatest(increaseView.value$,
         (eq, value) => new BinaryOperation({
                 type: '+',
                 left: eq,
                 right: value,
             }));
 
+    const equation$ = taggedEquation$.combineLatest(calculations.get('effect').startWith(new Effect()),
+        (eq, effect) => equationReplace(effect[skill.key] || 'value', 'value', eq));
+
     const algorithmView = algorithm({
         equation$,
         calculations,
     });
+    calculations.set(skill.key, algorithmView.value$);
     return {
         skill,
         DOM: Rx.Observable.combineLatest(
             algorithmView.DOM,
-            algorithmView.value$,
+            algorithmView.value$.startWith(null),
             increaseView.DOM,
             tagInput.DOM,
-            tagInput.value$,
+            tagInput.value$.startWith(false),
             (algorithmDOM, algorithmValue, increase, tag, tagValue) => h(`div.skill.skill-${skill.key}`, {
                     className: tagValue ? 'skill-tagged' : 'skill-untagged',
                     key: skill.key,
                 }, [
-                    tag,
-                    h(`span.skill-name`, {
-                        key: 'name',
-                    }, [skill.name]),
+                    h(`label.skill-label`, [
+                        tag,
+                        h(`span.skill-name`, {
+                            key: 'name',
+                        }, [skill.name]),
+                    ]),
                     h(`span.skill-value`, {
                         key: 'value',
-                    }, [algorithmValue + '']),
+                    }, [algorithmView != null ? algorithmValue + '' : algorithmView]),
                     increase,
                     algorithmDOM,
-                ])),
+                ]))
+            .startWith(renderLoading(skill.key))
+            .catch(renderError.handler(skill.key)),
         tagged$: tagInput.value$,
         increase$: increaseView.value$,
     };
@@ -76,14 +89,15 @@ function makeSkillCategoryView(category, dependencies) {
         .toArray();
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
-            .startWith([])
+            .startWith([renderLoading(category.key)])
             .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
                     key: category.key,
                 }, [
-                    h(`span.skill-category-title`, {
+                    h(`h3.skill-category-title`, {
                         key: 'title',
                     }, [category.name]),
-                ].concat(skillVTrees))),
+                ].concat(skillVTrees)))
+            .catch(renderError.handler(category.key)),
         tagged$: Rx.Observable.from(skillViews)
             .flatMap(({tagged$, skill: {key}}) => tagged$
                     .map(value => o => o.set(key, value)))
@@ -114,9 +128,13 @@ export default function skills({DOM, value$: inputValue$, calculations}) {
         .toArray();
     return {
         DOM: Rx.Observable.combineLatest(skillCategoryViews.map(o => o.DOM))
+            .startWith([renderLoading('skills')])
             .map(vTrees => h('section.skills', {
                     key: 'skills',
-                }, vTrees)),
+                }, [
+                    h('h2.skills-title', [localize.name('skills')]),
+                ].concat(vTrees)))
+            .catch(renderError.handler('skills')),
         value$: Rx.Observable.from(skillCategoryViews)
             .flatMap(({tagged$, increase$}) => Rx.Observable.merge(
                     tagged$

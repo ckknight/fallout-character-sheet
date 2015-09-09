@@ -2,12 +2,17 @@ import { Rx } from '@cycle/core';
 const owns = Object.prototype.hasOwnProperty;
 import InjectableObservable from 'rx-injectable-observable';
 
+const BLACKLISTED_KEYS = {};
+
 export default class Calculations {
     constructor(values = {}) {
         this.values = values;
     }
 
     set(key, value) {
+        if (key in BLACKLISTED_KEYS) {
+            throw new Error(`Cannot set '${key}'`);
+        }
         if (owns.call(this.values, key)) {
             const observable = this.values[key];
             if (!(observable instanceof InjectableObservable)) {
@@ -18,7 +23,10 @@ export default class Calculations {
     }
 
     get(key, future) {
-        if (!owns.call(this.values, key)) {
+        if (key in BLACKLISTED_KEYS) {
+            throw new Error(`Cannot refer to '${key}'`);
+        }
+        if (!(key in this.values)) {
             if (!future) {
                 throw new Error(`Unknown key: ${key}`);
             }

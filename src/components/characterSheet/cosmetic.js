@@ -5,6 +5,8 @@ import select from '../select';
 import combineLatestObject from '../../combineLatestObject';
 import { RACE_STATS } from '../../constants.json';
 import * as localize from '../../localize';
+import renderLoading from './renderLoading';
+import renderError from './renderError';
 
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
@@ -22,12 +24,15 @@ function makeBox(selector, object, calculations) {
         .forEach(([key, value]) => calculations.set(key, value.value$));
     return {
         DOM: Rx.Observable.combineLatest(Object.keys(object)
-            .map(key => object[key].DOM.startWith(null)
-                    .filter(x => x)
+            .map(key => object[key].DOM
+                    .startWith(renderLoading(key))
                     .map(vTree => h(`label.${key}-label`, {
                             key,
-                        }, [localize.name(key), ' ', vTree]))))
-            .map(vTrees => h(selector, vTrees)),
+                        }, [localize.name(key), ' ', vTree]))
+                    .catch(renderError.handler(key))))
+            .startWith(renderLoading('cosmetic'))
+            .map(vTrees => h(selector, vTrees))
+            .catch(renderError.handler('cosmetic')),
         value$: combineLatestObject(Object.keys(object)
             .reduce((acc, key) => {
                 const value$ = object[key].value$;
@@ -36,14 +41,14 @@ function makeBox(selector, object, calculations) {
                 }
                 return acc;
             }, {}))
-            .share(),
+            .shareReplay(1),
     };
 }
 
 export default function cosmetic({DOM, value$, raceDOM, calculations}) {
     return makeBox('section.cosmetic', {
         name: makeInput('name', 'text', '', DOM, value$),
-        age: makeInput('age', 'number', 20, DOM, value$, Rx.Observable.return({
+        age: makeInput('age', 'integer', 20, DOM, value$, Rx.Observable.return({
             min: 0,
             placeholder: 'Age',
         })),
@@ -51,7 +56,7 @@ export default function cosmetic({DOM, value$, raceDOM, calculations}) {
         race: {
             DOM: raceDOM,
         },
-        weight: makeInput('weight', 'number', 150, DOM, value$, calculations.get('race')
+        weight: makeInput('weight', 'integer', 150, DOM, value$, calculations.get('race')
             .pluck('weight')
             .map(({min, max}) => ({
                     min,

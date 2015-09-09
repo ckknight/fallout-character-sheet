@@ -33,7 +33,7 @@ function convertParts(object, path) {
 
 const fields = {
     key: '',
-    count: 1,
+    multiple: null,
     crippleEffect: new Effect(),
     crippleHealth: 0,
     cripplePartCount: 0,
@@ -76,6 +76,7 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         stats.damage = toEquation(fallback(stats.damage, 'value'), `${path}.damage`, VALID_KEYS_WITH_VALUE, 'number');
         stats.parts = convertParts(stats.parts, `${path}.parts`);
         stats.crippleEffect = Effect.from(stats.crippleEffect || {}, `${path}.crippleEffect`);
+        stats.multiple = stats.multiple && new Immutable.List(stats.multiple);
 
         return new this({
             key,

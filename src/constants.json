@@ -1256,7 +1256,7 @@
     },
     "BODY_PARTS": {
         "arm": {
-            "count": 2,
+            "multiple": ["leftArm", "rightArm"],
             "crippleEffect": {
                 "bigGuns": {
                     "$sub": [
@@ -1555,7 +1555,7 @@
                 },
                 "neck": {
                     "crippleEffect": {
-                        "damagePerTurn": {
+                        "damagePerRound": {
                             "$inc": "value"
                         }
                     },
@@ -1586,7 +1586,7 @@
             "targetPenalty": 25
         },
         "leg": {
-            "count": 2,
+            "multiple": ["leftLeg", "rightLeg"],
             "crippleHealth": {
                 "$add": [
                     "endurance",
@@ -1722,7 +1722,7 @@
             "parts": {
                 "chest": {
                     "crippleEffect": {
-                        "damagePerTurn": {
+                        "damagePerRound": {
                             "$inc": "value"
                         }
                     },
@@ -1807,6 +1807,35 @@
     },
     "LOCALIZATION": {
         "en-US": {
+            "skills": "Skills",
+            "perks": "Perks",
+            "doctorHealing": "Doctor Healing",
+            "firstAidHealing": "First Aid Healing",
+            "burstAttackActionPointCost": "Burst Attack Action Point Cost",
+            "withdrawalTime": "Withdrawal Time",
+            "receivedExplosiveDamage": "Received Explosion Damage",
+            "karma": "Karma",
+            "standUpActionPointCost": "Stand Up Action Point Cost",
+            "inventoryActionPointCost": "Inventory Action Point Cost",
+            "doctorActionPointCost": "Doctor Action Point Cost",
+            "fallDamage": "Fall Damage",
+            "xpMultiplier": "XP Multiplier",
+            "explosiveDamage": "Explosive Damage",
+            "criticalDamage": "Critical Damage",
+            "changeStanceCost": "Change Stance Cost",
+            "lightLevelPenality": "Light Level Penalty",
+            "freeMovement": "Free Movement",
+            "skillPointsPerBook": "Skill Points per Book",
+            "rangedDamage": "Ranged Damage",
+            "travelTime": "Travel Time",
+            "likability": "Likability",
+            "psychoAddictionChance": "Psycho Addiction Chance",
+            "firstAidActionPointCost": "First Aid Action Point Cost",
+            "vehicleWreckDamage": "Vehicle Wreck Damage",
+            "limbDamageChance": "Limb Damage Chance",
+            "damagePerDay": "Damage per Day",
+            "psychoEffects": "Psycho Effects",
+            "damagePerRound": "Damage per Round",
             "value": "value",
             "input": "input",
             "primaryTotal": "Primary Total",
@@ -1842,7 +1871,12 @@
             },
             "alphaMutant": "Mutant (Alpha)",
             "animalFriend": "Animal Friend",
-            "arm": "Arm",
+            "arm": {
+                "name": "Arm",
+                "plural": "Arms"
+            },
+            "leftArm": "Left Arm",
+            "rightArm": "Right Arm",
             "armorClass": {
                 "abbr": "AC",
                 "name": "Armor Class"
@@ -2018,7 +2052,12 @@
             "knee": "Knee",
             "leader": "Leader",
             "leadfoot": "Leadfoot",
-            "leg": "Leg",
+            "leg": {
+                "name": "Leg",
+                "plural": "Legs"
+            },
+            "leftLeg": "Left Leg",
+            "rightLeg": "Right Leg",
             "lesserMolerat": "Lesser Molerat",
             "lesserPigrat": "Greater Pigrat",
             "lesserRadscorpion": "Lesser Radscorption",
@@ -2235,7 +2274,7 @@
         },
         "damagePerDay": {
         },
-        "damagePerTurn": {
+        "damagePerRound": {
         },
         "doctorActionPointCost": {
         },
@@ -3597,7 +3636,11 @@
                     }
                 }
             },
-            "ranks": 3
+            "ranks": 3,
+            "requirements": {
+                "charisma": 6,
+                "level": 6
+            }
         },
         "psychotic": {
             "effect": {

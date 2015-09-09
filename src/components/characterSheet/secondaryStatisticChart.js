@@ -7,6 +7,8 @@ import algorithm from './algorithm';
 import renderRef from './renderRef';
 import { replace as equationReplace } from '../../models/Equation';
 import Effect from '../../models/Effect';
+import renderLoading from './renderLoading';
+import renderError from './renderError';
 
 function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
     const valueView = algorithm({
@@ -19,14 +21,16 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
     calculations.set(stat.key, valueView.value$.startWith(0));
 
     return {
-        DOM: Rx.Observable.combineLatest(valueView.DOM, valueView.value$.startWith('poo'),
+        DOM: Rx.Observable.combineLatest(valueView.DOM, valueView.value$.startWith(null),
             (vTree, value) => h(`div.secondary-statistic.secondary-statistic-${stat.key}` + (stat.percent ? '.secondary-statistic-percent' : ''), {
                     key: stat.key,
                 }, [
                     renderRef(stat.key, 'stat-label'),
-                    h(`span.stat-value`, [value]),
+                    value != null ? h(`span.stat-value`, [value]) : null,
                     vTree,
-                ])),
+                ]))
+            .startWith(renderLoading(stat.key))
+            .catch(renderError.handler(stat.key)),
         value$: valueView.value$,
     };
 }
@@ -43,12 +47,17 @@ export default function secondaryStatisticChart({DOM, value$, calculations}) {
 
     return {
         DOM: Rx.Observable.combineLatest(statisticEntries.map(a => a.DOM))
+            .startWith([renderLoading('secondary')])
             .map(inputVTrees => h('section.secondary', {
                     key: 'secondary',
-                }, inputVTrees)),
+                }, [
+                    h('h2.secondary-title', ['Secondary Statistics']),
+                ].concat(inputVTrees)))
+            .catch(renderError.handler('secondary')),
         value$: combineLatestObject(statistics.reduce((acc, stat, i) => {
             acc[stat.key] = statisticEntries[i].value$;
             return acc;
-        }, {})).share(),
+        }, {}))
+            .shareReplay(1),
     };
 }

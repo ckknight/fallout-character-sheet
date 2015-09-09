@@ -431,6 +431,7 @@ exports.Equals = Equals;
 exports.LessThanOrEqual = LessThanOrEqual;
 exports.BinaryOperation = BinaryOperation;
 exports.UnaryOperation = UnaryOperation;
+exports.Random = Random;
 
 function replace(value, from, to) {
     if (value === from || Immutable.is(value, from)) {

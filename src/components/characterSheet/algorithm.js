@@ -2,19 +2,44 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import * as localize from '../../localize';
 import When from '../../models/When';
-import { BinaryOperation, UnaryOperation } from '../../models/Equation';
+import { BinaryOperation, UnaryOperation, Random } from '../../models/Equation';
 import Immutable from 'immutable';
+import renderLoading from './renderLoading';
+import renderError from './renderError';
+import { getClassString as getNumberClassString } from './renderNumber';
 
 const owns = Object.prototype.hasOwnProperty;
 
 function renderUnary(name, value, operator, operand, equation) {
-    return h(`span.${name}.unary`, {
+    return h(`span.${name}.unary${getClassString(value)}`, {
         title: (equation || '').toString() + ' = ' + value,
     }, [
-        h(`span.${name}--operator.unary--operator`, [operator]),
-        h(`span.${name}--operand.unary--operand`, [operand]),
+        h(`span.${name}--operator.unary--operator`, {
+            key: 'operator',
+        }, [operator]),
+        h(`span.${name}--operand.unary--operand`, {
+            key: 'operand',
+        }, [operand]),
     ]);
 }
+const operatorToDisplay = {
+    '=': 'is',
+    '<=': '≤',
+    '>=': '≥',
+};
+function getBooleanClassString(value) {
+    return `.boolean.boolean-${!!value}`;
+}
+function getClassString(value) {
+    if (typeof value === 'number') {
+        return getNumberClassString(value);
+    } else if (typeof value === 'boolean') {
+        return getBooleanClassString(value);
+    } else {
+        return '';
+    }
+}
+
 function renderBinary(name, value, operator, left, right, equation) {
     // if (operator === '*' && typeof equation.right === 'number' && typeof equation.left !== 'number') {
     //     return renderBinary(name, value, operator, right, left, equation.merge({
@@ -22,12 +47,34 @@ function renderBinary(name, value, operator, left, right, equation) {
     //         right: equation.left,
     //     }));
     // }
-    return h(`span.${name}.binary`, {
+    return h(`span.${name}.binary${getClassString(value)}`, {
         title: (equation || '').toString() + ' = ' + value,
     }, [
-        h(`span.${name}--left.binary--left.${name}--operand.binary--operand`, [left]),
-        h(`span.${name}--operator.binary--operator`, [operator === '=' ? 'is' : operator]),
-        h(`span.${name}--right.binary--right.${name}--operand.binary--operand`, [right]),
+        h(`span.${name}--left.binary--left.${name}--operand.binary--operand`, {
+            key: 'left',
+        }, [left]),
+        h(`span.${name}--operator.binary--operator`, {
+            key: 'operator',
+        }, [operatorToDisplay[operator] || operator]),
+        h(`span.${name}--right.binary--right.${name}--operand.binary--operand`, {
+            key: 'right',
+        }, [right]),
+    ]);
+}
+
+function renderRandom(min, max, equation) {
+    return h(`span.${name}.random`, {
+        title: (equation || '').toString(),
+    }, [
+        h(`span.random--min.random--operand`, {
+            key: 'min',
+        }, [min]),
+        h(`span.random--operator`, {
+            key: 'operator',
+        }, ['..']),
+        h(`span.random--max.random--operand`, {
+            key: 'max',
+        }, [max]),
     ]);
 }
 
@@ -42,6 +89,8 @@ const operatorToName = {
     and: 'and',
     max: 'max',
     min: 'min',
+    '<=': 'lte',
+    '>=': 'gte',
 };
 const operationsByOperator = {
     '+': (x, y) => (+x) + (+y),
@@ -54,6 +103,8 @@ const operationsByOperator = {
     and: (x, y) => x && y,
     max: (x, y) => y > x ? y : x,
     min: (x, y) => y < x ? y : x,
+    '<=': (x, y) => x <= y,
+    '>=': (x, y) => x >= y,
 };
 const rightIdentity = {
     '+': 0,
@@ -66,6 +117,40 @@ const leftIdentity = {
     '+': 0,
     '*': 1,
 };
+
+const Range = Immutable.Record({
+    min: 0,
+    max: 0,
+}, 'Range');
+
+function calculateRandom(range, calculations) {
+    const minView = calculateAlgorithm(range.min, calculations);
+    const maxView = calculateAlgorithm(range.max, calculations);
+    const value$ = Rx.Observable.merge(
+        minView.value$
+            .map(min => o => o.set('min', min)),
+        maxView.value$
+            .map(max => o => o.set('max', max)))
+        .startWith(new Range())
+        .scan((acc, modifier) => modifier(acc))
+        .distinctUntilChanged(undefined, Immutable.is)
+        .shareReplay(1);
+    const equation$ = Rx.Observable.merge(
+        minView.equation$
+            .map(eq => acc => acc.set('min', eq)),
+        maxView.equation$
+            .map(eq => acc => acc.set('max', eq)))
+        .startWith(range)
+        .scan((equation, modifier) => modifier(equation))
+        .distinctUntilChanged(undefined, Immutable.is)
+        .shareReplay(1);
+    return {
+        DOM: minView.DOM.combineLatest(maxView.DOM, equation$,
+            (min, max, equation) => renderRandom(min, max, equation)),
+        value$,
+        equation$,
+    };
+}
 
 function calculateBinary(equation, calculations) {
     const operator = equation.type;
@@ -91,38 +176,38 @@ function calculateBinary(equation, calculations) {
     return {
         DOM: leftView.DOM.combineLatest(rightView.DOM, value$.startWith('(calculating binary)'), equation$,
             (left, right, value, equation) => {
-            if (operator === '^' && equation.right === 0.5) {
-                return renderUnary(name, value, '√', left, equation);
-            }
-            if (rightIdentity[operator] === equation.right) {
-                return left;
-            }
-            if (leftIdentity[operator] === equation.left) {
-                return right;
-            }
-            return renderBinary(name, value, operator, left, right, equation);
+                if (operator === '^' && equation.right === 0.5) {
+                    return renderUnary(name, value, '√', left, equation);
+                }
+                if (rightIdentity[operator] === equation.right) {
+                    return left;
+                }
+                if (leftIdentity[operator] === equation.left) {
+                    return right;
+                }
+                if (typeof equation.left === 'number' && operator === '<=') {
+                    return renderBinary(name, value, '>=', right, left, equation);
+                }
+                return renderBinary(name, value, operator, left, right, equation);
             }),
         value$,
         equation$,
     };
 }
 
-const unaryOperatorToName = {
-    not: 'not',
-    floor: 'floor',
-    ceil: 'ceil',
-};
+const unaryOperatorToName = {};
 const unaryOperationsByOperator = {
     not: x => !x,
     floor: Math.floor,
     ceil: Math.ceil,
+    abs: Math.abs,
 };
 function calculateUnary(equation, calculations) {
     const operator = equation.type;
     if (!owns.call(unaryOperationsByOperator, operator)) {
         throw new Error(`Unknown operator: '${operator}'`);
     }
-    const name = unaryOperatorToName[operator];
+    const name = unaryOperatorToName[operator] || operator;
     const operation = unaryOperationsByOperator[operator];
     const operandView = calculateAlgorithm(equation.value, calculations);
     const value$ = operandView.value$
@@ -147,13 +232,13 @@ function calculateWhen(equation, calculations) {
     const possibilities = equation.conditions
         .toKeyedSeq()
         .map((value, condition) => {
-        const operandView = calculateAlgorithm(value, calculations);
-        return {
-            condition$: calculations.get(condition),
-            DOM: operandView.DOM,
-            value$: operandView.value$,
-            equation$: operandView.equation$,
-        };
+            const operandView = calculateAlgorithm(value, calculations);
+            return {
+                condition$: calculations.get(condition),
+                DOM: operandView.DOM,
+                value$: operandView.value$,
+                equation$: operandView.equation$,
+            };
         })
         .toArray()
         .concat([{
@@ -165,16 +250,16 @@ function calculateWhen(equation, calculations) {
 
     const result = Rx.Observable.combineLatest(possibilities
         .map(({condition$, DOM, value$, equation$}) => Rx.Observable.combineLatest(
-            condition$, DOM, value$, equation$, (condition, vTree, value, equation) => {
-            if (!condition) {
-                return null;
-            }
-            return {
-                vTree,
-                value,
-                equation,
-            };
-            })))
+                condition$, DOM, value$, equation$, (condition, vTree, value, equation) => {
+                    if (!condition) {
+                        return null;
+                    }
+                    return {
+                        vTree,
+                        value,
+                        equation,
+                    };
+                })))
         .map(values => values.find(x => x))
         .shareReplay(1);
     return {
@@ -208,14 +293,14 @@ function calculateString(key, calculations) {
     return {
         DOM: Rx.Observable.return(null)
             .map(() => {
-            const name = localize.name(key);
-            const abbr = localize.abbr(key);
-            const vTree = name === abbr ?
-                h(`span.ref-${key}`, [name]) :
-                h(`abbr.ref-${key}`, {
-                    title: name,
-                }, [abbr]);
-            return vTree;
+                const name = localize.name(key);
+                const abbr = localize.abbr(key);
+                const vTree = name === abbr ?
+                    h(`span.ref-${key}`, [name]) :
+                    h(`abbr.ref-${key}`, {
+                        title: name,
+                    }, [abbr]);
+                return vTree;
             }),
         value$: calculations.get(key),
         equation$: Rx.Observable.return(key),
@@ -235,6 +320,8 @@ function calculateAlgorithm(equation, calculations) {
         return calculateUnary(equation, calculations);
     } else if (equation instanceof When) {
         return calculateWhen(equation, calculations);
+    } else if (equation instanceof Random) {
+        return calculateRandom(equation, calculations);
     } else {
         throw new Error(`Unknown equation: ${equation}`);
     }
@@ -251,7 +338,8 @@ export default function ({equation$, calculations}) {
         DOM: result
             .flatMapLatest(x => x.DOM)
             .distinctUntilChanged()
-            .startWith('(calculating algorithm)')
+            .startWith(renderLoading('algorithm'))
+            .catch(renderError.handler('algorithm'))
             .map(vTree => h('div.algorithm', [vTree])),
         value$: result
             .flatMapLatest(x => x.value$)

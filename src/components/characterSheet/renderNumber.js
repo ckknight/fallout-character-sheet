@@ -1,20 +1,26 @@
 import { h } from '@cycle/dom';
 
-function getNumberClasses(value, type) {
+function getNumberClasses(value) {
     if (value === 0) {
-        return ['zero', 'nonpositive', 'nonnegative', type];
+        return ['zero', 'nonpositive', 'nonnegative'];
     } else if (value === 1) {
-        return ['one', 'positive', 'nonnegative', type];
+        return ['one', 'positive', 'nonnegative'];
     } else if (value === 2) {
-        return ['two', 'positive', 'nonnegative', type];
+        return ['two', 'positive', 'nonnegative'];
     } else if (value > 0) {
-        return ['positive', 'nonnegative', type];
+        return ['positive', 'nonnegative'];
     } else if (value < 0) {
-        return ['negative', 'nonpositive', type];
+        return ['negative', 'nonpositive'];
     }
-    return ['nan', type];
+    return ['nan'];
 }
 
-export default function renderNumber(value, type, props = {}) {
-    return h(`span.number.number-` + getNumberClasses(value, type).join('.number-'), props, ['' + value]);
+function getClassString(value) {
+    return '.number.number-' + getNumberClasses(value).join('.number-');
 }
+
+function renderNumber(value, type, props = {}) {
+    return h(`span.number-${type}${getClassString(value)}`, props, ['' + value]);
+}
+renderNumber.getClassString = getClassString;
+export default renderNumber;

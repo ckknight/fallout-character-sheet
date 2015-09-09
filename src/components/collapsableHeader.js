@@ -105,55 +105,27 @@ function getValueByType(type) {
     }
 }
 
-export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null)}) {
-    const tag = type === 'textarea' ? type : 'input';
-    const selector = `${tag}.${key}`;
+export default function input(key, type, text, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null)}) {
+    const selector = `${type}.${key}`;
 
     const elements = DOM.select(selector);
-    const newValue$ = eventsByType(elements, type)
-        .map(getValueByType(type))
-        .map(typeToConverter[type] || identity);
-
-    const focus$ = elements.events('focus');
-    const blur$ = elements.events('blur');
-
-    const canChangeDOM$ = Rx.Observable.merge(
-        focus$
-            .map(() => false),
-        blur$
-            .map(() => true)
-            .startWith(true));
-
-    const value$ = inputValue$
-        .merge(newValue$);
-
-    props$ = props$.shareReplay(1);
-    const boundValue$ = Rx.Observable.combineLatest(value$, props$,
-        (value, props) => {
-            if (!props) {
-                return value;
-            }
-            if ('min' in props && value < props.min) {
-                return props.min;
-            }
-            if ('max' in props && value > props.max) {
-                return props.max;
-            }
-            return value;
-        })
+    const value$ = elements
+        .events('click')
+        .map(() => o => !o)
+        .merge(inputValue$.map(x => () => !!x))
+        .startWith(false)
+        .scan((acc, modifier) => modifier(acc))
         .distinctUntilChanged()
+        .debounce(5)
         .shareReplay(1);
 
-    const vtree$ = Rx.Observable.combineLatest(boundValue$, props$,
-        (value, props) => h(
-                selector,
-                calculateProps(key, type, value, props)));
+    const vtree$ = Rx.Observable.combineLatest(value$, props$,
+        (value, props) => h(selector, props || {}, [text]));
 
     return {
         DOM: vtree$
             .startWith(renderLoading(key))
-            .pausableBuffered(canChangeDOM$)
             .catch(renderError.handler(key)),
-        value$: boundValue$,
+        value$,
     };
 }

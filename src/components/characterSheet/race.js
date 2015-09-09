@@ -18,8 +18,9 @@ export default function race({DOM, value$, calculations}) {
     const race$ = raceSelect.value$;
     const model$ = race$
         .map(race => Race.getOrDefault(race))
+        .startWith(new Race())
         .distinctUntilChanged()
-        .share();
+        .shareReplay(1);
 
     calculations.set('race', model$);
     Race.all().forEach(race => calculations.set(race.key, Rx.Observable.return(race)));

@@ -26,7 +26,13 @@
   	  .binary.add > .add--operand > .binary.div::before,
   	  .binary.add > .add--operand > .binary.div::after,
   	  .binary.add > .add--operand > .binary.mul::before,
-  	  .binary.add > .add--operand > .binary.mul::after {
+  	  .binary.add > .add--operand > .binary.mul::after,
+	  .binary.sub > .sub--left > .binary.add::before,
+	  .binary.sub > .sub--left > .binary.add::after,
+	  .binary.sub > .sub--operand > .binary.mul::before,
+	  .binary.sub > .sub--operand > .binary.mul::after,
+	  .binary.sub > .sub--operand > .binary.div::before,
+	  .binary.sub > .sub--operand > .binary.div::after {
   		  content: ""
   	  }
 
@@ -77,6 +83,14 @@
 		  text-align: center;
 	  }
 
+  	  .primary.collapsed .primary-body {
+		  display: flex;
+	  }
+
+  	  .primary.collapsed .primary-body .primary-statistic-summary {
+		  flex: 1;
+	  }
+
 	  .primary-total {
 		  text-align: center;
 	  }
@@ -113,17 +127,13 @@
 		  flex-flow: column;
 	  }
 
-	  .skill-category-title {
-		  font-size: 1.2em;
-	  }
-
 	  .skill {
 		  padding-left: 1em;
 		  display: flex;
 	  }
 
-	  .skill-name {
-		  min-width: 7em;
+	  .skill-label {
+		  min-width: 8em;
 		  margin: 0 .5em;
 	  }
 
@@ -152,8 +162,37 @@
 		  min-width: 9em;
 	  }
 
+	  .trait-description {
+		  display: flex;
+	  }
+
+	  .effect-part + .effect-part::before {
+		  content: ", ";
+	  }
+
+	  .trait-effect {
+		  padding-right: 1em;
+	  }
+
 	  .number-diff.number-positive::before {
 		  content: "+";
+	  }
+
+	  .boolean-true {
+		  color: #007;
+	  }
+
+	  .boolean-false {
+		  color: #700;
+	  }
+
+	  .boolean .boolean-false,
+	  .boolean .boolean-true {
+		  color: inherit;
+	  }
+
+	  h1, h2, h3, h4, h5, h6 {
+		  margin: 0;
 	  }
 	</style>
 </head>
