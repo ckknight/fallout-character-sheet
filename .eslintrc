@@ -1,7 +1,7 @@
 {
     "extends": "airbnb/base",
     "rules": {
-        "indent": [2, 4],
+        "indent": [0, 4],
         "space-before-function-paren": [2, {"anonymous": "always", "named": "never"}],
         "semi-spacing": 0,
         "no-eq-null": 0,

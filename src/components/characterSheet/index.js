@@ -11,12 +11,12 @@ import health from './health';
 import combineLatestObject from '../../combineLatestObject';
 import Condition from '../../models/Condition';
 import Calculations from './Calculations';
-import requestAnimationFrameScheduler from '../../requestAnimationFrameScheduler';
 import { MISCELLANEOUS } from '../../constants.json';
 import { replace as equationReplace } from '../../models/Equation';
 import Immutable from 'immutable';
 import Effect from '../../models/Effect';
 import '../../sampleToRequestAnimationFrame';
+import future from '../../future';
 
 function safeParseJSON(value) {
     try {
@@ -26,16 +26,28 @@ function safeParseJSON(value) {
     }
 }
 
+const owns = Object.prototype.hasOwnProperty;
 function coerceEmptyObject(obj) {
-    for (let key in obj) {
-        return obj;
+    for (const key in obj) {
+        if (owns.call(obj, key)) {
+            return obj;
+        }
+    }
+    return null;
+}
+
+function coerceEmptyArray(array) {
+    for (let i = array.length; --i >= 0;) {
+        if (array[i]) {
+            return array.slice(0, i + 1);
+        }
     }
     return null;
 }
 
 function removeEmptyValues(obj) {
     if (Array.isArray(obj)) {
-        return obj.length ? obj.map(removeEmptyValues) : null;
+        return coerceEmptyArray(obj.map(removeEmptyValues));
     } else if (obj && obj.constructor === Object) {
         return coerceEmptyObject(Object.keys(obj)
             .sort()
@@ -58,18 +70,31 @@ export default function characterSheet({DOM, localStorageSource}) {
         .forEach(condition => calculations.set(condition.key, Rx.Observable.return(false)));
     Object.keys(MISCELLANEOUS)
         .forEach(key => calculations.set(key, Rx.Observable.return(0)));
-    const deserializedSavedData$ = localStorageSource
-        .map(safeParseJSON)
-        .shareReplay(1);
+    const deserializedSavedData$ = future(() => localStorageSource
+            .map(safeParseJSON)
+            .shareReplay(1));
     const characterSavedData$ = deserializedSavedData$
         .map(x => x.character || {});
+    const uiSavedData$ = deserializedSavedData$
+        .map(x => x.ui || {});
 
-    calculations.set('effect', calculations.get('effects', true)
+    const effects$ = Rx.Observable.combineLatest(
+        calculations.get('traitEffects', true),
+        calculations.get('healthEffects', true))
+        .map(effectLists => [].concat.apply([], effectLists));
+
+    const effect$ = effects$
         .map(effects => effects
                 .reduce((left, right) => left.mergeEffects(right), new Effect()))
         .startWith(new Effect())
         .distinctUntilChanged(undefined, Immutable.is)
-        .shareReplay(1));
+        .shareReplay(1);
+
+    const effecter = (equation$, key) => equation$.combineLatest(
+            effect$
+                .map(effect => effect[key] || 'value')
+                .distinctUntilChanged(),
+            (equation, replacement) => equationReplace(replacement, 'value', equation));
 
     const raceView = race({
         DOM,
@@ -81,33 +106,41 @@ export default function characterSheet({DOM, localStorageSource}) {
         DOM,
         value$: characterSavedData$
             .map(x => x.cosmetic || {}),
+        uiState$: uiSavedData$.map(x => x.cosmetic || false),
         raceDOM: raceView.DOM,
         calculations,
     });
     const primaryStatisticView = primaryStatisticChart({
         DOM,
         value$: characterSavedData$.map(x => x.primary || {}),
-        uiState$: Rx.Observable.return(false),
+        uiState$: uiSavedData$.map(x => x.primary || false),
         calculations,
+        effecter,
     });
     const secondaryStatisticView = secondaryStatisticChart({
         DOM,
         value$: characterSavedData$.map(x => x.secondary || {}),
+        uiState$: uiSavedData$.map(x => x.secondary || false),
         calculations,
+        effecter,
     });
     const skillsView = skills({
         DOM,
         value$: characterSavedData$.map(x => x.skills || {}),
+        uiState$: uiSavedData$.map(x => x.skills || false),
         calculations,
+        effecter,
     });
     const traitsView = traits({
         DOM,
         value$: characterSavedData$.map(x => x.traits || []),
+        uiState$: uiSavedData$.map(x => x.traits || false),
         calculations,
     });
     const perksView = perks({
         DOM,
         value$: characterSavedData$.map(x => x.perks || {}),
+        uiState$: uiSavedData$.map(x => x.perks || false),
         calculations,
     });
     const healthView = health({
@@ -117,17 +150,18 @@ export default function characterSheet({DOM, localStorageSource}) {
     });
     const result = {
         DOM: combineLatestObject({
-            cosmetic: cosmeticView.DOM.throttle(17),
-            primary: primaryStatisticView.DOM.throttle(17),
-            secondary: secondaryStatisticView.DOM.throttle(17),
-            skills: skillsView.DOM.throttle(17),
-            traits: traitsView.DOM.throttle(17),
-            perks: perksView.DOM.throttle(17),
-            health: healthView.DOM.throttle(17),
+            cosmetic: cosmeticView.DOM,
+            primary: primaryStatisticView.DOM,
+            secondary: secondaryStatisticView.DOM,
+            skills: skillsView.DOM,
+            traits: traitsView.DOM,
+            perks: perksView.DOM,
+            health: healthView.DOM,
         })
             .map(({cosmetic, primary, secondary, skills, traits, perks, health}) => h('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits, perks, health]))
             .startWith(h('section.loading', `Loading, y'all.`))
-            .sampleToRequestAnimationFrame(),
+            .sampleToRequestAnimationFrame()
+            .do(() => console.log(Date.now())),
         localStorageSink: localStorageSource.first()
             .concat(combineLatestObject({
                 character: {
@@ -138,7 +172,17 @@ export default function characterSheet({DOM, localStorageSource}) {
                     skills: skillsView.value$.startWith({}),
                     traits: traitsView.value$.startWith([]),
                     perks: perksView.value$.startWith({}),
-                    health: healthView.value$.startWith({}),
+                    health: healthView.value$
+                        // .do(x => console.log('health', x))
+                        .startWith({}),
+                },
+                ui: {
+                    primary: primaryStatisticView.uiState$,
+                    cosmetic: cosmeticView.uiState$,
+                    secondary: secondaryStatisticView.uiState$,
+                    skills: skillsView.uiState$,
+                    traits: traitsView.uiState$,
+                    perks: perksView.uiState$,
                 },
             })
                 .throttle(200)

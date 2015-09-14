@@ -1,10 +1,9 @@
 {
-	"root": true,
 	"preset": "default",
 	"indent": {
 		"value": "    ",
-		"CallExpression": 1,
-		"ReturnStatement": 0
+        "ReturnStatement": 0,
+        "SwitchStatement": 0
 	},
 	"whiteSpace": {
 		"after": {

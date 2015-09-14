@@ -3,6 +3,7 @@ import Range from './Range';
 import withLocalization from './withLocalization';
 import withLookup from './withLookup';
 import withNiceToString from './withNiceToString';
+import withMethods from './withMethods';
 import { RACES, PRIMARY_STATISTICS, SECONDARY_STATISTICS } from '../constants.json';
 
 const fields = {
@@ -11,6 +12,7 @@ const fields = {
     weight: new Range(25, 500),
     levelsPerPerk: 4,
     primaryTotal: 40,
+    nonplayable: false,
 };
 Object.entries(PRIMARY_STATISTICS).sort().forEach(([key, value]) => {
     fields[key] = new Range(1, 10);
@@ -19,7 +21,7 @@ Object.entries(SECONDARY_STATISTICS).sort().forEach(([key, value]) => {
     fields[key] = 0;
 });
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Race')), {
+export default withMethods(withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Race')), {
     get(key) {
         const stats = RACES[key];
         if (!stats) {
@@ -36,4 +38,8 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         return Immutable.Set(Object.keys(RACES)
             .map(key => this.get(key)));
     },
-}), fields);
+}), fields), {
+    get playable() {
+        return !this.nonplayable;
+    },
+});

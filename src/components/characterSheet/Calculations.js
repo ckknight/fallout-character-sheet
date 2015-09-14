@@ -18,6 +18,7 @@ export default class Calculations {
             if (!(observable instanceof InjectableObservable)) {
                 throw new Error(`Key already set: ${key}`);
             }
+            observable.inject(value);
         }
         return (this.values[key] = value);
     }
@@ -30,31 +31,7 @@ export default class Calculations {
             if (!future) {
                 throw new Error(`Unknown key: ${key}`);
             }
-            return Rx.Observable.create(subscriber => {
-                const values = this.values;
-                let unsubscribed = false;
-                let unsubscribe;
-                function tick() {
-                    setTimeout(check, 17);
-                }
-                function check() {
-                    if (unsubscribed) {
-                        return;
-                    }
-                    if (!owns.call(values, key)) {
-                        tick(); // eslint-disable-line no-use-before-define
-                        return;
-                    }
-                    unsubscribe = values[key].subscribe(subscriber);
-                }
-                tick();
-                return () => {
-                    unsubscribed = true;
-                    if (unsubscribe) {
-                        unsubscribe();
-                    }
-                };
-            });
+            this.values[key] = new InjectableObservable();
         }
         return this.values[key];
     }

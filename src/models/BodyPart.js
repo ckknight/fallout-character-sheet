@@ -37,10 +37,10 @@ const fields = {
     crippleEffect: new Effect(),
     crippleHealth: 0,
     cripplePartCount: 0,
-    meta: '',
     parts: Immutable.Map(),
     targetPenalty: 0,
     damage: 'value',
+    meta: '',
 };
 
 function fallback(value, otherwise) {

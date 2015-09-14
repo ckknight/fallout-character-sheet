@@ -2,13 +2,14 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
 import Trait from '../../models/Trait';
-import algorithm from './algorithm';
+import algorithm from '../algorithm';
 import Immutable from 'immutable';
 import renderRef from './renderRef';
 import Calculations from './Calculations';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
 import renderEffect from './renderEffect';
+import collapsableBox from '../collapsableBox';
 
 function isTraitChoosable(trait, calculations) {
     return algorithm({
@@ -56,8 +57,17 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
                         key: 'description',
                     }, description),
                 ]))
-            .startWith(renderLoading(trait.key))
-            .catch(renderError.handler(trait.key)),
+            .startWith(loadingIndicator(trait.key))
+            .catch(errorHandler(trait.key)),
+        smallDOM: checked$
+            .map(isChosen => {
+                if (!isChosen) {
+                    return null;
+                }
+                return h(`span.trait-name`, {
+                    key: trait.key,
+                }, [trait.name]);
+            }),
         value$: checked$,
         effect$: checked$
             .map(isChosen => {
@@ -119,7 +129,7 @@ function getTraitDescription(trait, calculations) {
         ]);
 }
 
-export default function traits({DOM, value$: inputValue$, calculations}) {
+export default function traits({DOM, value$: inputValue$, uiState$, calculations}) {
     const allTraitViews = Trait.all()
         .toArray()
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
@@ -131,19 +141,24 @@ export default function traits({DOM, value$: inputValue$, calculations}) {
         .distinctUntilChanged()
         .map(x => x.toArray().sort())
         .shareReplay(1);
-    calculations.set('effects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$.startWith(null)))
+    calculations.set('traitEffects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$.startWith(null)))
         .map(effects => new Immutable.Set(effects.filter(effect => effect)))
         .startWith(new Immutable.Set())
         .distinctUntilChanged(undefined, Immutable.is)
         .map(effects => effects.toArray())
         .shareReplay(1));
+
+    const boxView = collapsableBox('traits', 'Traits', {
+        DOM,
+        value$: uiState$,
+        collapsedBody$: Rx.Observable.combineLatest(allTraitViews.map(t => t.smallDOM))
+            .map(vTrees => vTrees.filter(x => x)),
+        uncollapsedBody$: Rx.Observable.combineLatest(allTraitViews.map(t => t.DOM)),
+    });
+
     return {
-        DOM: Rx.Observable.combineLatest(allTraitViews.map(t => t.DOM))
-            .startWith([renderLoading('traits')])
-            .map(vTrees => h('section.traits', [
-                    h('h2.traits-title', ['Traits']),
-                ].concat(vTrees)))
-            .catch(renderError.handler('traits')),
+        DOM: boxView.DOM,
         value$,
+        uiState$: boxView.value$,
     };
 }

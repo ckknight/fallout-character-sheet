@@ -7,7 +7,6 @@ function makeLocalStorageSourceDriver(keyName) {
 function makeLocalStorageSinkDriver(keyName) {
     return function (keyValue$) {
         keyValue$.subscribe(keyValue => {
-            console.log('setting to ', keyValue);
             localStorage.setItem(keyName, keyValue);
         });
     };

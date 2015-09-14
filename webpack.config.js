@@ -31,10 +31,13 @@ module.exports = {
     ],
 
     resolve: {
-        extensions: ['', '.js', '.json'],
+        extensions: ['', '.js', '.json', '.css'],
         modulesDirectories: [
             'node_modules',
         ],
+        alias: {
+            '~': path.resolve(__dirname, 'node_modules'),
+        },
     },
 
     module: {
@@ -60,6 +63,16 @@ module.exports = {
                         'es7.trailingFunctionCommas',
                     ],
                 },
+            },
+
+            {
+                test: /\.scss$/,
+                loader: 'style!css!sass',
+            },
+
+            {
+                test: /\.css$/,
+                loader: 'style!css',
             },
 
             {

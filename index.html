@@ -29,10 +29,28 @@
   	  .binary.add > .add--operand > .binary.mul::after,
 	  .binary.sub > .sub--left > .binary.add::before,
 	  .binary.sub > .sub--left > .binary.add::after,
+	  .binary.sub > .sub--left > .binary.sub::before,
+	  .binary.sub > .sub--left > .binary.sub::after,
 	  .binary.sub > .sub--operand > .binary.mul::before,
 	  .binary.sub > .sub--operand > .binary.mul::after,
 	  .binary.sub > .sub--operand > .binary.div::before,
-	  .binary.sub > .sub--operand > .binary.div::after {
+	  .binary.sub > .sub--operand > .binary.div::after,
+	  .binary.or > .or--operand > .binary.or::before,
+	  .binary.or > .or--operand > .binary.or::after ,
+	  .binary.and > .and--operand > .binary.and::before,
+	  .binary.and > .and--operand > .binary.and::after,
+	  .binary.or > .or--operand > .binary.lte::before,
+	  .binary.or > .or--operand > .binary.lte::after ,
+	  .binary.and > .and--operand > .binary.lte::before,
+	  .binary.and > .and--operand > .binary.lte::after,
+	  .binary.or > .or--operand > .binary.gte::before,
+	  .binary.or > .or--operand > .binary.gte::after ,
+	  .binary.and > .and--operand > .binary.gte::before,
+	  .binary.and > .and--operand > .binary.gte::after,
+	  .binary.or > .or--operand > .binary.eq::before,
+	  .binary.or > .or--operand > .binary.eq::after ,
+	  .binary.and > .and--operand > .binary.eq::before,
+	  .binary.and > .and--operand > .binary.eq::after {
   		  content: ""
   	  }
 
@@ -51,8 +69,8 @@
 		  display: flex;
 		  flex-flow: row wrap;
 		  justify-content: space-around;
-		  max-width: 600px;
 		  align-content: flex-start;
+		  flex: 2 0 30em;
 	  }
 	  .cosmetic > * {
 		  margin-bottom: 1em;
@@ -69,6 +87,7 @@
 	  .primary {
 		  display: flex;
 		  flex-flow: column;
+		  flex: 1 0 20em;
 	  }
 
 	  .primary-statistic {
@@ -89,6 +108,22 @@
 
   	  .primary.collapsed .primary-body .primary-statistic-summary {
 		  flex: 1;
+	  }
+
+	  .secondary.collapsed .secondary-body {
+		  display: flex;
+		  flex-flow: column wrap;
+		  align-items: center;
+		  max-height: 20em;
+	  }
+
+	  .skills.collapsed .skill-category {
+		  display: flex;
+		  flex-flow: row wrap;
+	  }
+
+	  .skills.collapsed .skill-name {
+		  min-width: 7em;
 	  }
 
 	  .primary-total {
@@ -190,6 +225,161 @@
 	  .boolean .boolean-true {
 		  color: inherit;
 	  }
+
+	  .secondary {
+		  flex: 2 0 20em;
+	  }
+
+	  .secondary.collapsed {
+		  flex: 1 0 10em;
+	  }
+
+	  .skills {
+		  flex: 2 0 20em;
+	  }
+
+	  .skills.collapsed {
+		  flex: 1 0 10em;
+	  }
+
+	  .perks {
+		  flex: 2 0 20em;
+	  }
+
+	  .perks.collapsed {
+		  flex: 1 0 10em;
+	  }
+
+	  .traits {
+		  flex: 2 0 20em;
+	  }
+
+	  .traits.collapsed {
+		  flex: 1 0 10em;
+	  }
+
+	  .health {
+		  flex: 2 0 20em;
+	  }
+
+	  .health-collapsed {
+		  flex: 1 0 10em;
+	  }
+
+	  .body-part-title {
+		  min-width: 5em;
+		  display: inline-block;
+		  font-size: 1.2em;
+	  }
+
+	  .body-part-target-penalty,
+	  .body-part-damage,
+	  .sub-body-part-target-penalty,
+	  .sub-body-part-damage {
+		  display: none;
+	  }
+
+	  .body-part > .body-part {
+		  margin-left: 1em;
+	  }
+
+	  .sub-body-part {
+		  margin-left: 1em;
+	  }
+
+	  .sub-body-part-title {
+		  min-width: 5em;
+		  display: inline-block;
+	  }
+
+	  .health-body-parts {
+		  display: flex;
+		  flex-flow: row wrap;
+		  justify-content: center;
+		  align-items: center;
+	  }
+
+	  .body-part {
+		  text-align: center;
+	  }
+
+	  .body-part-head {
+		  flex: 1 0 100%;
+		  order: 1;
+	  }
+
+	  .body-part-leftArm {
+		  flex: 1 0 33%;
+		  order: 2;
+	  }
+
+	  .body-part-torso {
+		  flex: 1 0 33%;
+		  order: 3;
+	  }
+
+	  .body-part-rightArm {
+		  flex: 1 0 33%;
+		  order: 4;
+	  }
+
+	  .body-part-leftLeg {
+		  flex: 1 0 50%;
+		  order: 5;
+	  }
+
+	  .body-part-rightLeg {
+		  flex: 1 0 50%;
+		  order: 6;
+	  }
+/*
+	  .secondary-statistic-healingRate {
+		  order: 1
+	  }
+
+	  .secondary-statistic-level {
+		  order: 1
+	  }
+
+	  .secondary-statistic-resistNormal {
+		  order: 3
+	  }
+
+	  .secondary-statistic-resistNormalThreshold {
+		  order: 4
+	  }
+
+	  .secondary-statistic-resistElectricity {
+		  order: 5
+	  }
+
+	  .secondary-statistic-resistElectricityThreshold {
+		  order: 6
+	  }
+
+	  .secondary-statistic-resistExplosives {
+		  order: 7
+	  }
+
+	  .secondary-statistic-resistExplosivesThreshold {
+		  order: 8
+	  }
+
+	  .secondary-statistic-resistLaser {
+		  order: 9
+	  }
+
+	  .secondary-statistic-resistLaserThreshold {
+		  order: 10
+	  }
+
+	  .secondary-statistic-resistPlasma {
+		  order: 11
+	  }
+
+	  .secondary-statistic-resistPlasmaThreshold {
+		  order: 12
+	  }*/
 
 	  h1, h2, h3, h4, h5, h6 {
 		  margin: 0;

@@ -1,4 +1,104 @@
 {
+    "APPAREL": {
+        "chineseJumpsuit": {
+            "effect": {
+                "smallGuns": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                }
+            },
+            "price": {
+                "caps": 10,
+                "denarius": 5,
+                "ncr": 15
+            },
+            "weight": 3
+        },
+        "mercenaryFashions": {
+            "effect": {
+                "melee": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                },
+                "smallGuns": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                }
+            },
+            "price": {
+                "caps": 10,
+                "denarius": 5,
+                "ncr": 10
+            },
+            "weight": 8
+        },
+        "vaultJumpsuit": {
+            "effect": {
+                "melee": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                },
+                "speech": {
+                    "$add": [
+                        "value",
+                        2
+                    ]
+                }
+            },
+            "price": {
+                "caps": 15,
+                "denarius": 15,
+                "ncr": 20
+            },
+            "weight": 3
+        },
+        "vaultLabCoat": {
+            "effect": {
+                "science": {
+                    "$add": [
+                        "value",
+                        10
+                    ]
+                }
+            },
+            "price": {
+                "caps": 8,
+                "denarius": 5,
+                "ncr": 12
+            },
+            "weight": 10
+        },
+        "vaultUtilityJumpsuit": {
+            "effect": {
+                "lockpick": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                },
+                "repair": {
+                    "$add": [
+                        "value",
+                        5
+                    ]
+                }
+            },
+            "price": {
+                "caps": 8,
+                "denarius": 5,
+                "ncr": 12
+            },
+            "weight": 5
+        }
+    },
     "ATTACK_TYPES": {
         "acid": {
             "damagePerRound": {
@@ -1256,7 +1356,6 @@
     },
     "BODY_PARTS": {
         "arm": {
-            "multiple": ["leftArm", "rightArm"],
             "crippleEffect": {
                 "bigGuns": {
                     "$sub": [
@@ -1304,6 +1403,10 @@
             },
             "cripplePartCount": 2,
             "meta": "-45% penalty to all skills if both arms are crippled",
+            "multiple": [
+                "leftArm",
+                "rightArm"
+            ],
             "parts": {
                 "elbow": {
                     "crippleEffect": {
@@ -1346,14 +1449,14 @@
                     "crippleEffect": {
                         "medicine": {
                             "$sub": [
-                                10,
-                                "value"
+                                "value",
+                                10
                             ]
                         },
                         "technical": {
                             "$sub": [
-                                10,
-                                "value"
+                                "value",
+                                10
                             ]
                         }
                     },
@@ -1586,7 +1689,6 @@
             "targetPenalty": 25
         },
         "leg": {
-            "multiple": ["leftLeg", "rightLeg"],
             "crippleHealth": {
                 "$add": [
                     "endurance",
@@ -1602,6 +1704,10 @@
             },
             "cripplePartCount": 2,
             "meta": "Each leg is necessary to move properly, so having one crippled will make running and sprinting impossible. If both legs become crippled, the player will no longer be able to walk, and moving one hex will be treated as a ‘Run’ action (As they are crawling across the ground).",
+            "multiple": [
+                "leftLeg",
+                "rightLeg"
+            ],
             "parts": {
                 "calf": {
                     "crippleEffect": {
@@ -1805,56 +1911,147 @@
             "targetPenalty": 0
         }
     },
+    "CHEMS": {
+        "antivenom": {
+            "cure": [
+                "poisonTypeA",
+                "poisonTypeB",
+                "poisonTypeC",
+                "poisonTypeD"
+            ],
+            "price": {
+                "caps": 35,
+                "denarius": 15,
+                "ncr": 40
+            }
+        },
+        "doctorBag": {
+            "meta": "A Doctor's Bag gives you a 15% bonus when healing crippled limbs and/or sight.",
+            "price": {
+                "caps": 60,
+                "denarius": 30,
+                "ncr": 70
+            }
+        },
+        "firstAidKit": {
+            "meta": "required for the first aid ability",
+            "price": {
+                "caps": 200,
+                "denarius": 100,
+                "ncr": 250
+            }
+        },
+        "fixer": {
+            "meta": "One dose of Fixer will stave off withdrawal symptoms for 3 hours.",
+            "price": {
+                "caps": 20,
+                "denarius": 10,
+                "ncr": 30
+            }
+        },
+        "medX": {
+            "effect": {
+                "armorClass": {
+                    "$add": [
+                        "value",
+                        10
+                    ]
+                }
+            },
+            "price": {
+                "caps": 20,
+                "denarius": 10,
+                "ncr": 30
+            }
+        },
+        "radAway": {
+            "effect": {
+                "rads": {
+                    "$sub": [
+                        "value",
+                        150
+                    ]
+                }
+            },
+            "price": {
+                "caps": 500,
+                "denarius": 250,
+                "ncr": 550
+            }
+        },
+        "radX": {
+            "duration": 6,
+            "effect": {
+                "resistRadiation": {
+                    "$add": [
+                        "value",
+                        50
+                    ]
+                }
+            },
+            "price": {
+                "caps": 40,
+                "denarius": 20,
+                "ncr": 50
+            }
+        },
+        "stimpack": {
+            "effect": {
+                "currentHealth": {
+                    "$add": [
+                        "value",
+                        {
+                            "$rand": 10
+                        },
+                        10
+                    ]
+                }
+            }
+        },
+        "superStimpack": {
+            "effect": {
+                "currentHealth": {
+                    "$add": [
+                        "value",
+                        {
+                            "$rand": 10
+                        },
+                        {
+                            "$rand": 10
+                        },
+                        {
+                            "$rand": 10
+                        },
+                        {
+                            "$rand": 10
+                        },
+                        {
+                            "$rand": 10
+                        },
+                        50
+                    ]
+                }
+            },
+            "meta": "Directly after combat, -1 Strength and -1 Endurance for 1 hour"
+        }
+    },
+    "CONDITIONS": {
+        "jogging": {
+        },
+        "running": {
+        },
+        "sprinting": {
+        },
+        "still": {
+        },
+        "walking": {
+        }
+    },
     "LOCALIZATION": {
         "en-US": {
-            "skills": "Skills",
-            "perks": "Perks",
-            "doctorHealing": "Doctor Healing",
-            "firstAidHealing": "First Aid Healing",
-            "burstAttackActionPointCost": "Burst Attack Action Point Cost",
-            "withdrawalTime": "Withdrawal Time",
-            "receivedExplosiveDamage": "Received Explosion Damage",
-            "karma": "Karma",
-            "standUpActionPointCost": "Stand Up Action Point Cost",
-            "inventoryActionPointCost": "Inventory Action Point Cost",
-            "doctorActionPointCost": "Doctor Action Point Cost",
-            "fallDamage": "Fall Damage",
-            "xpMultiplier": "XP Multiplier",
-            "explosiveDamage": "Explosive Damage",
-            "criticalDamage": "Critical Damage",
-            "changeStanceCost": "Change Stance Cost",
-            "lightLevelPenality": "Light Level Penalty",
-            "freeMovement": "Free Movement",
-            "skillPointsPerBook": "Skill Points per Book",
-            "rangedDamage": "Ranged Damage",
-            "travelTime": "Travel Time",
-            "likability": "Likability",
-            "psychoAddictionChance": "Psycho Addiction Chance",
-            "firstAidActionPointCost": "First Aid Action Point Cost",
-            "vehicleWreckDamage": "Vehicle Wreck Damage",
-            "limbDamageChance": "Limb Damage Chance",
-            "damagePerDay": "Damage per Day",
-            "psychoEffects": "Psycho Effects",
-            "damagePerRound": "Damage per Round",
-            "value": "value",
-            "input": "input",
-            "primaryTotal": "Primary Total",
-            "skillPoints": "Skill Points",
-            "damage": "Damage",
-            "criticalFailureChance": "Critical Failure Chance",
-            "addictionRecovery": "Addiction Recovery",
-            "addictionChance": "Addiction Chance",
-            "chemDuration": "Chem Duration",
-            "levelsPerPerk": "Levels per Perk",
-            "skillPointsPerLevel": "Skill Points per Level",
-            "actionPointCost": "Action Point Cost",
-            "name": "Name","age":"Age","hair":"Hair","eyes":"Eyes","appearance":"Appearance","sex":"Sex","weight":"Weight","height":"Height",
-            "travel": "Travel",
-            "experience": {
-                "abbr": "XP",
-                "name": "Experience"
-            },
-            "race": "Race",
+            "rangedActionPointCost": "Ranged Action Point Cost",
+            "meleeActionPointCost": "Melee Action Point Cost",
+            "unarmedActionPointCost": "Unarmed Action Point Cost",
             "actionChild": "Action Boy (or Girl)",
             "actionPointRegeneration": {
                 "abbr": "APR",
@@ -1864,19 +2061,21 @@
                 "abbr": "AP",
                 "name": "Action Points"
             },
+            "addictionChance": "Addiction Chance",
+            "addictionRecovery": "Addiction Recovery",
             "adrenalineRush": "Adrenaline Rush",
+            "age": "Age",
             "agility": {
                 "abbr": "Agi",
                 "name": "Agility"
             },
             "alphaMutant": "Mutant (Alpha)",
             "animalFriend": "Animal Friend",
+            "appearance": "Appearance",
             "arm": {
                 "name": "Arm",
                 "plural": "Arms"
             },
-            "leftArm": "Left Arm",
-            "rightArm": "Right Arm",
             "armorClass": {
                 "abbr": "AC",
                 "name": "Armor Class"
@@ -1907,6 +2106,7 @@
             "brownNoser": "Brown-Noser",
             "bruiser": "Bruiser",
             "brutishHulk": "Brutish Hulk",
+            "burstAttackActionPointCost": "Burst Attack Action Point Cost",
             "calf": "Calf",
             "cancerousGrowth": "Cancerous Growth",
             "carryWeight": {
@@ -1915,10 +2115,12 @@
             },
             "cautiousNature": "Cautious Nature",
             "centaur": "Centaur",
+            "changeStanceCost": "Change Stance Cost",
             "charisma": {
                 "abbr": "Cha",
                 "name": "Charisma"
             },
+            "chemDuration": "Chem Duration",
             "chemReliant": "Chem Reliant",
             "chemResistant": "Chem Resistant",
             "chems": "Chems",
@@ -1932,11 +2134,16 @@
                 "abbr": "CC",
                 "name": "Critical Chance"
             },
+            "criticalDamage": "Critical Damage",
             "criticalFailure": {
                 "abbr": "CF",
                 "name": "Critical Failure"
             },
+            "criticalFailureChance": "Critical Failure Chance",
             "cultOfPersonality": "Cult of Personality",
+            "damage": "Damage",
+            "damagePerDay": "Damage per Day",
+            "damagePerRound": "Damage per Round",
             "damageThreshold": {
                 "abbr": "DT",
                 "name": "Damage Threshold"
@@ -1953,6 +2160,8 @@
             "disguise": "Disguise",
             "divineFavor": "Divine Favor",
             "doctor": "Doctor",
+            "doctorActionPointCost": "Doctor Action Point Cost",
+            "doctorHealing": "Doctor Healing",
             "dodger": "Dodger",
             "dog": "Dog",
             "dolphin": "Dolphin",
@@ -1967,9 +2176,16 @@
                 "name": "Endurance"
             },
             "energyWeapons": "Energy Weapons",
+            "experience": {
+                "abbr": "XP",
+                "name": "Experience"
+            },
+            "experienceMultiplier": "XP Multiplier",
             "explorer": "Explorer",
+            "explosiveDamage": "Explosive Damage",
             "explosives": "Explosives",
             "eyes": "Eyes",
+            "fallDamage": "Fall Damage",
             "fastMetabolism": "Fast Metabolism",
             "fastShot": "Fast Shot",
             "fasterHealing": "Faster Healing",
@@ -1984,6 +2200,8 @@
             "fireBreath": "Fire Breath",
             "fireGecko": "Fire Gecko",
             "firstAid": "First Aid",
+            "firstAidActionPointCost": "First Aid Action Point Cost",
+            "firstAidHealing": "First Aid Healing",
             "flail": "Flail",
             "flailer": "Flailer",
             "flexible": "Flexible",
@@ -1991,6 +2209,7 @@
             "flowerChild": "Flower Child",
             "forehead": "Forehead",
             "fortuneFinder": "Fortune Finder",
+            "freeMovement": "Free Movement",
             "gainAgility": "Gain Agility",
             "gainCharisma": "Gain Charisma",
             "gainEndurance": "Gain Endurance",
@@ -2014,6 +2233,7 @@
             "groin": "Groin",
             "gunner": "Gunner",
             "gut": "Gut",
+            "hair": "Hair",
             "hamFisted": "Ham-Fisted",
             "hand": "Hand",
             "handToHandEvade": "Hand-to-Hand Evade",
@@ -2029,16 +2249,19 @@
                 "name": "Health"
             },
             "heaveHo": "Heave, Ho!",
+            "height": "Height",
             "hereAndNow": "Here and Now",
             "hideOfScars": "Hide of Scars",
             "hip": "Hip",
             "hitTheDeck": "Hit the Deck",
             "horn": "Horn",
             "human": "Human",
+            "input": "input",
             "intelligence": {
                 "abbr": "Int",
                 "name": "Intelligence"
             },
+            "inventoryActionPointCost": "Inventory Action Point Cost",
             "jinxed": "Jinxed",
             "jollyRoger": "Jolly Roger",
             "judgementClass": {
@@ -2048,22 +2271,27 @@
             "jump": "Jump",
             "kamaSutra": "Kama Sutra",
             "kamikaze": "Kamikaze",
+            "karma": "Karma",
             "karmaBeacon": "Karma Beacon",
             "knee": "Knee",
             "leader": "Leader",
             "leadfoot": "Leadfoot",
+            "leftArm": "Left Arm",
+            "leftLeg": "Left Leg",
             "leg": {
                 "name": "Leg",
                 "plural": "Legs"
             },
-            "leftLeg": "Left Leg",
-            "rightLeg": "Right Leg",
             "lesserMolerat": "Lesser Molerat",
             "lesserPigrat": "Greater Pigrat",
             "lesserRadscorpion": "Lesser Radscorption",
             "level": "Level",
+            "levelsPerPerk": "Levels per Perk",
             "lifegiver": "Lifegiver",
+            "lightLevelPenality": "Light Level Penalty",
             "lightStep": "Light Step",
+            "likability": "Likability",
+            "limbDamageChance": "Limb Damage Chance",
             "livingAnatomy": "Living Anatomy",
             "lockpick": "Lockpick",
             "loner": "Loner",
@@ -2091,6 +2319,7 @@
             "mrFixit": "Mr. (or Ms.) Fixit",
             "mutate": "Mutate!",
             "mysteriousStranger": "Mysterious Stranger",
+            "name": "Name",
             "neck": "Neck",
             "negotiator": "Negotiator",
             "nightPerson": "Night Person",
@@ -2105,21 +2334,28 @@
                 "abbr": "Per",
                 "name": "Perception"
             },
+            "perks": "Perks",
             "pickpocket": "Pickpocket",
             "pilot": "Pilot",
             "presence": "Presence",
+            "primaryTotal": "Primary Total",
+            "psychoAddictionChance": "Psycho Addiction Chance",
+            "psychoEffects": "Psycho Effects",
             "psychotic": "Psychotic",
             "pyromaniac": "Pyromaniac",
             "quickPockets": "Quick Pockets",
             "quickRecovery": "Quick Recovery",
+            "race": "Race",
             "radChild": "Rad Child",
             "radRat": "Rad Rat",
             "radResistance": "Rad Resistance",
             "radiationBurst": "Radiation Burst",
             "radroach": "Radroach",
             "ram": "Ram",
+            "rangedDamage": "Ranged Damage",
             "rangedWeapons": "Ranged Weapons",
             "ranger": "Ranger",
+            "receivedExplosiveDamage": "Received Explosion Damage",
             "redBaron": "Red Baron",
             "repair": "Repair",
             "resistContactGas": {
@@ -2182,6 +2418,8 @@
                 "abbr": "RR",
                 "name": "Radiation Resistance"
             },
+            "rightArm": "Right Arm",
+            "rightLeg": "Right Leg",
             "roadWarrior": "Road Warrior",
             "salesman": "Salesman",
             "science": "Science",
@@ -2192,13 +2430,18 @@
                 "abbr": "Seq",
                 "name": "Sequence"
             },
+            "sex": "Sex",
             "sexAppeal": "Sex Appeal",
             "sharpshooter": "Sharpshooter",
             "shoulder": "Shoulder",
             "silentDeath": "Silent Death",
             "silentRunning": "Silent Running",
             "simpleWeapons": "Simple Weapons",
+            "skillPoints": "Skill Points",
+            "skillPointsPerBook": "Skill Points per Book",
+            "skillPointsPerLevel": "Skill Points per Level",
             "skilled": "Skilled",
+            "skills": "Skills",
             "slayer": "Slayer",
             "smallFrame": "Small Frame",
             "smallGuns": {
@@ -2214,6 +2457,7 @@
             "speech": "Speech",
             "spit": "Spit",
             "stalk": "Stalk",
+            "standUpActionPointCost": "Stand Up Action Point Cost",
             "stat": "Stat!",
             "steadyArm": "Steady Arm",
             "steal": "Steal",
@@ -2241,19 +2485,23 @@
             "torso": "Torso",
             "toughHide": "Tough Hide",
             "toughness": "Toughness",
+            "travel": "Travel",
+            "travelTime": "Travel Time",
             "tunnelRat": "Tunnel Rat",
             "unarmed": "Unarmed",
+            "value": "value",
             "vatSkin": "Vat Skin",
+            "vehicleWreckDamage": "Vehicle Wreck Damage",
             "wayOfTheFruit": "Way of the Fruit",
             "weaponHandling": "Weapon Handling",
             "webCrawler": "Web Crawler",
+            "weight": "Weight",
+            "withdrawalTime": "Withdrawal Time",
             "wolf": "Wolf",
             "yaoGuai": "Yao Guai"
         }
     },
     "MISCELLANEOUS": {
-        "actionPointCost": {
-        },
         "addictionChance": {
         },
         "addictionRecovery": {
@@ -2273,22 +2521,31 @@
         "damage": {
         },
         "damagePerDay": {
+            "value": 0
         },
         "damagePerRound": {
+            "value": 0
         },
         "doctorActionPointCost": {
-        },
-        "doctorHealing": {
+            "value": 10
         },
         "experience": {
+        },
+        "experienceMultiplier": {
+            "percent": true,
+            "value": 100
         },
         "explosiveDamage": {
         },
         "fallDamage": {
         },
         "firstAidActionPointCost": {
+            "value": 10
         },
         "firstAidHealing": {
+            "value": {
+                "$rand": 10
+            }
         },
         "freeMovement": {
         },
@@ -2304,6 +2561,8 @@
         },
         "limbDamageChance": {
         },
+        "meleeActionPointCost": {
+        },
         "movingVehicleDamagePenalty": {
         },
         "primaryTotal": {
@@ -2314,9 +2573,16 @@
         },
         "radsPerHour": {
         },
+        "rangedActionPointCost": {
+        },
         "rangedDamage": {
         },
         "receivedExplosiveDamage": {
+        },
+        "repairHealing": {
+            "value": {
+                "$rand": 10
+            }
         },
         "skillPoints": {
         },
@@ -2332,13 +2598,13 @@
         },
         "travelTime": {
         },
+        "unarmedActionPointCost": {
+        },
         "vehicleMaximumSpeed": {
         },
         "vehicleWreckDamage": {
         },
         "withdrawalTime": {
-        },
-        "xpMultiplier": {
         }
     },
     "PERKS": {
@@ -2456,17 +2722,11 @@
         },
         "bonusHandToHandAttacks": {
             "effect": {
-                "$when": {
-                    "melee": {
-                        "actionPointCost": {
-                            "$dec": "value"
-                        }
-                    },
-                    "unarmed": {
-                        "actionPointCost": {
-                            "$dec": "value"
-                        }
-                    }
+                "meleeActionPointCost": {
+                    "$dec": "value"
+                },
+                "unarmedActionPointCost": {
+                    "$dec": "value"
                 }
             },
             "ranks": 1,
@@ -2530,12 +2790,8 @@
         },
         "bonusRateOfFire": {
             "effect": {
-                "$when": {
-                    "ranged": {
-                        "actionPointCost": {
-                            "$dec": "value"
-                        }
-                    }
+                "rangedActionPointCost": {
+                    "$dec": "value"
                 }
             },
             "ranks": 1,
@@ -3941,8 +4197,16 @@
         },
         "stat": {
             "effect": {
-                "doctorActionPointCost": 5,
-                "firstAidActionPointCost": 5
+                "doctorActionPointCost": {
+                    "$ceil": {
+                        "$half": "value"
+                    }
+                },
+                "firstAidActionPointCost": {
+                    "$ceil": {
+                        "$half": "value"
+                    }
+                }
             },
             "ranks": 1,
             "requirements": {
@@ -4043,7 +4307,7 @@
         },
         "swiftLearner": {
             "effect": {
-                "xpMultiplier": {
+                "experienceMultiplier": {
                     "$add": [
                         "value",
                         5
@@ -4322,8 +4586,10 @@
             }
         },
         "deathclaw": {
+            "nonplayable": true
         },
         "dog": {
+            "nonplayable": true
         },
         "ghoul": {
             "agility": {
@@ -4415,21 +4681,21 @@
             }
         }
     },
-    "CONDITIONS": {
-        "jogging": {},
-        "running": {},
-        "sprinting": {},
-        "still": {},
-        "walking": {}
-    },
     "SECONDARY_STATISTICS": {
         "actionPointRegeneration": {
+            "order": 28,
             "value": {
                 "$when": {
                     "jogging": {
                         "$floor": {
                             "$half": "agility"
                         }
+                    },
+                    "otherwise": {
+                        "$add": [
+                            3,
+                            "agility"
+                        ]
                     },
                     "running": 0,
                     "sprinting": {
@@ -4452,17 +4718,12 @@
                                 }
                             }
                         ]
-                    },
-                    "otherwise": {
-                        "$add": [
-                            3,
-                            "agility"
-                        ]
                     }
                 }
             }
         },
         "actionPoints": {
+            "order": 27,
             "value": {
                 "$add": [
                     5,
@@ -4480,10 +4741,12 @@
             }
         },
         "armorClass": {
+            "order": 25,
             "percent": true,
             "value": "agility"
         },
         "carryWeight": {
+            "order": 26,
             "value": {
                 "$add": [
                     25,
@@ -4497,10 +4760,12 @@
             }
         },
         "criticalChance": {
+            "order": 23,
             "percent": true,
             "value": "luck"
         },
         "criticalFailure": {
+            "order": 24,
             "percent": true,
             "value": {
                 "$add": [
@@ -4510,13 +4775,29 @@
             }
         },
         "damageThreshold": {
+            "order": 22,
             "value": 0
         },
         "detectionClass": {
+            "order": 21,
             "percent": true,
             "value": "perception"
         },
+        "doctorHealing": {
+            "order": 29,
+            "value": {
+                "$add": [
+                    {
+                        "$rand": 10
+                    },
+                    {
+                        "$rand": 10
+                    }
+                ]
+            }
+        },
         "healingRate": {
+            "order": 2,
             "value": {
                 "$floor": {
                     "$div": [
@@ -4527,6 +4808,7 @@
             }
         },
         "health": {
+            "order": 20,
             "value": {
                 "$add": [
                     15,
@@ -4553,10 +4835,12 @@
             }
         },
         "judgementClass": {
+            "order": 21,
             "percent": true,
             "value": "charisma"
         },
         "level": {
+            "order": 1,
             "value": {
                 "$floor": {
                     "$add": [
@@ -4584,62 +4868,81 @@
             }
         },
         "meleeDamage": {
+            "order": 19,
             "value": {
-                "$max": [1, {
-                "$sub": [
-                    "strength",
-                    5
-                ]}]
+                "$max": [
+                    1,
+                    {
+                        "$sub": [
+                            "strength",
+                            5
+                        ]
+                    }
+                ]
             }
         },
         "resistContactGas": {
+            "order": 17,
             "percent": true,
             "value": 0
         },
         "resistElectricity": {
+            "order": 15,
             "percent": true,
             "value": 0
         },
         "resistExplosion": {
+            "order": 7,
             "percent": true,
             "value": 0
         },
         "resistExplosionThreshold": {
+            "order": 8,
             "value": 0
         },
         "resistFire": {
+            "order": 5,
             "percent": true,
             "value": 0
         },
         "resistFireThreshold": {
+            "order": 6,
             "value": 0
         },
         "resistInhaledGas": {
+            "order": 16,
             "percent": true,
             "value": 0
         },
         "resistLaser": {
+            "order": 9,
             "percent": true,
             "value": 0
         },
         "resistLaserThreshold": {
+            "order": 10,
             "value": 0
         },
         "resistNormal": {
+            "order": 3,
             "percent": true,
             "value": 0
         },
         "resistNormalThreshold": {
+            "order": 4,
             "value": 0
         },
         "resistPlasma": {
+            "order": 11,
             "percent": true,
             "value": 0
         },
         "resistPlasmaThreshold": {
+            "order": 12,
             "value": 0
         },
         "resistPoison": {
+            "order": 14,
             "percent": true,
             "value": {
                 "$mul": [
@@ -4649,12 +4952,14 @@
             }
         },
         "resistRadiation": {
+            "order": 13,
             "percent": true,
             "value": {
                 "$double": "endurance"
             }
         },
         "sequence": {
+            "order": 18,
             "value": {
                 "$double": "perception"
             }
@@ -4958,13 +5263,10 @@
             "resistRadiation": 0
         },
         "fastShot": {
-            "actionPointCost": {
-                "$sub": [
-                    "value",
-                    1
-                ]
-            },
-            "meta": "Prevents action: Targeted Shot"
+            "meta": "Prevents action: Targeted Shot",
+            "rangedActionPointCost": {
+                "$dec": "value"
+            }
         },
         "fearTheReaper": {
             "levelsPerPerk": {
@@ -5001,14 +5303,15 @@
                 ]
             },
             "skillPoints": {
-                "$add": [
-                    {"$sub":["value",10]},
-                    {
-                        "$mul": [
-                            "level",
-                            -5
-                        ]
-                    }
+                "$sub": [
+                    "value",
+                    10
+                ]
+            },
+            "skillPointsPerLevel": {
+                "$sub": [
+                    "value",
+                    5
                 ]
             }
         },
@@ -5311,7 +5614,10 @@
             "carryWeight": {
                 "$add": [
                     {
-                        "$sub": ["value", 25]
+                        "$sub": [
+                            "value",
+                            25
+                        ]
                     },
                     {
                         "$mul": [

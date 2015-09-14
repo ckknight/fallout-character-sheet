@@ -1,16 +1,17 @@
 import { Rx } from '@cycle/core';
-import { h } from '@cycle/dom';
 import select from '../select';
 import Race from '../../models/Race';
 
-export default function race({DOM, value$, calculations}) {
+export default function raceDialogue({DOM, value$, calculations}) {
     const raceSelect = select('race', {
         DOM,
         value$,
-        options$: Rx.Observable.return(Race.all().map(race => ({
-                value: race.key,
-                text: race.name,
-        }))),
+        options$: Rx.Observable.return(Race.all()
+            .filter(race => race.playable)
+            .map(race => ({
+                    value: race.key,
+                    text: race.name,
+            }))),
         props$: Rx.Observable.return({
             fallback: '\u2014 Race \u2014',
         }),

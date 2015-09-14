@@ -2,40 +2,74 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
 import BodyPart from '../../models/BodyPart';
-import algorithm from './algorithm';
+import algorithm from '../algorithm';
 import Immutable from 'immutable';
 import renderRef from './renderRef';
 import Calculations from './Calculations';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
-import renderNumber from './renderNumber';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
+import renderNumber from '../algorithm/number/render';
 import * as localize from '../../localize';
 import renderEffect from './renderEffect';
 import Perk from '../../models/Perk';
+import collapsableBox from '../collapsableBox';
 
+function getMinimum(equation, key) {
+    if (Object(equation) !== equation) {
+        return null;
+    }
+
+    if (equation._name === 'BinaryOperation') {
+        if (equation.type === '<=' && typeof equation.left === 'number' && equation.right === key) {
+            return equation.left;
+        } else if (equation.type === 'and') {
+            const leftResult = getMinimum(equation.left, key);
+            if (leftResult !== null) {
+                return leftResult;
+            }
+            return getMinimum(equation.right, key);
+        }
+    }
+    return null;
+}
 
 function makePerkView(perk, inputValue$, DOM, calculations) {
-    // key: '',
-    // effect: new Effect(),
-    // ranks: 1,
-    // requirements: true,
-    // meta: '',
     const requirementsView = algorithm({
         equation$: Rx.Observable.return(perk.requirements),
         calculations,
     });
     const effectVTree$ = renderEffect(perk.effect, calculations);
-    const choosePerkView = input(`perk-choose-${perk.key}`, 'checkbox', {
-        DOM,
-        value$: inputValue$
-            .map(ranks => !!ranks),
-        props$: requirementsView.value$.startWith(true)
-            .map(fulfillsRequirements => ({
-                    className: 'perk-choose',
-                    disabled: !fulfillsRequirements,
-            })),
-    });
+    let choosePerkView;
+    if (perk.ranks === 1) {
+        choosePerkView = input(`perk-choose-${perk.key}`, 'checkbox', {
+            DOM,
+            value$: inputValue$
+                .map(ranks => !!ranks),
+            props$: requirementsView.value$.startWith(true)
+                .map(fulfillsRequirements => ({
+                        className: 'perk-choose',
+                        disabled: !fulfillsRequirements,
+                })),
+        });
+    } else {
+        choosePerkView = input(`perk-choose-${perk.key}`, 'integer', {
+            DOM,
+            value$: inputValue$,
+            props$: requirementsView.value$.startWith(true)
+                .map(fulfillsRequirements => ({
+                        className: 'perk-choose',
+                        disabled: !fulfillsRequirements,
+                        min: 0,
+                        max: perk.ranks,
+                })),
+        });
+    }
+
+    const value$ = choosePerkView.value$
+        .map(x => x ? 1 : 0);
+
     return {
+        order: getMinimum(perk.requirements, 'level') || 0,
         perk,
         DOM: Rx.Observable.combineLatest(choosePerkView.DOM, requirementsView.DOM, effectVTree$, requirementsView.value$.startWith(true),
             (choosePerkVTree, requirementsVTree, effectVTree, fulfillsRequirements) => h(`section.perk.perk-${perk.key}`, {
@@ -60,26 +94,34 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
                         key: 'meta',
                     }, [perk.meta]) : null,
                 ]))
-            .startWith([renderLoading(perk.key)])
-            .catch(renderError.handler(perk.key)),
-        value$: choosePerkView.value$
-            .map(x => x ? 1 : 0),
+            .startWith([loadingIndicator(perk.key)])
+            .catch(errorHandler(perk.key)),
+        smallDOM: value$
+            .map(ranksChosen => !ranksChosen ? null : h(`section.perk.perk-${perk.key}`, {
+                    key: perk.key,
+                    className: fulfillsRequirements ? 'perk-choosable' : 'perk-unchoosable',
+                }, [h(`span.perk-title`, {
+                    key: 'title',
+                }, [perk.name, ranksChosen > 1 ? ' (' + ranksChosen + ')' : null])])),
+        value$,
     };
 }
 
-export default function perks({DOM, value$: inputValue$, calculations}) {
+export default function perks({DOM, value$: inputValue$, uiState$, calculations}) {
     const allPerkViews = Perk.all()
         .toArray()
-        .map(perk => makePerkView(perk, inputValue$.map(x => x[perk.key] || 0), DOM, calculations));
+        .map(perk => makePerkView(perk, inputValue$.map(x => x[perk.key] || 0), DOM, calculations))
+        .sort((x, y) => x.order - y.order);
+
+    const boxView = collapsableBox('perks', localize.name('perks'), {
+        DOM,
+        value$: uiState$,
+        collapsedBody$: Rx.Observable.combineLatest(allPerkViews.map(t => t.smallDOM))
+            .map(vTrees => vTrees.filter(x => x)),
+        uncollapsedBody$: Rx.Observable.combineLatest(allPerkViews.map(t => t.DOM)),
+    });
     return {
-        DOM: Rx.Observable.combineLatest(allPerkViews.map(t => t.DOM))
-            .startWith([renderLoading('perks')])
-            .map(vTrees => h('section.perks', [
-                    h('h2.perks-title', {
-                        key: 'header',
-                    }, [localize.name('perks')]),
-                ].concat(vTrees)))
-            .catch(renderError.handler('perks')),
+        DOM: boxView.DOM,
         value$: Rx.Observable.merge(allPerkViews
             .map(({perk: {key}, value$}) => value$.map(value => o => o.set(key, value))))
             .startWith(Immutable.Map())
@@ -87,5 +129,6 @@ export default function perks({DOM, value$: inputValue$, calculations}) {
             .distinctUntilChanged(undefined, Immutable.is)
             .map(x => x.toJS())
             .shareReplay(1),
+        uiState$: boxView.value$,
     };
 }

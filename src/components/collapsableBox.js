@@ -1,7 +1,7 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
-import renderLoading from './characterSheet/renderLoading';
-import renderError from './characterSheet/renderError';
+import loadingIndicator from './loadingIndicator';
+import errorHandler from './errorHandler';
 import collapsableHeader from './collapsableHeader';
 
 export default function collapsableBox(key, title, {DOM, value$, collapsedBody$, uncollapsedBody$}) {
@@ -11,7 +11,6 @@ export default function collapsableBox(key, title, {DOM, value$, collapsedBody$,
     });
 
     const vTree$ = headerView.value$
-        .debounce(5)
         .combineLatest(headerView.DOM, (collapsed, header) => ({
                 collapsed,
                 header,
@@ -24,8 +23,8 @@ export default function collapsableBox(key, title, {DOM, value$, collapsedBody$,
                         h(`h2.${key}-title`, [title]),
                         h(`div.${key}-body`, vTrees),
                     ])))
-        .startWith([renderLoading(key)])
-        .catch(renderError.handler(key));
+        .startWith([loadingIndicator(key)])
+        .catch(errorHandler(key));
 
     return {
         DOM: vTree$,

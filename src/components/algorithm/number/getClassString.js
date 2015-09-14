@@ -1,5 +1,3 @@
-import { h } from '@cycle/dom';
-
 function getNumberClasses(value) {
     if (value === 0) {
         return ['zero', 'nonpositive', 'nonnegative'];
@@ -15,12 +13,6 @@ function getNumberClasses(value) {
     return ['nan'];
 }
 
-function getClassString(value) {
-    return '.number.number-' + getNumberClasses(value).join('.number-');
+export default function getClassString(value, type) {
+    return '.number.number-' + getNumberClasses(value).join('.number-') + (type ? '.number-' + type : '');
 }
-
-function renderNumber(value, type, props = {}) {
-    return h(`span.number-${type}${getClassString(value)}`, props, ['' + value]);
-}
-renderNumber.getClassString = getClassString;
-export default renderNumber;

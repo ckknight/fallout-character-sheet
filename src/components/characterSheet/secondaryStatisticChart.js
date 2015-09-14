@@ -3,19 +3,17 @@ import { h } from '@cycle/dom';
 import input from '../input';
 import combineLatestObject from '../../combineLatestObject';
 import SecondaryStatistic from '../../models/SecondaryStatistic';
-import algorithm from './algorithm';
+import algorithm from '../algorithm';
 import renderRef from './renderRef';
 import { replace as equationReplace } from '../../models/Equation';
 import Effect from '../../models/Effect';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
+import collapsableBox from '../collapsableBox';
 
-function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
+function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     const valueView = algorithm({
-        equation$: calculations.get('effect')
-            .startWith(new Effect())
-            .map(x => x[stat.key])
-            .map(x => equationReplace(x, 'value', stat.value)),
+        equation$: effecter(Rx.Observable.return(stat.value), stat.key),
         calculations,
     });
     calculations.set(stat.key, valueView.value$.startWith(0));
@@ -26,16 +24,25 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations}) {
                     key: stat.key,
                 }, [
                     renderRef(stat.key, 'stat-label'),
-                    value != null ? h(`span.stat-value`, [value]) : null,
+                    value != null ? h(`span.stat-value`, ['' + value]) : null,
                     vTree,
                 ]))
-            .startWith(renderLoading(stat.key))
-            .catch(renderError.handler(stat.key)),
+            .startWith(loadingIndicator(stat.key))
+            .catch(errorHandler(stat.key)),
+        smallDOM: valueView.value$.startWith(null)
+            .map(value => h(`div.secondary-statistic.secondary-statistic-${stat.key}` + (stat.percent ? '.secondary-statistic-percent' : ''), {
+                    key: stat.key,
+                }, [
+                    renderRef(stat.key, 'stat-label'),
+                    value != null ? h(`span.stat-value`, [value]) : null,
+                ]))
+            .startWith(loadingIndicator(stat.key))
+            .catch(errorHandler(stat.key)),
         value$: valueView.value$,
     };
 }
 
-export default function secondaryStatisticChart({DOM, value$, calculations}) {
+export default function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
     const statistics = SecondaryStatistic.all()
         .toArray();
     const statisticEntries = statistics
@@ -43,21 +50,29 @@ export default function secondaryStatisticChart({DOM, value$, calculations}) {
                 DOM,
                 value$,
                 calculations,
+                effecter,
             }));
 
+    const uncollapsedBody$ = Rx.Observable.combineLatest(
+        statisticEntries.map(a => a.DOM));
+
+    const collapsedBody$ = Rx.Observable.combineLatest(
+        statisticEntries.map(a => a.smallDOM));
+
+    const boxView = collapsableBox('secondary', 'Secondary Statistics', {
+        DOM,
+        value$: uiState$,
+        collapsedBody$,
+        uncollapsedBody$,
+    });
+
     return {
-        DOM: Rx.Observable.combineLatest(statisticEntries.map(a => a.DOM))
-            .startWith([renderLoading('secondary')])
-            .map(inputVTrees => h('section.secondary', {
-                    key: 'secondary',
-                }, [
-                    h('h2.secondary-title', ['Secondary Statistics']),
-                ].concat(inputVTrees)))
-            .catch(renderError.handler('secondary')),
+        DOM: boxView.DOM,
         value$: combineLatestObject(statistics.reduce((acc, stat, i) => {
             acc[stat.key] = statisticEntries[i].value$;
             return acc;
         }, {}))
             .shareReplay(1),
+        uiState$: boxView.value$,
     };
 }

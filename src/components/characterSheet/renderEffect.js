@@ -1,12 +1,13 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
-import algorithm from './algorithm';
+import algorithm from '../algorithm';
 import renderRef from './renderRef';
-import renderError from './renderError';
+import errorHandler from '../errorHandler';
+import { replace as equationReplace } from '../../models/Equation';
 
 function renderEffectEquation(key, equation, calculations) {
     return algorithm({
-        equation$: Rx.Observable.return(equation),
+        equation$: Rx.Observable.return(equationReplace(equation, 'value', key)),
         calculations,
     }).DOM;
 }
@@ -34,5 +35,5 @@ export default function renderEffect(effect, calculations) {
         .toArray())
         .startWith([])
         .map(vTrees => h('span.effect', vTrees))
-        .catch(renderError.handler('effect'));
+        .catch(errorHandler('effect'));
 }

@@ -2,16 +2,17 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
 import SkillCategory from '../../models/SkillCategory';
-import algorithm from './algorithm';
+import algorithm from '../algorithm';
 import { BinaryOperation } from '../../models/Equation';
 import Immutable from 'immutable';
 import Effect from '../../models/Effect';
 import { replace as equationReplace } from '../../models/Equation';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
 import * as localize from '../../localize';
+import collapsableBox from '../collapsableBox';
 
-function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
+function makeSkillView(skill, categoryKey, {DOM, inputTags$, inputIncrease$, calculations, effecter}) {
     const tagInput = input(`skill-tag-${skill.key}`, 'checkbox', {
         DOM,
         value$: inputTags$
@@ -26,7 +27,7 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
                 left: skill.value,
                 right: isTagged ? 15 : 0,
             }));
-    const increaseView = input(`skill-increase-${skill.key}`, 'number', {
+    const increaseView = input(`skill-increase-${skill.key}`, 'integer', {
         DOM,
         value$: inputIncrease$
             .map(increase => increase[skill.key] || 0)
@@ -44,14 +45,13 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
                 right: value,
             }));
 
-    const equation$ = taggedEquation$.combineLatest(calculations.get('effect').startWith(new Effect()),
-        (eq, effect) => equationReplace(effect[skill.key] || 'value', 'value', eq));
+    const equation$ = effecter(effecter(effecter(taggedEquation$, skill.key), categoryKey), 'skills');
 
     const algorithmView = algorithm({
         equation$,
         calculations,
     });
-    calculations.set(skill.key, algorithmView.value$);
+    calculations.set(skill.key, algorithmView.value$.startWith(0));
     return {
         skill,
         DOM: Rx.Observable.combineLatest(
@@ -72,24 +72,41 @@ function makeSkillView(skill, {DOM, inputTags$, inputIncrease$, calculations}) {
                     ]),
                     h(`span.skill-value`, {
                         key: 'value',
-                    }, [algorithmView != null ? algorithmValue + '' : algorithmView]),
+                    }, [algorithmValue != null ? algorithmValue + '' : null]),
                     increase,
                     algorithmDOM,
                 ]))
-            .startWith(renderLoading(skill.key))
-            .catch(renderError.handler(skill.key)),
+            .startWith(loadingIndicator(skill.key))
+            .catch(errorHandler(skill.key)),
+        smallDOM: Rx.Observable.combineLatest(
+            algorithmView.value$.startWith(null),
+            tagInput.value$.startWith(false),
+            (algorithmValue, tagValue) => h(`div.skill.skill-${skill.key}`, {
+                    className: tagValue ? 'skill-tagged' : 'skill-untagged',
+                    key: skill.key,
+                }, [
+                    h(`span.skill-name`, {
+                        key: 'name',
+                    }, [skill.name]),
+                    h(`span.skill-value`, {
+                        key: 'value',
+                    }, [algorithmValue != null ? algorithmValue + '' : null]),
+                ]))
+            .startWith(loadingIndicator(skill.key))
+            .catch(errorHandler(skill.key)),
         tagged$: tagInput.value$,
         increase$: increaseView.value$,
     };
 }
 
 function makeSkillCategoryView(category, dependencies) {
+    dependencies.calculations.set(category.key, Rx.Observable.return(0));
     const skillViews = category.skills.valueSeq()
-        .map(skill => makeSkillView(skill, dependencies))
+        .map(skill => makeSkillView(skill, category.key, dependencies))
         .toArray();
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
-            .startWith([renderLoading(category.key)])
+            .startWith([loadingIndicator(category.key)])
             .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
                     key: category.key,
                 }, [
@@ -97,7 +114,13 @@ function makeSkillCategoryView(category, dependencies) {
                         key: 'title',
                     }, [category.name]),
                 ].concat(skillVTrees)))
-            .catch(renderError.handler(category.key)),
+            .catch(errorHandler(category.key)),
+        smallDOM: Rx.Observable.combineLatest(skillViews.map(o => o.smallDOM))
+            .startWith([loadingIndicator(category.key)])
+            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
+                    key: category.key,
+                }, skillVTrees))
+            .catch(errorHandler(category.key)),
         tagged$: Rx.Observable.from(skillViews)
             .flatMap(({tagged$, skill: {key}}) => tagged$
                     .map(value => o => o.set(key, value)))
@@ -111,30 +134,36 @@ function makeSkillCategoryView(category, dependencies) {
     };
 }
 
-export default function skills({DOM, value$: inputValue$, calculations}) {
+export default function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
     const inputTags$ = inputValue$
         .map(value => value.tag || [])
-        .share();
+        .shareReplay(1);
     const inputIncrease$ = inputValue$
         .map(value => value.increase || {})
-        .share();
+        .shareReplay(1);
     const skillCategoryViews = SkillCategory.all()
         .map(category => makeSkillCategoryView(category, {
                 DOM,
                 inputTags$,
                 inputIncrease$,
                 calculations,
+                effecter,
             }))
         .toArray();
+
+    const collapsedBody$ = Rx.Observable.combineLatest(skillCategoryViews.map(o => o.smallDOM));
+
+    const uncollapsedBody$ = Rx.Observable.combineLatest(skillCategoryViews.map(o => o.DOM));
+
+    const boxView = collapsableBox('skills', localize.name('skills'), {
+        DOM,
+        value$: uiState$,
+        collapsedBody$,
+        uncollapsedBody$,
+    });
+
     return {
-        DOM: Rx.Observable.combineLatest(skillCategoryViews.map(o => o.DOM))
-            .startWith([renderLoading('skills')])
-            .map(vTrees => h('section.skills', {
-                    key: 'skills',
-                }, [
-                    h('h2.skills-title', [localize.name('skills')]),
-                ].concat(vTrees)))
-            .catch(renderError.handler('skills')),
+        DOM: boxView.DOM,
         value$: Rx.Observable.from(skillCategoryViews)
             .flatMap(({tagged$, increase$}) => Rx.Observable.merge(
                     tagged$
@@ -161,5 +190,6 @@ export default function skills({DOM, value$: inputValue$, calculations}) {
                         .toArray(),
                     increase: increase.toJS(),
             })),
+        uiState$: boxView.value$,
     };
 }

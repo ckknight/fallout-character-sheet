@@ -4,10 +4,10 @@ import input from '../input';
 import combineLatestObject from '../../combineLatestObject';
 import PrimaryStatistic from '../../models/PrimaryStatistic';
 import { replace as equationReplace } from '../../models/Equation';
-import algorithm from './algorithm';
-import renderNumber from './renderNumber';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
+import algorithm from '../algorithm';
+import renderNumber from '../algorithm/number/render';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
 import collapsableBox from '../collapsableBox';
 import remember from './remember';
 
@@ -18,10 +18,10 @@ function toExtrema(range) {
     };
 }
 
-function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
+function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     const raceExtrema$ = calculations.get('race')
         .pluck(stat.key);
-    const inputView = input(stat.key, 'number', {
+    const inputView = input(stat.key, 'integer', {
         DOM,
         value$: value$.map(value => value[stat.key] || 5).startWith(5),
         props$: raceExtrema$
@@ -32,16 +32,14 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
             })),
     });
     const extremaVTree$ = raceExtrema$
-        .startWith(renderLoading('extrema'))
+        .startWith(loadingIndicator('extrema'))
         .map(({min, max}) => h('span.stat-extrema', {
                 key: 'extrema',
             }, [renderNumber(min, 'value'), '/', renderNumber(max, 'value')]))
-        .catch(renderError.handler('extrema'));
-    const statEffect$ = calculations.get('effect')
-        .map(e => e[stat.key] || 'value');
+        .catch(errorHandler('extrema'));
+
     const effectedValue$ = raceExtrema$.combineLatest(algorithm({
-        equation$: inputView.value$.combineLatest(statEffect$,
-            (value, effect) => equationReplace(effect, 'value', value)),
+        equation$: effecter(inputView.value$, stat.key),
         calculations,
     }).value$,
         ({min, max} , value) => Math.min(max, Math.min(max, value)))
@@ -71,8 +69,8 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
                     }) : null,
                 ]);
             })
-            .startWith(renderLoading(stat.key))
-            .catch(renderError.handler(stat.key)),
+            .startWith(loadingIndicator(stat.key))
+            .catch(errorHandler(stat.key)),
         smallDOM: effectedValue$.startWith(null)
             .map(effectedValue => h(`div.primary-statistic-summary.primary-statistic-summary-${stat.key}`, {
                     key: stat.key,
@@ -88,7 +86,7 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations}) {
     };
 }
 
-export default function primaryStatisticChart({DOM, value$, uiState$, calculations}) {
+export default function primaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
     const statistics = PrimaryStatistic.all()
         .toArray();
     const statisticEntries = statistics
@@ -97,6 +95,7 @@ export default function primaryStatisticChart({DOM, value$, uiState$, calculatio
                 DOM,
                 value$,
                 calculations,
+                effecter,
             });
             calculations.set(stat.key, entry.effectedValue$);
             return entry;
@@ -106,20 +105,28 @@ export default function primaryStatisticChart({DOM, value$, uiState$, calculatio
         .map(values => values.reduce((x, y) => x + y, 0))
         .startWith(0);
 
-    const primaryTotal$ = calculations.get('race')
-        .pluck('primaryTotal')
-        .startWith(40);
+    const primaryTotal$ = algorithm({
+        equation$: effecter(calculations.get('race')
+            .pluck('primaryTotal')
+            .startWith(40), 'primaryTotal'),
+        calculations,
+    }).value$;
 
     const summaryVTree$ = Rx.Observable.combineLatest(sum$, primaryTotal$, (sum, primaryTotal) => {
         return h('div', {
             className: 'primary-total ' + (sum === primaryTotal ? 'primary-total--same' : ''),
             key: 'primaryTotal',
         }, [sum, '/', primaryTotal]);
-    }).catch(renderError.handler('primary-total'));
+    }).catch(errorHandler('primary-total'));
 
-    const uncollapsedBody$ = Rx.Observable.combineLatest(statisticEntries.map(a => a.DOM).concat([summaryVTree$]));
+    const uncollapsedBody$ = Rx.Observable.combineLatest([].concat(
+        statisticEntries
+            .map(a => a.DOM),
+        [summaryVTree$]));
 
-    const collapsedBody$ = Rx.Observable.combineLatest(statisticEntries.map(a => a.smallDOM));
+    const collapsedBody$ = Rx.Observable.combineLatest(
+        statisticEntries
+            .map(a => a.smallDOM));
 
     const boxView = collapsableBox('primary', 'Primary Statistics', {
         DOM,

@@ -3,10 +3,9 @@ import { h } from '@cycle/dom';
 import input from '../input';
 import select from '../select';
 import combineLatestObject from '../../combineLatestObject';
-import { RACE_STATS } from '../../constants.json';
 import * as localize from '../../localize';
-import renderLoading from './renderLoading';
-import renderError from './renderError';
+import loadingIndicator from '../loadingIndicator';
+import errorHandler from '../errorHandler';
 
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
@@ -25,14 +24,14 @@ function makeBox(selector, object, calculations) {
     return {
         DOM: Rx.Observable.combineLatest(Object.keys(object)
             .map(key => object[key].DOM
-                    .startWith(renderLoading(key))
+                    .startWith(loadingIndicator(key))
                     .map(vTree => h(`label.${key}-label`, {
                             key,
                         }, [localize.name(key), ' ', vTree]))
-                    .catch(renderError.handler(key))))
-            .startWith(renderLoading('cosmetic'))
+                    .catch(errorHandler(key))))
+            .startWith(loadingIndicator('cosmetic'))
             .map(vTrees => h(selector, vTrees))
-            .catch(renderError.handler('cosmetic')),
+            .catch(errorHandler('cosmetic')),
         value$: combineLatestObject(Object.keys(object)
             .reduce((acc, key) => {
                 const value$ = object[key].value$;

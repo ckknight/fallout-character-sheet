@@ -9,6 +9,7 @@ const fields = {
     key: '',
     value: 0,
     percent: false,
+    order: 0,
 };
 
 const VALID_KEYS = [].concat(
@@ -34,7 +35,8 @@ export default withNiceToString(withLookup(withLocalization(new Immutable.Record
         }).mergeDeep(stats);
     },
     all() {
-        return new Immutable.Set(Object.keys(SECONDARY_STATISTICS)
-            .map(key => this.get(key)));
+        return new Immutable.List(Object.keys(SECONDARY_STATISTICS)
+            .map(key => this.get(key)))
+            .sortBy(stat => stat.order);
     },
 }), fields);
