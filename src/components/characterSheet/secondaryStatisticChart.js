@@ -10,6 +10,7 @@ import Effect from '../../models/Effect';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import collapsableBox from '../collapsableBox';
+import future from '../../future';
 
 function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     const valueView = algorithm({
@@ -42,7 +43,7 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     };
 }
 
-export default function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
+function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
     const statistics = SecondaryStatistic.all()
         .toArray();
     const statisticEntries = statistics
@@ -76,3 +77,5 @@ export default function secondaryStatisticChart({DOM, value$, uiState$, calculat
         uiState$: boxView.value$,
     };
 }
+
+export default future.wrap(secondaryStatisticChart, 'DOM', 'value$', 'uiState$');

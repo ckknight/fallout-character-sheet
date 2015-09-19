@@ -11,6 +11,7 @@ import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import * as localize from '../../localize';
 import collapsableBox from '../collapsableBox';
+import future from '../../future';
 
 function makeSkillView(skill, categoryKey, {DOM, inputTags$, inputIncrease$, calculations, effecter}) {
     const tagInput = input(`skill-tag-${skill.key}`, 'checkbox', {
@@ -134,7 +135,7 @@ function makeSkillCategoryView(category, dependencies) {
     };
 }
 
-export default function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
+function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
     const inputTags$ = inputValue$
         .map(value => value.tag || [])
         .shareReplay(1);
@@ -193,3 +194,5 @@ export default function skills({DOM, value$: inputValue$, uiState$, calculations
         uiState$: boxView.value$,
     };
 }
+
+export default future.wrap(skills, 'DOM', 'value$', 'uiState$');

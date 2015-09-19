@@ -3,34 +3,40 @@ import { Rx } from '@cycle/core';
 Rx.Observable.prototype.sampleToRequestAnimationFrame = function () {
     return Rx.Observable.create(subscriber => {
         let unsubscribed = false;
-        let timer = null;
+        let timer = false;
         let nextValue;
         function onTimer() {
-            timer = null;
-            subscriber.onNext(nextValue);
-            nextValue = undefined;
-        }
-        function clearTimer() {
-            if (timer) {
-                clearAnimationFrame(timer);
-                timer = null;
+            if (!unsubscribed && timer) {
+                timer = false;
+                subscriber.onNext(nextValue);
+                nextValue = undefined;
             }
         }
+        function clearTimer() {
+            timer = false;
+        }
         function onNext(value) {
+            if (unsubscribed) {
+                return;
+            }
             nextValue = value;
             if (!timer) {
-                timer = requestAnimationFrame(onTimer);
+                timer = true;
+                requestAnimationFrame(onTimer);
             }
         }
         function onError(error) {
+            if (unsubscribed) {
+                return;
+            }
             clearTimer();
             subscriber.onError(error);
         }
         function onDone() {
-            if (timer) {
-                clearAnimationFrame(timer);
-                onTimer();
+            if (unsubscribed) {
+                return;
             }
+            onTimer();
             subscriber.onDone();
         }
         const unsubscribe = this.subscribe(onNext, onError, onDone);

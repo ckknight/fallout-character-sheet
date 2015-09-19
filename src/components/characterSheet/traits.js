@@ -10,6 +10,7 @@ import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import renderEffect from './renderEffect';
 import collapsableBox from '../collapsableBox';
+import future from '../../future';
 
 function isTraitChoosable(trait, calculations) {
     return algorithm({
@@ -129,7 +130,7 @@ function getTraitDescription(trait, calculations) {
         ]);
 }
 
-export default function traits({DOM, value$: inputValue$, uiState$, calculations}) {
+function traits({DOM, value$: inputValue$, uiState$, calculations}) {
     const allTraitViews = Trait.all()
         .toArray()
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
@@ -162,3 +163,5 @@ export default function traits({DOM, value$: inputValue$, uiState$, calculations
         uiState$: boxView.value$,
     };
 }
+
+export default future.wrap(traits, 'DOM', 'value$', 'uiState$');

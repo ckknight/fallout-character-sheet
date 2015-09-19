@@ -10,6 +10,7 @@ import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import collapsableBox from '../collapsableBox';
 import remember from './remember';
+import future from '../../future';
 
 function toExtrema(range) {
     return {
@@ -145,3 +146,5 @@ export default function primaryStatisticChart({DOM, value$, uiState$, calculatio
         uiState$: boxView.value$,
     };
 }
+
+// export default future.wrap(primaryStatisticChart, 'DOM', 'value$', 'uiState$');

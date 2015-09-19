@@ -6,6 +6,7 @@ import combineLatestObject from '../../combineLatestObject';
 import * as localize from '../../localize';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
+import future from '../../future';
 
 function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
@@ -44,7 +45,7 @@ function makeBox(selector, object, calculations) {
     };
 }
 
-export default function cosmetic({DOM, value$, raceDOM, calculations}) {
+function cosmetic({DOM, value$, raceDOM, calculations}) {
     return makeBox('section.cosmetic', {
         name: makeInput('name', 'text', '', DOM, value$),
         age: makeInput('age', 'integer', 20, DOM, value$, Rx.Observable.return({
@@ -75,3 +76,5 @@ export default function cosmetic({DOM, value$, raceDOM, calculations}) {
         appearance: makeInput('appearance', 'textarea', '', DOM, value$),
     }, calculations);
 }
+
+export default future.wrap(cosmetic, 'DOM', 'value$');

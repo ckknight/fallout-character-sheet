@@ -11,6 +11,7 @@ import calculateBinary from './binary';
 import calculateUnary from './unary';
 import calculateWhen from './when';
 import calculateRandom from './random';
+import '../../rx-start-with-throttled';
 
 function calculateAlgorithm(equation, calculations) {
     if (typeof equation === 'number') {
@@ -42,7 +43,7 @@ export default function ({equation$, calculations}) {
         DOM: result
             .flatMapLatest(x => x.DOM)
             .distinctUntilChanged()
-            .startWith(loadingIndicator('algorithm'))
+            .startWithThrottled(() => loadingIndicator('algorithm'))
             .catch(errorHandler('algorithm'))
             .map(vTree => h('div.algorithm', [vTree])),
         value$: result

@@ -63,16 +63,27 @@ function removeEmptyValues(obj) {
     }
 }
 
+function timer() {
+    let lastTime = Date.now();
+    return () => {
+        const now = Date.now();
+        const before = lastTime;
+        lastTime = now;
+        return now - before;
+    };
+}
+
 export default function characterSheet({DOM, localStorageSource}) {
+    const t = timer();
     console.log('start', Date.now());
     const calculations = new Calculations();
     Condition.all()
         .forEach(condition => calculations.set(condition.key, Rx.Observable.return(false)));
     Object.keys(MISCELLANEOUS)
         .forEach(key => calculations.set(key, Rx.Observable.return(0)));
-    const deserializedSavedData$ = future(() => localStorageSource
-            .map(safeParseJSON)
-            .shareReplay(1));
+    const deserializedSavedData$ = localStorageSource
+        .map(safeParseJSON)
+        .shareReplay(1);
     const characterSavedData$ = deserializedSavedData$
         .map(x => x.character || {});
     const uiSavedData$ = deserializedSavedData$
@@ -96,12 +107,14 @@ export default function characterSheet({DOM, localStorageSource}) {
                 .distinctUntilChanged(),
             (equation, replacement) => equationReplace(replacement, 'value', equation));
 
+    console.log('alpha', t());
     const raceView = race({
         DOM,
         value$: characterSavedData$
             .map(x => x.race || ''),
         calculations,
     });
+    console.log('race', t());
     const cosmeticView = cosmetic({
         DOM,
         value$: characterSavedData$
@@ -110,6 +123,7 @@ export default function characterSheet({DOM, localStorageSource}) {
         raceDOM: raceView.DOM,
         calculations,
     });
+    console.log('cosmetic', t());
     const primaryStatisticView = primaryStatisticChart({
         DOM,
         value$: characterSavedData$.map(x => x.primary || {}),
@@ -117,6 +131,7 @@ export default function characterSheet({DOM, localStorageSource}) {
         calculations,
         effecter,
     });
+    console.log('primary', t());
     const secondaryStatisticView = secondaryStatisticChart({
         DOM,
         value$: characterSavedData$.map(x => x.secondary || {}),
@@ -124,6 +139,7 @@ export default function characterSheet({DOM, localStorageSource}) {
         calculations,
         effecter,
     });
+    console.log('secondary', t());
     const skillsView = skills({
         DOM,
         value$: characterSavedData$.map(x => x.skills || {}),
@@ -131,50 +147,51 @@ export default function characterSheet({DOM, localStorageSource}) {
         calculations,
         effecter,
     });
+    console.log('skills', t());
     const traitsView = traits({
         DOM,
         value$: characterSavedData$.map(x => x.traits || []),
         uiState$: uiSavedData$.map(x => x.traits || false),
         calculations,
     });
+    console.log('traits', t());
     const perksView = perks({
         DOM,
         value$: characterSavedData$.map(x => x.perks || {}),
         uiState$: uiSavedData$.map(x => x.perks || false),
         calculations,
     });
+    console.log('perks', t());
     const healthView = health({
         DOM,
         value$: characterSavedData$.map(x => x.health || {}),
         calculations,
     });
+    console.log('health', t());
     const result = {
-        DOM: combineLatestObject({
-            cosmetic: cosmeticView.DOM,
-            primary: primaryStatisticView.DOM,
-            secondary: secondaryStatisticView.DOM,
-            skills: skillsView.DOM,
-            traits: traitsView.DOM,
-            perks: perksView.DOM,
-            health: healthView.DOM,
-        })
-            .map(({cosmetic, primary, secondary, skills, traits, perks, health}) => h('section.character-sheet-body', [cosmetic, primary, secondary, skills, traits, perks, health]))
+        DOM: Rx.Observable.combineLatest([
+            cosmeticView.DOM.startWith(null),
+            primaryStatisticView.DOM.startWith(null),
+            secondaryStatisticView.DOM.startWith(null),
+            skillsView.DOM.startWith(null),
+            traitsView.DOM.startWith(null),
+            perksView.DOM.startWith(null),
+            healthView.DOM.startWith(null),
+        ])
+            .map(vTrees => h('section.character-sheet-body', vTrees))
             .startWith(h('section.loading', `Loading, y'all.`))
-            .sampleToRequestAnimationFrame()
-            .do(() => console.log(Date.now())),
+            .sampleToRequestAnimationFrame(),
         localStorageSink: localStorageSource.first()
             .concat(combineLatestObject({
                 character: {
-                    race: raceView.value$.startWith(''),
-                    cosmetic: cosmeticView.value$.startWith({}),
-                    primary: primaryStatisticView.value$.startWith({}),
-                    secondary: secondaryStatisticView.value$.startWith({}),
-                    skills: skillsView.value$.startWith({}),
-                    traits: traitsView.value$.startWith([]),
-                    perks: perksView.value$.startWith({}),
-                    health: healthView.value$
-                        // .do(x => console.log('health', x))
-                        .startWith({}),
+                    race: raceView.value$,
+                    cosmetic: cosmeticView.value$,
+                    primary: primaryStatisticView.value$,
+                    secondary: secondaryStatisticView.value$,
+                    skills: skillsView.value$,
+                    traits: traitsView.value$,
+                    perks: perksView.value$,
+                    health: healthView.value$,
                 },
                 ui: {
                     primary: primaryStatisticView.uiState$,
@@ -184,13 +201,13 @@ export default function characterSheet({DOM, localStorageSource}) {
                     traits: traitsView.uiState$,
                     perks: perksView.uiState$,
                 },
-            })
+            }, null)
                 .throttle(200)
                 .map(removeEmptyValues)
                 .map(JSON.stringify.bind(JSON)))
             .distinctUntilChanged()
             .skip(1),
     };
-    console.log('end', Date.now());
+    console.log('end', t(), Date.now());
     return result;
 }

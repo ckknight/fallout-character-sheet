@@ -13,6 +13,7 @@ import * as localize from '../../localize';
 import renderEffect from './renderEffect';
 import Perk from '../../models/Perk';
 import collapsableBox from '../collapsableBox';
+import future from '../../future';
 
 function getMinimum(equation, key) {
     if (Object(equation) !== equation) {
@@ -96,8 +97,8 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
                 ]))
             .startWith([loadingIndicator(perk.key)])
             .catch(errorHandler(perk.key)),
-        smallDOM: value$
-            .map(ranksChosen => !ranksChosen ? null : h(`section.perk.perk-${perk.key}`, {
+        smallDOM: value$.combineLatest(requirementsView.value$.startWith(true),
+            (ranksChosen, fulfillsRequirements) => !ranksChosen ? null : h(`section.perk.perk-${perk.key}`, {
                     key: perk.key,
                     className: fulfillsRequirements ? 'perk-choosable' : 'perk-unchoosable',
                 }, [h(`span.perk-title`, {
@@ -107,7 +108,7 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
     };
 }
 
-export default function perks({DOM, value$: inputValue$, uiState$, calculations}) {
+function perks({DOM, value$: inputValue$, uiState$, calculations}) {
     const allPerkViews = Perk.all()
         .toArray()
         .map(perk => makePerkView(perk, inputValue$.map(x => x[perk.key] || 0), DOM, calculations))
@@ -132,3 +133,5 @@ export default function perks({DOM, value$: inputValue$, uiState$, calculations}
         uiState$: boxView.value$,
     };
 }
+
+export default future.wrap(perks, 'DOM', 'value$', 'uiState$');

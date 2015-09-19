@@ -13,6 +13,7 @@ import renderEffect from './renderEffect';
 import plusMinusButtons from '../plusMinusButtons';
 import InjectableObservable from 'rx-injectable-observable';
 import button from '../button';
+import future from '../../future';
 
 const SHOW_EQUATION = false;
 
@@ -318,7 +319,7 @@ function makeBodyPartView(bodyPart, inputValue$, DOM, calculations) {
     };
 }
 
-export default function health({DOM, value$: inputValue$, calculations}) {
+function health({DOM, value$: inputValue$, calculations}) {
     const allBodyPartViews = BodyPart.all()
         .toArray()
         .map(bodyPart => makeBodyPartView(bodyPart, inputValue$, DOM, calculations));
@@ -358,3 +359,5 @@ export default function health({DOM, value$: inputValue$, calculations}) {
             .shareReplay(1),
     };
 }
+
+export default future.wrap(health, 'DOM', 'value$');
