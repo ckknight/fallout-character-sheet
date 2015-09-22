@@ -28,7 +28,7 @@ export default class Calculations {
             throw new Error(`Cannot refer to '${key}'`);
         }
         if (!(key in this.values)) {
-            if (!future) {
+            if (false && !future) {
                 throw new Error(`Unknown key: ${key}`);
             }
             this.values[key] = new InjectableObservable();

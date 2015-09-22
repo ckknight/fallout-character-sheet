@@ -14,6 +14,7 @@ export default function raceDialogue({DOM, value$, calculations}) {
             }))),
         props$: Rx.Observable.return({
             fallback: '\u2014 Race \u2014',
+            className: 'pure-u-23-24',
         }),
     });
     const race$ = raceSelect.value$;

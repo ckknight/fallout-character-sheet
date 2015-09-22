@@ -65,7 +65,9 @@ function makeSkillView(skill, categoryKey, {DOM, inputTags$, inputIncrease$, cal
                     className: tagValue ? 'skill-tagged' : 'skill-untagged',
                     key: skill.key,
                 }, [
-                    h(`label.skill-label`, [
+                    h(`label.skill-label.pure-checkbox`, {
+                        key: 'tag',
+                    }, [
                         tag,
                         h(`span.skill-name`, {
                             key: 'name',
@@ -108,7 +110,7 @@ function makeSkillCategoryView(category, dependencies) {
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
             .startWith([loadingIndicator(category.key)])
-            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
+            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}.pure-u-1.pure-u-md-1-2.pure-u-lg-1-3`, {
                     key: category.key,
                 }, [
                     h(`h3.skill-category-title`, {
@@ -135,7 +137,7 @@ function makeSkillCategoryView(category, dependencies) {
     };
 }
 
-function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
+export default function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
     const inputTags$ = inputValue$
         .map(value => value.tag || [])
         .shareReplay(1);
@@ -195,4 +197,4 @@ function skills({DOM, value$: inputValue$, uiState$, calculations, effecter}) {
     };
 }
 
-export default future.wrap(skills, 'DOM', 'value$', 'uiState$');
+// export default future.wrap(skills, 'DOM', 'value$', 'uiState$');

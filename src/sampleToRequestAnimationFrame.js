@@ -39,11 +39,11 @@ Rx.Observable.prototype.sampleToRequestAnimationFrame = function () {
             onTimer();
             subscriber.onDone();
         }
-        const unsubscribe = this.subscribe(onNext, onError, onDone);
+        const subscription = this.subscribe(onNext, onError, onDone);
         return () => {
             unsubscribed = true;
             clearTimer();
-            return unsubscribe();
+            subscription.dispose();
         };
     });
 };

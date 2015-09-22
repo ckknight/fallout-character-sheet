@@ -1,0 +1,221 @@
+// @import "~normalize.css";
+@import "~purecss/build/pure.css";
+@import "~purecss/build/grids-responsive.css";
+@import "~sass-mediaqueries/media-queries";
+@import "~font-awesome/css/font-awesome.css";
+html,
+button,
+input,
+select,
+textarea,
+.pure-g [class *= "pure-u"] {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+.character-sheet {
+    max-width: 100%;
+    @include min-screen(960px) {
+        max-width: 960px;
+    }
+}
+.content {
+    padding: 0 2em;
+}
+.algorithm {
+    display: inline-block;
+}
+.algorithm .binary::before {
+    content: "(";
+}
+.algorithm .binary::after {
+    content: ")";
+}
+.algorithm .binary--operator::before,
+.algorithm .binary--operator::after {
+    content: " ";
+}
+.algorithm > .binary::before,
+.algorithm > .binary::after,
+.binary.add > .add--operand > .binary.add::before,
+.binary.add > .add--operand > .binary.add::after,
+.binary.add > .add--operand > .binary.div::before,
+.binary.add > .add--operand > .binary.div::after,
+.binary.add > .add--operand > .binary.mul::before,
+.binary.add > .add--operand > .binary.mul::after,
+.binary.sub > .sub--left > .binary.add::before,
+.binary.sub > .sub--left > .binary.add::after,
+.binary.sub > .sub--left > .binary.sub::before,
+.binary.sub > .sub--left > .binary.sub::after,
+.binary.sub > .sub--operand > .binary.mul::before,
+.binary.sub > .sub--operand > .binary.mul::after,
+.binary.sub > .sub--operand > .binary.div::before,
+.binary.sub > .sub--operand > .binary.div::after,
+.binary.or > .or--operand > .binary.or::before,
+.binary.or > .or--operand > .binary.or::after,
+.binary.and > .and--operand > .binary.and::before,
+.binary.and > .and--operand > .binary.and::after,
+.binary.or > .or--operand > .binary.lte::before,
+.binary.or > .or--operand > .binary.lte::after,
+.binary.and > .and--operand > .binary.lte::before,
+.binary.and > .and--operand > .binary.lte::after,
+.binary.or > .or--operand > .binary.gte::before,
+.binary.or > .or--operand > .binary.gte::after,
+.binary.and > .and--operand > .binary.gte::before,
+.binary.and > .and--operand > .binary.gte::after,
+.binary.or > .or--operand > .binary.eq::before,
+.binary.or > .or--operand > .binary.eq::after,
+.binary.and > .and--operand > .binary.eq::before,
+.binary.and > .and--operand > .binary.eq::after {
+    content: "";
+}
+.skill {
+    padding-left: 1em;
+    display: flex;
+}
+.skill-label {
+    min-width: 7.5em;
+    margin: 0 0.5em;
+}
+.skill-value {
+    min-width: 2em;
+    margin: 0 0.5em;
+    text-align: right;
+}
+.skill-value::after {
+    content: "%";
+}
+.skill-increase {
+    text-align: right;
+}
+.skill .algorithm {
+    min-width: 12em;
+    margin: 0 0.5em;
+}
+.primary-statistic {
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-start;
+    .stat-name {
+        min-width: 5em;
+        text-align: left;
+    }
+    .stat-input {
+        min-width: 3em;
+        text-align: right;
+    }
+    .stat-extrema {
+        min-width: 3em;
+        text-align: center;
+    }
+    .stat-effect {
+        min-width: 3em;
+        text-align: right;
+    }
+    .stat-total {
+        min-width: 3em;
+        text-align: right;
+    }
+}
+.health {
+    flex: 2 0 20em;
+}
+.health-collapsed {
+    flex: 1 0 10em;
+}
+.body-part-title {
+    min-width: 5em;
+    display: inline-block;
+    font-size: 1.2em;
+}
+.body-part-target-penalty,
+.body-part-damage,
+.sub-body-part-target-penalty,
+.sub-body-part-damage {
+    display: none;
+}
+.body-part > .body-part {
+    margin-left: 1em;
+}
+.sub-body-part {
+    margin-left: 1em;
+}
+.sub-body-part-title {
+    min-width: 5em;
+    display: inline-block;
+}
+.health-body-parts {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+}
+.body-part {
+    text-align: center;
+}
+.body-part-head {
+    flex: 1 0 100%;
+    order: 1;
+}
+.body-part-leftArm {
+    flex: 1 0 33%;
+    order: 2;
+}
+.body-part-torso {
+    flex: 1 0 33%;
+    order: 3;
+}
+.body-part-rightArm {
+    flex: 1 0 33%;
+    order: 4;
+}
+.body-part-leftLeg {
+    flex: 1 0 50%;
+    order: 5;
+}
+.body-part-rightLeg {
+    flex: 1 0 50%;
+    order: 6;
+}
+.health-total {
+    font-size: 200%;
+    text-align: center;
+    display: block;
+}
+.health-button {
+    border-radius: 50%;
+    padding: 0;
+    width: 2em;
+    height: 2em;
+}
+.traits {
+    display: flex;
+    flex-flow: column;
+}
+.trait {
+    display: flex;
+}
+.trait-label {
+    min-width: 9em;
+}
+.trait-description {
+    display: flex;
+}
+.effect-part + .effect-part::before {
+    content: ", ";
+}
+.trait-effect {
+    padding-right: 1em;
+}
+.secondary-statistic {
+    display: flex;
+}
+.stat-value {
+    min-width: 2em;
+    text-align: center;
+}
+.secondary-statistic-percent .stat-value::after {
+    content: "%";
+}
+.stat-label {
+    min-width: 3em;
+    text-align: right;
+}

@@ -1,12 +1,13 @@
-import { run } from '@cycle/core';
+import { run, Rx } from '@cycle/core';
 import { makeDOMDriver } from '@cycle/dom';
-import characterSheet from './components/characterSheet';
+import main from './components/main';
 import { makeLocalStorageSinkDriver, makeLocalStorageSourceDriver } from './drivers';
+import './base.scss';
 
-require('normalize.css');
-
-run(characterSheet, {
-    DOM: makeDOMDriver('.character-sheet'),
+run(main, {
+    DOM: makeDOMDriver('.app'),
     localStorageSink: makeLocalStorageSinkDriver('sheet'),
     localStorageSource: makeLocalStorageSourceDriver('sheet'),
+    initialHash: () => Rx.Observable.just(window.location.hash),
+    hashchange: () => Rx.Observable.fromEvent(window, 'hashchange'),
 });

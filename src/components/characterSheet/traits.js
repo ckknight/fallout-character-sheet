@@ -130,7 +130,7 @@ function getTraitDescription(trait, calculations) {
         ]);
 }
 
-function traits({DOM, value$: inputValue$, uiState$, calculations}) {
+export default function traits({DOM, value$: inputValue$, uiState$, calculations}) {
     const allTraitViews = Trait.all()
         .toArray()
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
@@ -142,9 +142,9 @@ function traits({DOM, value$: inputValue$, uiState$, calculations}) {
         .distinctUntilChanged()
         .map(x => x.toArray().sort())
         .shareReplay(1);
-    calculations.set('traitEffects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$.startWith(null)))
-        .map(effects => new Immutable.Set(effects.filter(effect => effect)))
-        .startWith(new Immutable.Set())
+    calculations.set('traitEffects', Rx.Observable.combineLatest(allTraitViews.map(view => view.effect$))
+        .map(effects => new Immutable.List(effects.filter(effect => effect)))
+        .startWith(new Immutable.List())
         .distinctUntilChanged(undefined, Immutable.is)
         .map(effects => effects.toArray())
         .shareReplay(1));
@@ -164,4 +164,4 @@ function traits({DOM, value$: inputValue$, uiState$, calculations}) {
     };
 }
 
-export default future.wrap(traits, 'DOM', 'value$', 'uiState$');
+// export default future.wrap(traits, 'DOM', 'value$', 'uiState$');

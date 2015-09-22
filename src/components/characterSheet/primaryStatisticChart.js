@@ -57,9 +57,7 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
                 return h(`div.primary-statistic.primary-statistic-${stat.key}`, {
                     key: stat.key,
                 }, [
-                    h(`abbr.stat-label`, {
-                        title: stat.name,
-                    }, [stat.abbr]),
+                    h('span.stat-name', [stat.name]),
                     input,
                     extrema,
                     effectedValue != null ? renderNumber(effectedValue - inputValue, 'diff', {

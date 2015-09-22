@@ -73,7 +73,7 @@ function timer() {
     };
 }
 
-export default function characterSheet({DOM, localStorageSource}) {
+export default function characterSheet({DOM, localStorageSource, route$}) {
     const t = timer();
     console.log('start', Date.now());
     const calculations = new Calculations();
@@ -168,17 +168,21 @@ export default function characterSheet({DOM, localStorageSource}) {
         calculations,
     });
     console.log('health', t());
+
+    const routeToDOM = {
+        cosmetic: cosmeticView.DOM.shareReplay(1),
+        primary: primaryStatisticView.DOM.shareReplay(1),
+        secondary: secondaryStatisticView.DOM.shareReplay(1),
+        skills: skillsView.DOM.shareReplay(1),
+        traits: traitsView.DOM.shareReplay(1),
+        perks: perksView.DOM.shareReplay(1),
+        health: healthView.DOM.shareReplay(1),
+    };
     const result = {
-        DOM: Rx.Observable.combineLatest([
-            cosmeticView.DOM.startWith(null),
-            primaryStatisticView.DOM.startWith(null),
-            secondaryStatisticView.DOM.startWith(null),
-            skillsView.DOM.startWith(null),
-            traitsView.DOM.startWith(null),
-            perksView.DOM.startWith(null),
-            healthView.DOM.startWith(null),
-        ])
-            .map(vTrees => h('section.character-sheet-body', vTrees))
+        DOM: route$
+            .do(console.log.bind(console))
+            .flatMapLatest(route => routeToDOM[route] || routeToDOM.cosmetic)
+            .map(vTree => h('section.character-sheet-body', [vTree]))
             .startWith(h('section.loading', `Loading, y'all.`))
             .sampleToRequestAnimationFrame(),
         localStorageSink: localStorageSource.first()

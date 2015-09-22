@@ -12,13 +12,16 @@ function makeInput(key, type, defaultValue, DOM, value$, props$) {
     return input(key, type, {
         DOM,
         value$: value$.map(value => value[key] || defaultValue).startWith(defaultValue),
-        props$: props$ || Rx.Observable.return({
-                placeholder: key,
-            }),
+        props$: (props$ || Rx.Observable.return({}))
+            .map(props => ({
+                id: key,
+                className: 'pure-u-23-24',
+                ...props,
+            })),
     });
 }
 
-function makeBox(selector, object, calculations) {
+function makeForm(selector, object, calculations) {
     Object.entries(object)
         .filter(([key, value]) => value.value$)
         .forEach(([key, value]) => calculations.set(key, value.value$));
@@ -26,12 +29,21 @@ function makeBox(selector, object, calculations) {
         DOM: Rx.Observable.combineLatest(Object.keys(object)
             .map(key => object[key].DOM
                     .startWith(loadingIndicator(key))
-                    .map(vTree => h(`label.${key}-label`, {
-                            key,
-                        }, [localize.name(key), ' ', vTree]))
+                    .map(vTree => h(`div.pure-u-1${key === 'appearance' ? '' : '.pure-u-sm-1-2'}.pure-u-md-1-3`, {
+                        key,
+                    }, [
+                        h(`label`, {
+                            htmlFor: key,
+                        }, [localize.name(key)]),
+                        vTree,
+                    ]))
                     .catch(errorHandler(key))))
             .startWith(loadingIndicator('cosmetic'))
-            .map(vTrees => h(selector, vTrees))
+            .map(vTrees => h(selector, [
+                h('fieldset', [
+                    h('.pure-g', vTrees),
+                ]),
+            ]))
             .catch(errorHandler('cosmetic')),
         value$: combineLatestObject(Object.keys(object)
             .reduce((acc, key) => {
@@ -46,7 +58,7 @@ function makeBox(selector, object, calculations) {
 }
 
 function cosmetic({DOM, value$, raceDOM, calculations}) {
-    return makeBox('section.cosmetic', {
+    return makeForm('form.cosmetic.pure-form.pure-form-stacked', {
         name: makeInput('name', 'text', '', DOM, value$),
         age: makeInput('age', 'integer', 20, DOM, value$, Rx.Observable.return({
             min: 0,

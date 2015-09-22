@@ -43,7 +43,7 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     };
 }
 
-function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
+export default function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}) {
     const statistics = SecondaryStatistic.all()
         .toArray();
     const statisticEntries = statistics
@@ -78,4 +78,4 @@ function secondaryStatisticChart({DOM, value$, uiState$, calculations, effecter}
     };
 }
 
-export default future.wrap(secondaryStatisticChart, 'DOM', 'value$', 'uiState$');
+// export default future.wrap(secondaryStatisticChart, 'DOM', 'value$', 'uiState$');

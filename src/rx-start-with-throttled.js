@@ -27,7 +27,7 @@ Rx.Observable.prototype.startWithThrottled = function startWithThrottled(action,
                     disposable.dispose();
                     return;
                 }
-                subscriber.onNext();
+                subscriber.onNext(result);
             }
         }));
         disposable.add(this.subscribe(onNext, onError, onCompleted));

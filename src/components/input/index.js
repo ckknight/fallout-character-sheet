@@ -74,7 +74,9 @@ export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.
             .map(() => false),
         blur$
             .map(() => true))
-        .startWith(true);
+        .debounce(1, scheduler)
+        .startWith(true)
+        .distinctUntilChanged();
 
     const value$ = inputValue$
         .flatMapLatest(value => {

@@ -2,15 +2,16 @@ import { Rx } from '@cycle/core';
 import button from '../button';
 import InjectableObservable from 'rx-injectable-observable';
 
-export default function plusMinusButtons(key, {DOM, value$: inputValue$, min$, max$, plus$, minus$}) {
+export default function plusMinusButtons(key, {DOM, value$: inputValue$, min$, max$, plus$, minus$, plusProps$, minusProps$}) {
     const state$ = new InjectableObservable();
 
     const plusView = button(`${key}-plus`, {
         DOM,
         vTree$: plus$,
-        props$: state$
-            .map(({value, max}) => ({
+        props$: state$.combineLatest(plusProps$ || Rx.Observable.return({}),
+            ({value, max}, props) => ({
                     disabled: value >= max,
+                    ...props,
             }))
             .distinctUntilChanged(),
     });
@@ -18,9 +19,10 @@ export default function plusMinusButtons(key, {DOM, value$: inputValue$, min$, m
     const minusView = button(`${key}-minus`, {
         DOM,
         vTree$: minus$,
-        props$: state$
-            .map(({value, min}) => ({
+        props$: state$.combineLatest(minusProps$ || Rx.Observable.return({}),
+            ({value, min}, props) => ({
                     disabled: value <= min,
+                    ...props
             }))
             .distinctUntilChanged(),
     });
