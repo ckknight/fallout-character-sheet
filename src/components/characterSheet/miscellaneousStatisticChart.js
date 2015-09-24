@@ -16,6 +16,7 @@ import InjectableObservable from 'rx-injectable-observable';
 function miscellaneousStatisticEntry(stat, {DOM, value$: inputValue$, calculations, effecter}) {
     let vTree$;
     let value$;
+    let equation$;
     let calculate;
     let savedValue = false;
     if (stat.value instanceof Input) {
@@ -62,16 +63,21 @@ function miscellaneousStatisticEntry(stat, {DOM, value$: inputValue$, calculatio
         value$ = inputView.value$;
         vTree$ = inputView.DOM;
     } else {
+        let equation;
+        if (stat.key === 'levelsPerPerk' || stat.key === 'primaryTotal') {
+            equation = calculations.get('race')
+                .map(race => race[stat.key]);
+        } else {
+            equation = Rx.Observable.return(stat.value || 0);
+        }
         const valueView = algorithm({
-            equation$: effecter(Rx.Observable.return(stat.value || 0), stat.key),
+            equation$: effecter(equation, stat.key),
             calculations,
         });
         calculations.set(stat.key, valueView.value$.startWith(0));
         value$ = valueView.value$;
         vTree$ = valueView.DOM;
-        // if (!valueView.calculate) {
-        //     debugger;
-        // }
+        equation$ = valueView.equation$;
         calculate = valueView.calculate;
     }
 
@@ -91,13 +97,13 @@ function miscellaneousStatisticEntry(stat, {DOM, value$: inputValue$, calculatio
     }
 
     return {
-        DOM: Rx.Observable.combineLatest(vTree$, calculateButtonVTree$, value$.startWith(null),
-            (vTree, calculateButton, value) => h(`div.miscellaneous-statistic.miscellaneous-statistic-${stat.key}` + (stat.percent ? '.miscellaneous-statistic-percent' : ''), {
+        DOM: Rx.Observable.combineLatest(vTree$, calculateButtonVTree$, value$.startWith(null), equation$ || Rx.Observable.return(null),
+            (vTree, calculateButton, value, equation) => h(`div.miscellaneous-statistic.miscellaneous-statistic-${stat.key}` + (stat.percent ? '.miscellaneous-statistic-percent' : ''), {
                     key: stat.key,
                 }, [
                     h(`span.stat-label.ref-${stat.key}`, [stat.name]),
-                    // value != null && value === value && !savedValue ? h(`span.stat-value`, ['' + value]) : null,
-                    vTree,
+                    value != null && !Number.isNaN(value) && !savedValue ? h(`span.stat-value`, ['' + value]) : null,
+                    typeof equation !== 'number' ? vTree : null,
                     Number.isNaN(value) ? calculateButton : null,
                 ]))
             .startWith(loadingIndicator(stat.key))

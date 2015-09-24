@@ -1,7 +1,8 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
-import characterMain from '../characterMain';
+import characterList from '../characterList';
 import removeEmptyValues from '../../utils/removeEmptyValues';
+import '../../sampleToRequestAnimationFrame';
 
 // function renderMenuList(items, selectedKey) {
 //     return Object.entries(items)
@@ -40,13 +41,15 @@ function safeParseJSON(value) {
 
 function renderMenuList(items, currentRoute) {
     return items
-        .map(({route, name}) => h('li.pure-menu-item', {
-            className: currentRoute === route ? 'pure-menu-selected' : '',
-        }, [
-            h('a.pure-menu-link', {
-                href: '#/' + route,
-            }, [name]),
-        ]));
+        .map(({route, name}) => route != null ?
+            h('li.pure-menu-item', {
+                className: currentRoute === route ? 'pure-menu-selected' : '',
+            }, [
+                h('a.pure-menu-link', {
+                    href: '#/' + route,
+                }, [name]),
+            ]) :
+            h('li.pure-menu-heading', [name]));
 }
 
 export default function main({ DOM, localStorageSource, initialHash, hashchange }) {
@@ -54,22 +57,27 @@ export default function main({ DOM, localStorageSource, initialHash, hashchange 
     const deserializedSavedData$ = localStorageSource
         .map(safeParseJSON)
         .shareReplay(1);
-    const characterView = characterMain({ DOM, value$: deserializedSavedData$, route$ });
+    const characterListView = characterList({ DOM, value$: deserializedSavedData$.map(x => x.chars || {}), route$ });
     return {
         DOM: Rx.Observable.combineLatest(
-            characterView.DOM,
-            characterView.nav$,
+            characterListView.DOM,
+            characterListView.nav$,
             route$,
-            (character, nav, route) => h('.layout', [
+            (vTree, nav, route) => h('.layout', [
                 h('nav.menu', [
                     h('.pure-menu.pure-menu-horizontal.pure-menu-scrollable', [
                         h('ul.pure-menu-list', renderMenuList(nav, route)),
                     ]),
                 ]),
-                h('section.content', [character]),
-            ])),
+                h('section.content', [vTree]),
+            ]))
+            .debounce(5)
+            .sampleToRequestAnimationFrame(),
         localStorageSink: localStorageSource.first()
-            .concat(characterView.value$
+            .concat(characterListView.value$
+                .map(chars => ({
+                    chars,
+                }))
                 .throttle(200)
                 .map(removeEmptyValues)
                 .map(x => x ? JSON.stringify(x) : ''))

@@ -17042,13 +17042,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _cycleDom = __webpack_require__(6);
 	
-	var _characterMain = __webpack_require__(122);
+	var _characterList = __webpack_require__(311);
 	
-	var _characterMain2 = _interopRequireDefault(_characterMain);
+	var _characterList2 = _interopRequireDefault(_characterList);
 	
 	var _utilsRemoveEmptyValues = __webpack_require__(293);
 	
 	var _utilsRemoveEmptyValues2 = _interopRequireDefault(_utilsRemoveEmptyValues);
+	
+	__webpack_require__(292);
 	
 	// function renderMenuList(items, selectedKey) {
 	//     return Object.entries(items)
@@ -17085,11 +17087,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return items.map(function (_ref) {
 	        var route = _ref.route;
 	        var name = _ref.name;
-	        return (0, _cycleDom.h)('li.pure-menu-item', {
+	        return route != null ? (0, _cycleDom.h)('li.pure-menu-item', {
 	            className: currentRoute === route ? 'pure-menu-selected' : ''
 	        }, [(0, _cycleDom.h)('a.pure-menu-link', {
 	            href: '#/' + route
-	        }, [name])]);
+	        }, [name])]) : (0, _cycleDom.h)('li.pure-menu-heading', [name]);
 	    });
 	}
 	
@@ -17101,12 +17103,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var route$ = getRoute$(initialHash, hashchange);
 	    var deserializedSavedData$ = localStorageSource.map(safeParseJSON).shareReplay(1);
-	    var characterView = (0, _characterMain2['default'])({ DOM: DOM, value$: deserializedSavedData$, route$: route$ });
+	    var characterListView = (0, _characterList2['default'])({ DOM: DOM, value$: deserializedSavedData$.map(function (x) {
+	            return x.chars || {};
+	        }), route$: route$ });
 	    return {
-	        DOM: _cycleCore.Rx.Observable.combineLatest(characterView.DOM, characterView.nav$, route$, function (character, nav, route) {
-	            return (0, _cycleDom.h)('.layout', [(0, _cycleDom.h)('nav.menu', [(0, _cycleDom.h)('.pure-menu.pure-menu-horizontal.pure-menu-scrollable', [(0, _cycleDom.h)('ul.pure-menu-list', renderMenuList(nav, route))])]), (0, _cycleDom.h)('section.content', [character])]);
-	        }),
-	        localStorageSink: localStorageSource.first().concat(characterView.value$.throttle(200).map(_utilsRemoveEmptyValues2['default']).map(function (x) {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(characterListView.DOM, characterListView.nav$, route$, function (vTree, nav, route) {
+	            return (0, _cycleDom.h)('.layout', [(0, _cycleDom.h)('nav.menu', [(0, _cycleDom.h)('.pure-menu.pure-menu-horizontal.pure-menu-scrollable', [(0, _cycleDom.h)('ul.pure-menu-list', renderMenuList(nav, route))])]), (0, _cycleDom.h)('section.content', [vTree])]);
+	        }).debounce(5).sampleToRequestAnimationFrame(),
+	        localStorageSink: localStorageSource.first().concat(characterListView.value$.map(function (chars) {
+	            return {
+	                chars: chars
+	            };
+	        }).throttle(200).map(_utilsRemoveEmptyValues2['default']).map(function (x) {
 	            return x ? JSON.stringify(x) : '';
 	        })).distinctUntilChanged().skip(1)
 	    };
@@ -17170,7 +17178,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            traits: 'Traits',
 	            health: 'Health'
 	        })),
-	        value$: characterView.value$
+	        value$: characterView.value$,
+	        name$: characterView.name$,
+	        description$: characterView.description$
 	    };
 	}
 	
@@ -17887,8 +17897,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _modelsEffect2 = _interopRequireDefault(_modelsEffect);
 	
-	__webpack_require__(292);
-	
 	// import future from '../../future';
 	
 	function log() {
@@ -18062,7 +18070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return routeToDOM[route] || routeToDOM.cosmetic;
 	        }).map(function (vTree) {
 	            return (0, _cycleDom.h)('section.character-sheet-body', [vTree]);
-	        }).startWith((0, _cycleDom.h)('section.loading', 'Loading, y\'all.')).sampleToRequestAnimationFrame(),
+	        }).startWith((0, _cycleDom.h)('section.loading', 'Loading, y\'all.')),
 	        value$: (0, _combineLatestObject2['default'])({
 	            character: {
 	                race: raceView.value$,
@@ -18084,7 +18092,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                traits: traitsView.uiState$,
 	                perks: perksView.uiState$
 	            }
-	        }, null)
+	        }, null),
+	        name$: cosmeticView.value$.map(function (_ref2) {
+	            var name = _ref2.name;
+	            return name || '';
+	        }).distinctUntilChanged(),
+	        description$: (0, _combineLatestObject2['default'])({
+	            race: calculations.get('race'),
+	            cosmetic: cosmeticView.value$,
+	            secondary: secondaryStatisticView.value$
+	        }, null).throttle(17).map(function (_ref3) {
+	            var race = _ref3.race;
+	            var cosmetic = _ref3.cosmetic;
+	            var secondary = _ref3.secondary;
+	
+	            return [cosmetic && cosmetic.name, race && race.name, secondary && secondary.level ? 'Level ' + secondary.level : ''].filter(Boolean).join(', ');
+	        }).distinctUntilChanged()
 	    };
 	    log('end', t(), Date.now());
 	    return result;
@@ -18181,6 +18204,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(188);
 	
+	var _utilsMakeUid = __webpack_require__(312);
+	
+	var _utilsMakeUid2 = _interopRequireDefault(_utilsMakeUid);
+	
+	var _utilsAddIdToProps = __webpack_require__(313);
+	
+	var _utilsAddIdToProps2 = _interopRequireDefault(_utilsAddIdToProps);
+	
 	function select(key, _ref) {
 	    var DOM = _ref.DOM;
 	    var inputValue$ = _ref.value$;
@@ -18188,7 +18219,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _ref$props$ = _ref.props$;
 	    var props$ = _ref$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref$props$;
 	
-	    var newValue$ = DOM.select('.' + key).events('change').map(function (ev) {
+	    var id = key + '-' + (0, _utilsMakeUid2['default'])();
+	    var newValue$ = DOM.select('.' + id).events('change').map(function (ev) {
 	        return ev.target.value;
 	    });
 	
@@ -18198,7 +18230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var value$ = inputValue$.mergeAfterFirst(newValue$).distinctUntilChanged().shareReplay(1);
 	
 	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(sharedOptions$, value$, props$, function (options, value, props) {
-	        return (0, _render2['default'])(key, options, value, props);
+	        return (0, _render2['default'])(key, options, value, (0, _utilsAddIdToProps2['default'])(id, props));
 	    });
 	
 	    return {
@@ -26230,6 +26262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		"LOCALIZATION": {
 			"en-US": {
+				"aimedShotActionPointCost": "Aimed Shot Action Point Cost",
 				"actionChild": "Action Boy (or Girl)",
 				"actionPointRegeneration": {
 					"abbr": "APR",
@@ -26359,7 +26392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					"abbr": "XP",
 					"name": "Experience"
 				},
-				"experienceMultiplier": "XP Multiplier",
+				"experienceMultiplier": "Experience Multiplier",
 				"explorer": "Explorer",
 				"explosiveDamage": "Explosive Damage",
 				"explosives": "Explosives",
@@ -26688,6 +26721,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		},
 		"MISCELLANEOUS": {
+			"aimedShotActionPointCost": {
+				"value": 3
+			},
 			"addictionChance": {},
 			"addictionRecovery": {},
 			"armorClassPerUnusedActionPoint": {},
@@ -26759,7 +26795,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			"psychoAddictionChance": {},
 			"psychoEffects": {},
 			"radsPerHour": {},
-			"rangedActionPointCost": {},
+			"rangedActionPointCost": {
+				"value": 3
+			},
 			"rangedDamage": {},
 			"receivedExplosiveDamage": {},
 			"repairHealing": {
@@ -30235,6 +30273,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(226);
 	
+	var _utilsMakeUid = __webpack_require__(312);
+	
+	var _utilsMakeUid2 = _interopRequireDefault(_utilsMakeUid);
+	
+	var _utilsAddIdToProps = __webpack_require__(313);
+	
+	var _utilsAddIdToProps2 = _interopRequireDefault(_utilsAddIdToProps);
+	
 	var typeToEvents = {
 	    text: {
 	        keyup: 0,
@@ -30310,7 +30356,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var deserialize = _ref$deserialize === undefined ? identity : _ref$deserialize;
 	    var scheduler = _ref.scheduler;
 	
-	    var elements = DOM.select('.' + key);
+	    var id = key + '-' + (0, _utilsMakeUid2['default'])();
+	    var elements = DOM.select('.' + id);
 	    var newValue$ = eventsByType(elements, type, scheduler)['let'](function (o) {
 	        return typeToConverter[type] ? o.map(typeToConverter[type]) : o;
 	    });
@@ -30330,7 +30377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return serialized;
 	        }
 	        return _cycleCore.Rx.Observable['return'](serialized);
-	    }).merge(newValue$);
+	    }).mergeAfterFirst(newValue$);
 	
 	    var sharedProps$ = props$.shareReplay(1);
 	    var boundValue$ = _cycleCore.Rx.Observable.combineLatest(value$, sharedProps$, function (value, props) {
@@ -30354,7 +30401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).distinctUntilChanged().pausableBuffered1(canChangeDOM$).map(function (_ref2) {
 	        var value = _ref2.value;
 	        var props = _ref2.props;
-	        return (0, _render2['default'])(key, type, value, props);
+	        return (0, _render2['default'])(key, type, value, (0, _utilsAddIdToProps2['default'])(id, props));
 	    });
 	
 	    return {
@@ -42888,16 +42935,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _errorHandler2 = _interopRequireDefault(_errorHandler);
 	
+	var _utilsMakeUid = __webpack_require__(312);
+	
+	var _utilsMakeUid2 = _interopRequireDefault(_utilsMakeUid);
+	
+	var _utilsAddIdToProps = __webpack_require__(313);
+	
+	var _utilsAddIdToProps2 = _interopRequireDefault(_utilsAddIdToProps);
+	
 	function collapsableHeader(key, type, text, _ref) {
 	    var DOM = _ref.DOM;
 	    var inputValue$ = _ref.value$;
 	    var _ref$props$ = _ref.props$;
 	    var props$ = _ref$props$ === undefined ? _cycleCore.Rx.Observable['return'](null) : _ref$props$;
 	
-	    var selector = type + '.' + key;
+	    var id = key + '-' + (0, _utilsMakeUid2['default'])();
 	
-	    var elements = DOM.select(selector);
-	    var value$ = elements.events('click').map(function () {
+	    var value$ = DOM.select('.' + id).events('click').map(function () {
 	        return function (o) {
 	            return !o;
 	        };
@@ -42910,7 +42964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).distinctUntilChanged().debounce(5).shareReplay(1);
 	
 	    var vtree$ = _cycleCore.Rx.Observable.combineLatest(value$, props$, function (value, props) {
-	        return (0, _cycleDom.h)(selector, props || {}, [text]);
+	        return (0, _cycleDom.h)(type + '.' + key, (0, _utilsAddIdToProps2['default'])(id, props), [text]);
 	    });
 	
 	    return {
@@ -43611,6 +43665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var vTree$ = undefined;
 	    var value$ = undefined;
+	    var equation$ = undefined;
 	    var calculate = undefined;
 	    var savedValue = false;
 	    if (stat.value instanceof _modelsEquationOperations.Input) {
@@ -43656,16 +43711,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            vTree$ = inputView.DOM;
 	        })();
 	    } else {
+	        var equation = undefined;
+	        if (stat.key === 'levelsPerPerk' || stat.key === 'primaryTotal') {
+	            equation = calculations.get('race').map(function (race) {
+	                return race[stat.key];
+	            });
+	        } else {
+	            equation = _cycleCore.Rx.Observable['return'](stat.value || 0);
+	        }
 	        var valueView = (0, _algorithm2['default'])({
-	            equation$: effecter(_cycleCore.Rx.Observable['return'](stat.value || 0), stat.key),
+	            equation$: effecter(equation, stat.key),
 	            calculations: calculations
 	        });
 	        calculations.set(stat.key, valueView.value$.startWith(0));
 	        value$ = valueView.value$;
 	        vTree$ = valueView.DOM;
-	        // if (!valueView.calculate) {
-	        //     debugger;
-	        // }
+	        equation$ = valueView.equation$;
 	        calculate = valueView.calculate;
 	    }
 	
@@ -43684,12 +43745,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return {
-	        DOM: _cycleCore.Rx.Observable.combineLatest(vTree$, calculateButtonVTree$, value$.startWith(null), function (vTree, calculateButton, value) {
+	        DOM: _cycleCore.Rx.Observable.combineLatest(vTree$, calculateButtonVTree$, value$.startWith(null), equation$ || _cycleCore.Rx.Observable['return'](null), function (vTree, calculateButton, value, equation) {
 	            return (0, _cycleDom.h)('div.miscellaneous-statistic.miscellaneous-statistic-' + stat.key + (stat.percent ? '.miscellaneous-statistic-percent' : ''), {
 	                key: stat.key
-	            }, [(0, _cycleDom.h)('span.stat-label.ref-' + stat.key, [stat.name]),
-	            // value != null && value === value && !savedValue ? h(`span.stat-value`, ['' + value]) : null,
-	            vTree, _Number$isNaN(value) ? calculateButton : null]);
+	            }, [(0, _cycleDom.h)('span.stat-label.ref-' + stat.key, [stat.name]), value != null && !_Number$isNaN(value) && !savedValue ? (0, _cycleDom.h)('span.stat-value', ['' + value]) : null, typeof equation !== 'number' ? vTree : null, _Number$isNaN(value) ? calculateButton : null]);
 	        }).startWith((0, _loadingIndicator2['default'])(stat.key))['catch']((0, _errorHandler2['default'])(stat.key)),
 	        smallDOM: value$.startWith(null).map(function (value) {
 	            return (0, _cycleDom.h)('div.miscellaneous-statistic.miscellaneous-statistic-' + stat.key + (stat.percent ? '.miscellaneous-statistic-percent' : ''), {
@@ -44559,7 +44618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (0, _algorithm2['default'])({
 	        equation$: _cycleCore.Rx.Observable['return'](trait.requirements),
 	        calculations: calculations
-	    }).value$;
+	    }).value$.debounce(1000).startWith(true);
 	}
 	
 	function getTraitDescription(trait, calculations) {
@@ -46465,10 +46524,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.i(__webpack_require__(298), "");
 	exports.i(__webpack_require__(299), "");
 	exports.i(__webpack_require__(300), "");
-	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300);", ""]);
 	
 	// module
-	exports.push([module.id, "html {\n  -ms-touch-action: manipulation;\n  touch-action: manipulation; }\n\nhtml,\nbutton,\ninput,\nselect,\ntextarea,\n.pure-g [class*=\"pure-u\"] {\n  font-family: 'Roboto Condensed', sans-serif; }\n\n.layout {\n  max-width: 100%;\n  margin: 0 auto; }\n  @media only screen and (min-width: 64em) {\n    .layout {\n      max-width: 64em; } }\n  @media only screen and (min-width: 80em) {\n    .layout {\n      max-width: 80em; } }\n\n.content {\n  padding: 0 0.5em; }\n  @media only screen and (min-width: 35.5em) {\n    .content {\n      padding: 0 2em; } }\n\n.algorithm {\n  display: inline-block; }\n\n.algorithm .binary::before {\n  content: \"(\"; }\n\n.algorithm .binary::after {\n  content: \")\"; }\n\n.algorithm .binary--operator::before,\n.algorithm .binary--operator::after {\n  content: \" \"; }\n\n.algorithm > .binary::before,\n.algorithm > .binary::after,\n.binary.add > .add--operand > .binary.add::before,\n.binary.add > .add--operand > .binary.add::after,\n.binary.add > .add--operand > .binary.div::before,\n.binary.add > .add--operand > .binary.div::after,\n.binary.add > .add--operand > .binary.mul::before,\n.binary.add > .add--operand > .binary.mul::after,\n.binary.sub > .sub--left > .binary.add::before,\n.binary.sub > .sub--left > .binary.add::after,\n.binary.sub > .sub--left > .binary.sub::before,\n.binary.sub > .sub--left > .binary.sub::after,\n.binary.sub > .sub--operand > .binary.mul::before,\n.binary.sub > .sub--operand > .binary.mul::after,\n.binary.sub > .sub--operand > .binary.div::before,\n.binary.sub > .sub--operand > .binary.div::after,\n.binary.or > .or--operand > .binary.or::before,\n.binary.or > .or--operand > .binary.or::after,\n.binary.and > .and--operand > .binary.and::before,\n.binary.and > .and--operand > .binary.and::after,\n.binary.or > .or--operand > .binary.lte::before,\n.binary.or > .or--operand > .binary.lte::after,\n.binary.and > .and--operand > .binary.lte::before,\n.binary.and > .and--operand > .binary.lte::after,\n.binary.or > .or--operand > .binary.gte::before,\n.binary.or > .or--operand > .binary.gte::after,\n.binary.and > .and--operand > .binary.gte::before,\n.binary.and > .and--operand > .binary.gte::after,\n.binary.or > .or--operand > .binary.eq::before,\n.binary.or > .or--operand > .binary.eq::after,\n.binary.and > .and--operand > .binary.eq::before,\n.binary.and > .and--operand > .binary.eq::after {\n  content: \"\"; }\n\n.skill {\n  padding-left: 1em;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap; }\n\n.skill-label {\n  min-width: 7.5em;\n  margin: 0 0.5em; }\n\n.skill-value {\n  min-width: 2em;\n  margin: 0 0.5em;\n  text-align: right; }\n\n.skill-value::after {\n  content: \"%\"; }\n\n.skill-increase {\n  text-align: right; }\n\n.skill .algorithm {\n  margin: 0 0.5em; }\n\n.primary-statistic-body {\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  -webkit-flex-flow: row;\n      -ms-flex-flow: row;\n          flex-flow: row;\n  -webkit-box-pack: start;\n  -webkit-justify-content: flex-start;\n      -ms-flex-pack: start;\n          justify-content: flex-start; }\n  .primary-statistic-body .stat-name {\n    min-width: 5em;\n    text-align: left; }\n  .primary-statistic-body .stat-input {\n    min-width: 3em;\n    text-align: right; }\n  .primary-statistic-body .stat-select {\n    width: 3.5em;\n    text-align: right; }\n  .primary-statistic-body .stat-extrema {\n    min-width: 3em;\n    text-align: center; }\n  .primary-statistic-body .stat-effect {\n    min-width: 3em;\n    text-align: right; }\n    .primary-statistic-body .stat-effect.number-negative {\n      color: #a00; }\n    .primary-statistic-body .stat-effect.number-positive {\n      color: #0a0; }\n      .primary-statistic-body .stat-effect.number-positive::before {\n        content: \"+\"; }\n  .primary-statistic-body .stat-total {\n    min-width: 3em;\n    text-align: right; }\n\n.health {\n  -webkit-box-flex: 2;\n  -webkit-flex: 2 0 20em;\n      -ms-flex: 2 0 20em;\n          flex: 2 0 20em; }\n\n.health-collapsed {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 0 10em;\n      -ms-flex: 1 0 10em;\n          flex: 1 0 10em; }\n\n.body-part-title {\n  min-width: 5em;\n  display: inline-block;\n  font-size: 1.2em; }\n\n.body-part-target-penalty,\n.body-part-damage,\n.sub-body-part-target-penalty,\n.sub-body-part-damage {\n  display: none; }\n\n.body-part > .body-part {\n  margin-left: 1em; }\n\n.sub-body-part {\n  margin: 0 0.5em;\n  border-radius: 0.5em; }\n\n.sub-body-part--crippled {\n  background: #fdd; }\n\n.sub-body-part--damaged {\n  background: #ffd; }\n\n.sub-body-part--healthy {\n  background: #dfd; }\n\n.sub-body-part-title {\n  min-width: 5em;\n  display: inline-block; }\n\n.health-body-parts {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.body-part {\n  text-align: center;\n  border: solid 1px #333;\n  border-radius: 1em;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  margin: 0.5em; }\n\n.body-part-head {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 2;\n  -webkit-order: 1;\n      -ms-flex-order: 1;\n          order: 1; }\n\n.body-part-torso {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 3;\n  -webkit-order: 2;\n      -ms-flex-order: 2;\n          order: 2; }\n  @media only screen and (min-width: 48em) {\n    .body-part-torso {\n      min-width: 30%;\n      -webkit-box-ordinal-group: 4;\n      -webkit-order: 3;\n          -ms-flex-order: 3;\n              order: 3; } }\n\n.body-part-leftArm {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 4;\n  -webkit-order: 3;\n      -ms-flex-order: 3;\n          order: 3; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-leftArm {\n      min-width: 45%; } }\n  @media only screen and (min-width: 48em) {\n    .body-part-leftArm {\n      min-width: 30%;\n      -webkit-box-ordinal-group: 3;\n      -webkit-order: 2;\n          -ms-flex-order: 2;\n              order: 2; } }\n\n.body-part-rightArm {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 5;\n  -webkit-order: 4;\n      -ms-flex-order: 4;\n          order: 4; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-rightArm {\n      min-width: 45%; } }\n  @media only screen and (min-width: 48em) {\n    .body-part-rightArm {\n      min-width: 30%; } }\n\n.body-part-leftLeg {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 6;\n  -webkit-order: 5;\n      -ms-flex-order: 5;\n          order: 5; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-leftLeg {\n      min-width: 45%; } }\n\n.body-part-rightLeg {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 7;\n  -webkit-order: 6;\n      -ms-flex-order: 6;\n          order: 6; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-rightLeg {\n      min-width: 45%; } }\n\n.body-part--healthy {\n  background: #efe; }\n\n.body-part--damaged {\n  background: #ffe; }\n\n.body-part--crippled {\n  background: #fee; }\n\n.health-total {\n  font-size: 200%;\n  text-align: center;\n  display: block; }\n\n.health-button {\n  border-radius: 50%;\n  padding: 0;\n  width: 2em;\n  height: 2em; }\n\n.traits {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: column;\n      -ms-flex-flow: column;\n          flex-flow: column; }\n\n.trait {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap; }\n\n.trait-label {\n  min-width: 9em; }\n\n.trait-description {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex; }\n\n.effect-part + .effect-part::before {\n  content: \", \"; }\n\n.trait-effect {\n  min-width: 10em;\n  padding-right: 1em; }\n\n.secondary-statistic {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap; }\n\n.stat-value {\n  min-width: 2em;\n  text-align: center; }\n\n.secondary-statistic-percent .stat-value::after {\n  content: \"%\"; }\n\n.stat-label {\n  min-width: 10em; }\n\n.secondary.collapsed .stat-label {\n  min-width: 3em;\n  text-align: right; }\n\n.perks {\n  -webkit-box-flex: 2;\n  -webkit-flex: 2 0 20em;\n      -ms-flex: 2 0 20em;\n          flex: 2 0 20em; }\n\n.perks.collapsed {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 0 10em;\n      -ms-flex: 1 0 10em;\n          flex: 1 0 10em; }\n\n.perk {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.perk-label {\n  min-width: 13em; }\n\n.perk-choose-wrapper {\n  min-width: 2.5em;\n  display: inline-block;\n  text-align: center; }\n\n.perk-requirements,\n.trait-requirements {\n  min-width: 14em; }\n  .perk-requirements .algorithm > .boolean-true,\n  .trait-requirements .algorithm > .boolean-true {\n    color: #070; }\n  .perk-requirements .algorithm > .boolean-false,\n  .trait-requirements .algorithm > .boolean-false {\n    color: #700; }\n\n.perk-effect {\n  min-width: 10em; }\n\n.primary-body {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: column;\n      -ms-flex-flow: column;\n          flex-flow: column; }\n\n.primary-statistic {\n  margin: 0.25em; }\n\n.primary-statistic-body {\n  padding: 0.25em;\n  border-radius: 0.25em; }\n\n.primary-statistic-strength .primary-statistic-body {\n  background: #ffebeb; }\n\n.primary-statistic-perception .primary-statistic-body {\n  background: #ebffeb; }\n\n.primary-statistic-endurance .primary-statistic-body {\n  background: #fff5eb; }\n\n.primary-statistic-charisma .primary-statistic-body {\n  background: #ebffff; }\n\n.primary-statistic-intelligence .primary-statistic-body {\n  background: #ffebff; }\n\n.primary-statistic-agility .primary-statistic-body {\n  background: #ebebff; }\n\n.primary-statistic-luck .primary-statistic-body {\n  background: #ffffeb; }\n\n.perk,\n.trait,\n.secondary-statistic,\n.miscellaneous-statistic {\n  padding: 0.25em; }\n  .perk:nth-child(odd),\n  .trait:nth-child(odd),\n  .secondary-statistic:nth-child(odd),\n  .miscellaneous-statistic:nth-child(odd) {\n    background: #eee; }\n\n.skill-category-body {\n  background: #eee;\n  border-radius: 0.5em;\n  padding: 0.5em;\n  margin: 0.5em;\n  -webkit-column-break-inside: avoid;\n     page-break-inside: avoid;\n          break-inside: avoid; }\n\n.skills-body {\n  -webkit-column-width: 18em;\n     -moz-column-width: 18em;\n          column-width: 18em; }\n\n.skill-category-medicine .skill-category-body {\n  background: #fee; }\n\n.skill-category-rangedWeapons .skill-category-body {\n  background: #f0ffee; }\n\n.skill-category-simpleWeapons .skill-category-body {\n  background: #fff9ee; }\n\n.skill-category-social .skill-category-body {\n  background: #fbeeff; }\n\n.skill-category-survival .skill-category-body {\n  background: #eefffd; }\n\n.skill-category-technical .skill-category-body {\n  background: #f5f5f5; }\n\n.skill-category-thieving .skill-category-body {\n  background: #eef1ff; }\n", ""]);
+	exports.push([module.id, "html {\n  -ms-touch-action: manipulation;\n  touch-action: manipulation; }\n\n.layout {\n  max-width: 100%;\n  margin: 0 auto; }\n  @media only screen and (min-width: 64em) {\n    .layout {\n      max-width: 64em; } }\n  @media only screen and (min-width: 80em) {\n    .layout {\n      max-width: 80em; } }\n\n.content {\n  padding: 0 0.5em; }\n  @media only screen and (min-width: 35.5em) {\n    .content {\n      padding: 0 2em; } }\n\n.algorithm {\n  display: inline-block; }\n\n.algorithm .binary::before {\n  content: \"(\"; }\n\n.algorithm .binary::after {\n  content: \")\"; }\n\n.algorithm .binary--operator::before,\n.algorithm .binary--operator::after {\n  content: \" \"; }\n\n.algorithm > .binary::before,\n.algorithm > .binary::after,\n.binary.add > .add--operand > .binary.add::before,\n.binary.add > .add--operand > .binary.add::after,\n.binary.add > .add--operand > .binary.div::before,\n.binary.add > .add--operand > .binary.div::after,\n.binary.add > .add--operand > .binary.mul::before,\n.binary.add > .add--operand > .binary.mul::after,\n.binary.sub > .sub--left > .binary.add::before,\n.binary.sub > .sub--left > .binary.add::after,\n.binary.sub > .sub--left > .binary.sub::before,\n.binary.sub > .sub--left > .binary.sub::after,\n.binary.sub > .sub--operand > .binary.mul::before,\n.binary.sub > .sub--operand > .binary.mul::after,\n.binary.sub > .sub--operand > .binary.div::before,\n.binary.sub > .sub--operand > .binary.div::after,\n.binary.or > .or--operand > .binary.or::before,\n.binary.or > .or--operand > .binary.or::after,\n.binary.and > .and--operand > .binary.and::before,\n.binary.and > .and--operand > .binary.and::after,\n.binary.or > .or--operand > .binary.lte::before,\n.binary.or > .or--operand > .binary.lte::after,\n.binary.and > .and--operand > .binary.lte::before,\n.binary.and > .and--operand > .binary.lte::after,\n.binary.or > .or--operand > .binary.gte::before,\n.binary.or > .or--operand > .binary.gte::after,\n.binary.and > .and--operand > .binary.gte::before,\n.binary.and > .and--operand > .binary.gte::after,\n.binary.or > .or--operand > .binary.eq::before,\n.binary.or > .or--operand > .binary.eq::after,\n.binary.and > .and--operand > .binary.eq::before,\n.binary.and > .and--operand > .binary.eq::after {\n  content: \"\"; }\n\n.skill {\n  padding-left: 1em;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap; }\n\n.skill-label {\n  min-width: 7.5em;\n  margin: 0 0.5em; }\n\n.skill-value {\n  min-width: 2em;\n  margin: 0 0.5em;\n  text-align: right; }\n\n.skill-value::after {\n  content: \"%\"; }\n\n.skill-increase {\n  text-align: right; }\n\n.skill .algorithm {\n  margin: 0 0.5em; }\n\n.primary-statistic-body {\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  -webkit-flex-flow: row;\n      -ms-flex-flow: row;\n          flex-flow: row;\n  -webkit-box-pack: start;\n  -webkit-justify-content: flex-start;\n      -ms-flex-pack: start;\n          justify-content: flex-start; }\n  .primary-statistic-body .stat-name {\n    min-width: 5em;\n    text-align: left; }\n  .primary-statistic-body .stat-input {\n    min-width: 3em;\n    text-align: right; }\n  .primary-statistic-body .stat-select {\n    width: 3.5em;\n    text-align: right; }\n  .primary-statistic-body .stat-extrema {\n    min-width: 3em;\n    text-align: center; }\n  .primary-statistic-body .stat-effect {\n    min-width: 3em;\n    text-align: right; }\n    .primary-statistic-body .stat-effect.number-negative {\n      color: #a00; }\n    .primary-statistic-body .stat-effect.number-positive {\n      color: #0a0; }\n      .primary-statistic-body .stat-effect.number-positive::before {\n        content: \"+\"; }\n  .primary-statistic-body .stat-total {\n    min-width: 3em;\n    text-align: right; }\n\n.health {\n  -webkit-box-flex: 2;\n  -webkit-flex: 2 0 20em;\n      -ms-flex: 2 0 20em;\n          flex: 2 0 20em; }\n\n.health-collapsed {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 0 10em;\n      -ms-flex: 1 0 10em;\n          flex: 1 0 10em; }\n\n.body-part-title {\n  min-width: 5em;\n  display: inline-block;\n  font-size: 1.2em; }\n\n.body-part-target-penalty,\n.body-part-damage,\n.sub-body-part-target-penalty,\n.sub-body-part-damage {\n  display: none; }\n\n.body-part > .body-part {\n  margin-left: 1em; }\n\n.sub-body-part {\n  margin: 0 0.5em;\n  border-radius: 0.5em; }\n\n.sub-body-part--crippled {\n  background: #fdd; }\n\n.sub-body-part--damaged {\n  background: #ffd; }\n\n.sub-body-part--healthy {\n  background: #dfd; }\n\n.sub-body-part-title {\n  min-width: 5em;\n  display: inline-block; }\n\n.health-body-parts {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.body-part {\n  text-align: center;\n  border: solid 1px #333;\n  border-radius: 1em;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  margin: 0.5em; }\n\n.body-part-head {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 2;\n  -webkit-order: 1;\n      -ms-flex-order: 1;\n          order: 1; }\n\n.body-part-torso {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 3;\n  -webkit-order: 2;\n      -ms-flex-order: 2;\n          order: 2; }\n  @media only screen and (min-width: 48em) {\n    .body-part-torso {\n      min-width: 30%;\n      -webkit-box-ordinal-group: 4;\n      -webkit-order: 3;\n          -ms-flex-order: 3;\n              order: 3; } }\n\n.body-part-leftArm {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 4;\n  -webkit-order: 3;\n      -ms-flex-order: 3;\n          order: 3; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-leftArm {\n      min-width: 45%; } }\n  @media only screen and (min-width: 48em) {\n    .body-part-leftArm {\n      min-width: 30%;\n      -webkit-box-ordinal-group: 3;\n      -webkit-order: 2;\n          -ms-flex-order: 2;\n              order: 2; } }\n\n.body-part-rightArm {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 5;\n  -webkit-order: 4;\n      -ms-flex-order: 4;\n          order: 4; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-rightArm {\n      min-width: 45%; } }\n  @media only screen and (min-width: 48em) {\n    .body-part-rightArm {\n      min-width: 30%; } }\n\n.body-part-leftLeg {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 6;\n  -webkit-order: 5;\n      -ms-flex-order: 5;\n          order: 5; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-leftLeg {\n      min-width: 45%; } }\n\n.body-part-rightLeg {\n  min-width: 100%;\n  -webkit-box-ordinal-group: 7;\n  -webkit-order: 6;\n      -ms-flex-order: 6;\n          order: 6; }\n  @media only screen and (min-width: 35.5em) {\n    .body-part-rightLeg {\n      min-width: 45%; } }\n\n.body-part--healthy {\n  background: #efe; }\n\n.body-part--damaged {\n  background: #ffe; }\n\n.body-part--crippled {\n  background: #fee; }\n\n.health-total {\n  font-size: 200%;\n  text-align: center;\n  display: block; }\n\n.health-button {\n  border-radius: 50%;\n  padding: 0;\n  width: 2em;\n  height: 2em; }\n\n.traits {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: column;\n      -ms-flex-flow: column;\n          flex-flow: column; }\n\n.trait {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap; }\n\n.trait-label {\n  min-width: 9em; }\n\n.trait-description {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex; }\n\n.effect-part + .effect-part::before {\n  content: \", \"; }\n\n.trait-effect {\n  min-width: 10em;\n  padding-right: 1em; }\n\n.secondary-body {\n  -webkit-column-width: 20em;\n     -moz-column-width: 20em;\n          column-width: 20em; }\n\n.secondary-statistic {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-column-break-inside: avoid;\n     page-break-inside: avoid;\n          break-inside: avoid; }\n\n.stat-value {\n  min-width: 2em;\n  text-align: center; }\n\n.secondary-statistic-percent .stat-value::after {\n  content: \"%\"; }\n\n.miscellaneous-statistic-percent .stat-value::after {\n  content: \"%\"; }\n\n.stat-label {\n  min-width: 10em; }\n\n.secondary.collapsed .stat-label {\n  min-width: 3em;\n  text-align: right; }\n\n.perks {\n  -webkit-box-flex: 2;\n  -webkit-flex: 2 0 20em;\n      -ms-flex: 2 0 20em;\n          flex: 2 0 20em; }\n\n.perks.collapsed {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 0 10em;\n      -ms-flex: 1 0 10em;\n          flex: 1 0 10em; }\n\n.perk {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.perk-label {\n  min-width: 13em; }\n\n.perk-choose-wrapper {\n  min-width: 2.5em;\n  display: inline-block;\n  text-align: center; }\n\n.perk-requirements,\n.trait-requirements {\n  min-width: 14em; }\n  .perk-requirements .algorithm > .boolean-true,\n  .trait-requirements .algorithm > .boolean-true {\n    color: #070; }\n  .perk-requirements .algorithm > .boolean-false,\n  .trait-requirements .algorithm > .boolean-false {\n    color: #700; }\n\n.perk-effect {\n  min-width: 10em; }\n\n.primary-body {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: column;\n      -ms-flex-flow: column;\n          flex-flow: column; }\n\n.primary-statistic {\n  margin: 0.25em; }\n\n.primary-statistic-body {\n  padding: 0.25em;\n  border-radius: 0.25em; }\n\n.primary-statistic-strength .primary-statistic-body {\n  background: #ffebeb; }\n\n.primary-statistic-perception .primary-statistic-body {\n  background: #ebffeb; }\n\n.primary-statistic-endurance .primary-statistic-body {\n  background: #fff5eb; }\n\n.primary-statistic-charisma .primary-statistic-body {\n  background: #ebffff; }\n\n.primary-statistic-intelligence .primary-statistic-body {\n  background: #ffebff; }\n\n.primary-statistic-agility .primary-statistic-body {\n  background: #ebebff; }\n\n.primary-statistic-luck .primary-statistic-body {\n  background: #ffffeb; }\n\n.perk,\n.trait,\n.secondary-statistic,\n.miscellaneous-statistic {\n  padding: 0.25em; }\n  .perk:nth-child(odd),\n  .trait:nth-child(odd),\n  .secondary-statistic:nth-child(odd),\n  .miscellaneous-statistic:nth-child(odd) {\n    background: #eee; }\n\n.miscellaneous-body {\n  -webkit-column-width: 18em;\n     -moz-column-width: 18em;\n          column-width: 18em; }\n\n.miscellaneous-statistic {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-column-break-inside: avoid;\n     page-break-inside: avoid;\n          break-inside: avoid; }\n  .miscellaneous-statistic .stat-label {\n    min-width: 15em; }\n\n.skill-category-body {\n  background: #eee;\n  border-radius: 0.5em;\n  padding: 0.5em;\n  margin: 0.5em;\n  -webkit-column-break-inside: avoid;\n     page-break-inside: avoid;\n          break-inside: avoid; }\n\n.skills-body {\n  -webkit-column-width: 18em;\n     -moz-column-width: 18em;\n          column-width: 18em; }\n\n.skill-category-medicine .skill-category-body {\n  background: #fee; }\n\n.skill-category-rangedWeapons .skill-category-body {\n  background: #f0ffee; }\n\n.skill-category-simpleWeapons .skill-category-body {\n  background: #fff9ee; }\n\n.skill-category-social .skill-category-body {\n  background: #fbeeff; }\n\n.skill-category-survival .skill-category-body {\n  background: #eefffd; }\n\n.skill-category-technical .skill-category-body {\n  background: #f5f5f5; }\n\n.skill-category-thieving .skill-category-body {\n  background: #eef1ff; }\n", ""]);
 	
 	// exports
 
@@ -47735,6 +47793,230 @@ return /******/ (function(modules) { // webpackBootstrap
 	        max$: max$,
 	        step$: step$,
 	        props$: props$
+	    });
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 310 */,
+/* 311 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _slicedToArray = __webpack_require__(123)['default'];
+	
+	var _Object$entries = __webpack_require__(163)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = characterList;
+	
+	var _cycleCore = __webpack_require__(2);
+	
+	var _cycleDom = __webpack_require__(6);
+	
+	var _characterMain = __webpack_require__(122);
+	
+	var _characterMain2 = _interopRequireDefault(_characterMain);
+	
+	__webpack_require__(226);
+	
+	function makeNav(items) {
+	    return _Object$entries(items).map(function (_ref) {
+	        var _ref2 = _slicedToArray(_ref, 2);
+	
+	        var route = _ref2[0];
+	        var name = _ref2[1];
+	        return {
+	            route: route,
+	            name: name
+	        };
+	    });
+	}
+	
+	function parseRoute(route) {
+	    var match = /^(\d+)(\/|$)(.*)/.exec(route);
+	    if (!match) {
+	        return null;
+	    }
+	    var id = +match[1];
+	    if (isNaN(id)) {
+	        return null;
+	    }
+	    return id;
+	}
+	
+	function trimRoute(id, route) {
+	    var match = /^(\d+)(\/|$)(.*)/.exec(route);
+	    if (!match || +match[1] !== id) {
+	        return null;
+	    }
+	    return match[3];
+	}
+	
+	function characterList(_ref3) {
+	    var DOM = _ref3.DOM;
+	    var value$ = _ref3.value$;
+	    var route$ = _ref3.route$;
+	
+	    var newCharacter$ = new _cycleCore.Rx.Subject();
+	    var characterViews$ = value$.first().map(function (characters) {
+	        return characters.map(function (character, id) {
+	            return (0, _characterMain2['default'])({ DOM: DOM, value$: _cycleCore.Rx.Observable['return'](character), route$: route$.map(function (route) {
+	                    return trimRoute(id, route);
+	                }).distinctUntilChanged() });
+	        });
+	    }).map(function (characterViews) {
+	        return function () {
+	            return characterViews;
+	        };
+	    }).merge(newCharacter$.map(function () {
+	        return function (characterViews) {
+	            var id = characterViews.length;
+	            return characterViews.concat([(0, _characterMain2['default'])({ DOM: DOM, value$: _cycleCore.Rx.Observable['return']({}), route$: route$.map(function (route) {
+	                    return trimRoute(id, route);
+	                }).distinctUntilChanged() })]);
+	        };
+	    })).scan(function (acc, modifier) {
+	        return modifier(acc);
+	    }, []).shareReplay(1);
+	
+	    var selectedCharacterView$ = characterViews$.combineLatest(route$, function (characterViews, route) {
+	        if (!route || route === 'new') {
+	            return null;
+	        }
+	        var id = parseRoute(route);
+	        if (id !== null) {
+	            var view = characterViews[id];
+	            if (view) {
+	                return { id: id, view: view };
+	            }
+	        }
+	        return null;
+	    }).distinctUntilChanged().shareReplay(1);
+	
+	    return {
+	        DOM: characterViews$.combineLatest(route$.throttle(5), function (characterViews, route) {
+	            if (!route) {
+	                var menuItems$ = _cycleCore.Rx.Observable.combineLatest(characterViews.map(function (view, i) {
+	                    return view.description$.map(function (description) {
+	                        return (0, _cycleDom.h)('li.pure-menu-item', [(0, _cycleDom.h)('a.pure-menu-link', {
+	                            href: '#/' + i
+	                        }, description || 'Character #' + i)]);
+	                    });
+	                }));
+	
+	                return menuItems$.map(function (menuItems) {
+	                    return (0, _cycleDom.h)('.pure-menu', [(0, _cycleDom.h)('span.pure-menu-heading', 'Characters'), (0, _cycleDom.h)('ul.pure-menu-list', menuItems.concat([(0, _cycleDom.h)('li.pure-menu-item', [(0, _cycleDom.h)('a.pure-menu-link', {
+	                        href: '#/new'
+	                    }, 'New character')])]))]);
+	                }).startWithThrottled(function () {
+	                    return null;
+	                });
+	            }
+	            if (route === 'new') {
+	                window.location = '#/' + characterViews.length;
+	                return _cycleCore.Rx.Observable['return']((0, _cycleDom.h)('div', ['Loading new character']));
+	            }
+	            var match = /^(\d+)(\/|$)(.*)/.exec(route);
+	            if (match) {
+	                var id = +match[1];
+	                var view = characterViews[id];
+	                if (view) {
+	                    return view.DOM.startWithThrottled(function () {
+	                        return null;
+	                    });
+	                }
+	                if (id === characterViews.length) {
+	                    newCharacter$.onNext();
+	                    return _cycleCore.Rx.Observable['return']((0, _cycleDom.h)('div', ['Loading']));
+	                }
+	            }
+	            return _cycleCore.Rx.Observable['return']((0, _cycleDom.h)('div', ['Character not found']));
+	        }).switchLatest(),
+	        nav$: selectedCharacterView$.flatMapLatest(function (box) {
+	            if (!box) {
+	                return _cycleCore.Rx.Observable['return']([]);
+	            }
+	            var id = box.id;
+	            var view = box.view;
+	
+	            return view.name$.combineLatest(view.nav$, function (charName, nav) {
+	                return [{
+	                    name: charName
+	                }].concat(nav.map(function (_ref4) {
+	                    var route = _ref4.route;
+	                    var name = _ref4.name;
+	                    return {
+	                        route: id + '/' + route,
+	                        name: name
+	                    };
+	                }));
+	            }).startWithThrottled(function () {
+	                return [];
+	            });
+	        }).map(function (nav) {
+	            return makeNav({
+	                '': 'Characters'
+	            }).concat(nav);
+	        }),
+	        value$: characterViews$.flatMapLatest(function (characterViews) {
+	            return _cycleCore.Rx.Observable.combineLatest(characterViews.map(function (view) {
+	                return view.value$;
+	            }));
+	        })
+	    };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 312 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports["default"] = function () {
+	  return Math.random().toString(36).slice(2);
+	};
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 313 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _Object$assign = __webpack_require__(181)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports['default'] = addIdToProps;
+	
+	function addIdToProps(id, props) {
+	    if (!props) {
+	        return { className: id };
+	    }
+	    var className = props.className;
+	
+	    if (className) {
+	        className += ' ' + id;
+	    } else {
+	        className = id;
+	    }
+	    return _Object$assign({}, props, {
+	        className: className
 	    });
 	}
 	

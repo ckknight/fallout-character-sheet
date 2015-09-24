@@ -2,9 +2,12 @@ import { Rx } from '@cycle/core';
 import renderSelect from './render';
 import errorHandler from '../errorHandler';
 import '../../rx-merge-after-first';
+import makeUid from '../../utils/makeUid';
+import addIdToProps from '../../utils/addIdToProps';
 
 export default function select(key, {DOM, value$: inputValue$, options$, props$ = Rx.Observable.return(null)}) {
-    const newValue$ = DOM.select(`.${key}`)
+    const id = `${key}-${makeUid()}`;
+    const newValue$ = DOM.select(`.${id}`)
         .events('change')
         .map(ev => ev.target.value);
 
@@ -17,7 +20,7 @@ export default function select(key, {DOM, value$: inputValue$, options$, props$ 
         .shareReplay(1);
 
     const vtree$ = Rx.Observable.combineLatest(sharedOptions$, value$, props$,
-        (options, value, props) => renderSelect(key, options, value, props));
+        (options, value, props) => renderSelect(key, options, value, addIdToProps(id, props)));
 
     return {
         DOM: vtree$

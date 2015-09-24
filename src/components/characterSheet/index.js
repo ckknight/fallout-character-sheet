@@ -15,7 +15,6 @@ import Calculations from './Calculations';
 import equationReplace from '../../models/Equation/replace';
 import Immutable from 'immutable';
 import Effect from '../../models/Effect';
-import '../../sampleToRequestAnimationFrame';
 // import future from '../../future';
 
 function log(...args) {
@@ -151,8 +150,7 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
         DOM: route$
             .flatMapLatest(route => routeToDOM[route] || routeToDOM.cosmetic)
             .map(vTree => h('section.character-sheet-body', [vTree]))
-            .startWith(h('section.loading', `Loading, y'all.`))
-            .sampleToRequestAnimationFrame(),
+            .startWith(h('section.loading', `Loading, y'all.`)),
         value$: combineLatestObject({
             character: {
                 race: raceView.value$,
@@ -175,6 +173,25 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
                 perks: perksView.uiState$,
             },
         }, null),
+        name$: cosmeticView.value$
+            .map(({name}) => name || '')
+            .distinctUntilChanged(),
+        description$: combineLatestObject({
+            race: calculations.get('race'),
+            cosmetic: cosmeticView.value$,
+            secondary: secondaryStatisticView.value$,
+        }, null)
+            .throttle(17)
+            .map(({race, cosmetic, secondary}) => {
+                return [
+                    cosmetic && cosmetic.name,
+                    race && race.name,
+                    secondary && secondary.level ? 'Level ' + secondary.level : ''
+                ]
+                    .filter(Boolean)
+                    .join(', ');
+            })
+            .distinctUntilChanged(),
     };
     log('end', t(), Date.now());
     return result;

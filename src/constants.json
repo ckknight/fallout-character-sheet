@@ -2049,6 +2049,7 @@
     },
     "LOCALIZATION": {
         "en-US": {
+            "aimedShotActionPointCost": "Aimed Shot Action Point Cost",
             "actionChild": "Action Boy (or Girl)",
             "actionPointRegeneration": {
                 "abbr": "APR",
@@ -2178,7 +2179,7 @@
                 "abbr": "XP",
                 "name": "Experience"
             },
-            "experienceMultiplier": "XP Multiplier",
+            "experienceMultiplier": "Experience Multiplier",
             "explorer": "Explorer",
             "explosiveDamage": "Explosive Damage",
             "explosives": "Explosives",
@@ -2507,6 +2508,9 @@
         }
     },
     "MISCELLANEOUS": {
+        "aimedShotActionPointCost": {
+            "value": 3
+        },
         "addictionChance": {
         },
         "addictionRecovery": {
@@ -2602,6 +2606,7 @@
         "radsPerHour": {
         },
         "rangedActionPointCost": {
+            "value": 3
         },
         "rangedDamage": {
         },

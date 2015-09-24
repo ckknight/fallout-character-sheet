@@ -15,7 +15,9 @@ function isTraitChoosable(trait, calculations) {
         equation$: Rx.Observable.return(trait.requirements),
         calculations,
     })
-        .value$;
+        .value$
+        .debounce(1000)
+        .startWith(true);
 }
 
 function getTraitDescription(trait, calculations) {

@@ -2,12 +2,13 @@ import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import loadingIndicator from './loadingIndicator';
 import errorHandler from './errorHandler';
+import makeUid from '../utils/makeUid';
+import addIdToProps from '../utils/addIdToProps';
 
 export default function collapsableHeader(key, type, text, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null)}) {
-    const selector = `${type}.${key}`;
+    const id = `${key}-${makeUid()}`;
 
-    const elements = DOM.select(selector);
-    const value$ = elements
+    const value$ = DOM.select(`.${id}`)
         .events('click')
         .map(() => o => !o)
         .merge(inputValue$.map(x => () => !!x))
@@ -18,7 +19,7 @@ export default function collapsableHeader(key, type, text, {DOM, value$: inputVa
         .shareReplay(1);
 
     const vtree$ = Rx.Observable.combineLatest(value$, props$,
-        (value, props) => h(selector, props || {}, [text]));
+        (value, props) => h(`${type}.${key}`, addIdToProps(id, props), [text]));
 
     return {
         DOM: vtree$

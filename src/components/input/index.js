@@ -4,6 +4,8 @@ import errorHandler from '../errorHandler';
 import render from './render';
 import '../../rx-pausable-buffered1';
 import '../../rx-start-with-throttled';
+import makeUid from '../../utils/makeUid';
+import addIdToProps from '../../utils/addIdToProps';
 
 const typeToEvents = {
     text: {
@@ -63,7 +65,8 @@ function eventsByType(DOM, type, scheduler) {
 }
 
 export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.Observable.return(null), serialize = identity, deserialize = identity, scheduler}) {
-    const elements = DOM.select(`.${key}`);
+    const id = `${key}-${makeUid()}`;
+    const elements = DOM.select(`.${id}`);
     const newValue$ = eventsByType(elements, type, scheduler)
         .let(o => typeToConverter[type] ? o.map(typeToConverter[type]) : o);
 
@@ -87,7 +90,7 @@ export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.
             }
             return Rx.Observable.return(serialized);
         })
-        .merge(newValue$);
+        .mergeAfterFirst(newValue$);
 
     const sharedProps$ = props$.shareReplay(1);
     const boundValue$ = Rx.Observable.combineLatest(value$, sharedProps$,
@@ -113,7 +116,7 @@ export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.
         }))
         .distinctUntilChanged()
         .pausableBuffered1(canChangeDOM$)
-        .map(({value, props}) => render(key, type, value, props));
+        .map(({value, props}) => render(key, type, value, addIdToProps(id, props)));
 
     return {
         DOM: vtree$

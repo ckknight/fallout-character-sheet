@@ -25,5 +25,7 @@ export default function characterMain({ DOM, value$, route$ }) {
             health: 'Health',
         })),
         value$: characterView.value$,
+        name$: characterView.name$,
+        description$: characterView.description$,
     };
 }
