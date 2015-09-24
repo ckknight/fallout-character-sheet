@@ -1,18 +1,15 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
-import input from '../input';
 import combineLatestObject from '../../combineLatestObject';
 import SecondaryStatistic from '../../models/SecondaryStatistic';
 import algorithm from '../algorithm';
 import renderRef from './renderRef';
-import { replace as equationReplace } from '../../models/Equation';
-import Effect from '../../models/Effect';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import collapsableBox from '../collapsableBox';
-import future from '../../future';
+// import future from '../../future';
 
-function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
+function secondaryStatisticEntry(stat, {calculations, effecter}) {
     const valueView = algorithm({
         equation$: effecter(Rx.Observable.return(stat.value), stat.key),
         calculations,
@@ -24,9 +21,9 @@ function secondaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
             (vTree, value) => h(`div.secondary-statistic.secondary-statistic-${stat.key}` + (stat.percent ? '.secondary-statistic-percent' : ''), {
                     key: stat.key,
                 }, [
-                    renderRef(stat.key, 'stat-label'),
+                    h(`span.stat-label.ref-${stat.key}`, [stat.name]),
                     value != null ? h(`span.stat-value`, ['' + value]) : null,
-                    vTree,
+                    value !== 0 ? vTree : null,
                 ]))
             .startWith(loadingIndicator(stat.key))
             .catch(errorHandler(stat.key)),

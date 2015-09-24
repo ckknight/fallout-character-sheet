@@ -13,7 +13,7 @@ import renderEffect from './renderEffect';
 import plusMinusButtons from '../plusMinusButtons';
 import InjectableObservable from 'rx-injectable-observable';
 import button from '../button';
-import future from '../../future';
+// import future from '../../future';
 
 const SHOW_EQUATION = false;
 
@@ -70,6 +70,7 @@ function makeSubBodyPartView(key, subBodyPart, inputValue$, DOM, calculations, r
             (damageVTree, crippledVTree, addDamageVTree, subDamageVTree, currentDamage, crippleHealthVTree, crippleHealth, crippled) => {
                 return h(`section.sub-body-part.sub-body-part-${subBodyPart.key}`, {
                     key: subBodyPart.key,
+                    className: `sub-body-part--${crippled ? 'crippled' : currentDamage ? 'damaged' : 'healthy'}`
                 }, [
                     h(`span.sub-body-part-title`, {
                         key: 'title',
@@ -239,8 +240,9 @@ function makeSingleBodyPartView(key, bodyPart, inputValue$, DOM, calculations, i
             status$,
             damageButtonView.DOM,
             healButtonView.DOM,
-            (damageVTree, health, crippleHealthVTree, vTrees, effectVTree, {damaged, crippled} , damageButton, healButton) => h(`section.body-part.body-part-${key}`, {
+            (damageVTree, totalHealth, crippleHealthVTree, vTrees, effectVTree, {damaged, crippled}, damageButton, healButton) => h(`section.body-part.body-part-${key}`, {
                     key,
+                    className: `body-part--${crippled ? 'crippled' : damaged ? 'damaged' : 'healthy'}`
                 }, [
                     h(`span.body-part-title`, {
                         key: 'title',
@@ -248,7 +250,7 @@ function makeSingleBodyPartView(key, bodyPart, inputValue$, DOM, calculations, i
                     damageButton,
                     h(`span.body-part-health`, {
                         key: 'health',
-                    }, [(health - damaged), '/', health]),
+                    }, [(totalHealth - damaged), '/', totalHealth]),
                     healButton,
                     SHOW_EQUATION ? h(`span.body-part-health-equation`, {
                         key: 'healthEquation',
@@ -259,7 +261,7 @@ function makeSingleBodyPartView(key, bodyPart, inputValue$, DOM, calculations, i
                     crippled ? h(`span.body-part-crippled`, {
                         key: 'crippled',
                     }, [h(`i.fa.fa-wheelchair`)]) : null,
-                    crippled ? h(`p.body-part-cripple-effect`, {
+                    false && crippled ? h(`p.body-part-cripple-effect`, {
                         key: 'crippleEffect',
                     }, [effectVTree]) : null,
                     crippled && bodyPart.meta ? h(`p.body-part-meta`, {
@@ -296,15 +298,13 @@ function indexedMapToList(map) {
 
 function flattenListOfObjects(list) {
     return list
-        .reduce((acc, element, index) => {
+        .reduce((map, element, index) => {
             return element
                 .toKeyedSeq()
                 .reduce((acc, value, key) => {
-                    if (!acc.get(key)) {
-                        acc = acc.set(key, new Immutable.List());
-                    }
-                    return acc.setIn([key, index], value);
-                }, acc);
+                    const accWithKey = acc.has(key) ? acc : acc.set(key, new Immutable.List());
+                    return accWithKey.setIn([key, index], value);
+                }, map);
         }, new Immutable.Map());
 }
 

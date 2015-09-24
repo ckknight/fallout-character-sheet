@@ -1,6 +1,6 @@
 import { h } from '@cycle/dom';
 import When from '../../models/When';
-import { BinaryOperation, UnaryOperation, Random } from '../../models/Equation';
+import { BinaryOperation, UnaryOperation, Random } from '../../models/Equation/operations';
 import Immutable from 'immutable';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
@@ -11,6 +11,7 @@ import calculateBinary from './binary';
 import calculateUnary from './unary';
 import calculateWhen from './when';
 import calculateRandom from './random';
+// import calculateInput from './input';
 import '../../rx-start-with-throttled';
 
 function calculateAlgorithm(equation, calculations) {
@@ -32,7 +33,7 @@ function calculateAlgorithm(equation, calculations) {
     throw new TypeError(`Unknown equation: ${equation}`);
 }
 
-export default function ({equation$, calculations}) {
+export default function algorithm({equation$, calculations}) {
     if (!calculations) {
         throw new TypeError(`Expected calculations to be non-null`);
     }
@@ -54,5 +55,10 @@ export default function ({equation$, calculations}) {
             .flatMapLatest(x => x.equation$)
             .distinctUntilChanged(undefined, Immutable.is)
             .shareReplay(1),
+        calculate() {
+            return result
+                .flatMapLatest(x => x.calculate())
+                .first();
+        },
     };
 }

@@ -1,4 +1,3 @@
-import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import loadingIndicator from './loadingIndicator';
 import errorHandler from './errorHandler';
@@ -20,7 +19,7 @@ export default function collapsableBox(key, title, {DOM, value$, collapsedBody$,
                         key,
                         className: collapsed ? 'collapsed' : 'uncollapsed',
                     }, [
-                        h(`h2.${key}-title`, [title]),
+                        header,
                         h(`div.${key}-body`, vTrees),
                     ])))
         .startWith([loadingIndicator(key)])

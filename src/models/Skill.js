@@ -25,7 +25,7 @@ export default withNiceToString(withLookup(withLocalization(new Immutable.Record
         return [].concat(...Object.values(SKILLS)
             .map(category => Object.entries(category)))
             .filter(([skillName]) => skillName === key)
-            .map(([skillName, skill]) => skill)
+            .map(pair => pair[1])
             .map(skill => Object.assign({}, skill))
             .map(skill => {
                 skill.value = toEquation(skill.value, `SKILLS.${key}.value`, VALID_KEYS, 'number');

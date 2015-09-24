@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>Fallout PnP Character Sheet</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link href="/dist/styles.css" rel="stylesheet">
 	<style>
 	  /*
 
@@ -83,10 +84,6 @@
 		  text-align: center;
 	  }
 
-	  .stat-label {
-		  min-width: 3em;
-		  text-align: right;
-	  }
 
 	  .stat-input {
 		  min-width: 4em;
@@ -159,13 +156,6 @@
 		  flex: 1 0 10em;
 	  }
 
-	  .perks {
-		  flex: 2 0 20em;
-	  }
-
-	  .perks.collapsed {
-		  flex: 1 0 10em;
-	  }
 
 	  .traits {
 		  flex: 2 0 20em;
@@ -214,40 +204,6 @@
 		  flex-flow: row wrap;
 		  justify-content: center;
 		  align-items: center;
-	  }
-
-	  .body-part {
-		  text-align: center;
-	  }
-
-	  .body-part-head {
-		  flex: 1 0 100%;
-		  order: 1;
-	  }
-
-	  .body-part-leftArm {
-		  flex: 1 0 33%;
-		  order: 2;
-	  }
-
-	  .body-part-torso {
-		  flex: 1 0 33%;
-		  order: 3;
-	  }
-
-	  .body-part-rightArm {
-		  flex: 1 0 33%;
-		  order: 4;
-	  }
-
-	  .body-part-leftLeg {
-		  flex: 1 0 50%;
-		  order: 5;
-	  }
-
-	  .body-part-rightLeg {
-		  flex: 1 0 50%;
-		  order: 6;
 	  }*/
 /*
 	  .secondary-statistic-healingRate {
@@ -307,7 +263,6 @@
 		  height: 100%;
 	  }
 	</style>
-	<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400' rel='stylesheet' type='text/css'>
 </head>
 <body>
 <div class="app"></div>

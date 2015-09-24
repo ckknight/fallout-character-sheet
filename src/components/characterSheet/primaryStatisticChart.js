@@ -1,37 +1,34 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
+import selectRange from '../selectRange';
+import selectRangeOrInput from '../selectRangeOrInput';
 import combineLatestObject from '../../combineLatestObject';
 import PrimaryStatistic from '../../models/PrimaryStatistic';
-import { replace as equationReplace } from '../../models/Equation';
+// import equationReplace from '../../models/Equation/replace';
 import algorithm from '../algorithm';
 import renderNumber from '../algorithm/number/render';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import collapsableBox from '../collapsableBox';
-import remember from './remember';
-import future from '../../future';
+// import future from '../../future';
 
-function toExtrema(range) {
-    return {
-        min: range.min,
-        max: range.max,
-    };
+function makeInputView(useSelect, key, DOM, superValue$, raceExtrema$) {
+    return selectRangeOrInput(key, {
+        DOM,
+        value$: superValue$.map(value => value[key] || 5).startWith(5),
+        min$: raceExtrema$.pluck('min'),
+        max$: raceExtrema$.pluck('max'),
+        props$: Rx.Observable.return({
+            className: 'stat-select',
+        }),
+    });
 }
 
 function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
     const raceExtrema$ = calculations.get('race')
         .pluck(stat.key);
-    const inputView = input(stat.key, 'integer', {
-        DOM,
-        value$: value$.map(value => value[stat.key] || 5).startWith(5),
-        props$: raceExtrema$
-            .map(({min, max}) => ({
-                    min,
-                    max,
-                    className: 'stat-input',
-            })),
-    });
+    const inputView = makeInputView(true, stat.key, DOM, value$, raceExtrema$);
     const extremaVTree$ = raceExtrema$
         .startWith(loadingIndicator('extrema'))
         .map(({min, max}) => h('span.stat-extrema', {
@@ -39,34 +36,39 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
             }, [renderNumber(min, 'value'), '/', renderNumber(max, 'value')]))
         .catch(errorHandler('extrema'));
 
-    const effectedValue$ = raceExtrema$.combineLatest(algorithm({
-        equation$: effecter(inputView.value$, stat.key),
-        calculations,
-    }).value$,
-        ({min, max} , value) => Math.min(max, Math.min(max, value)))
+    const inputValue$ = inputView.value$
+        // .filter(x => x != null)
+        .shareReplay(1);
+
+    const effectedValue$ = Rx.Observable.combineLatest(
+        algorithm({
+            equation$: effecter(inputValue$, stat.key),
+            calculations,
+        }).value$,
+        raceExtrema$,
+        (value, {min, max}) => Math.min(max, Math.max(min, value)))
         .distinctUntilChanged()
         .shareReplay(1);
     return {
-        DOM: combineLatestObject({
-            input: inputView.DOM,
-            extrema: extremaVTree$,
-            inputValue: inputView.value$,
-            effectedValue: effectedValue$.startWith(null),
-        })
-            .map(({input, extrema, inputValue, effectedValue}) => {
+        DOM: Rx.Observable.combineLatest(
+            inputView.DOM,
+            extremaVTree$,
+            inputValue$,
+            effectedValue$.startWith(null),
+            (inputVTree, extremaVTree, inputValue, effectedValue) => {
                 return h(`div.primary-statistic.primary-statistic-${stat.key}`, {
                     key: stat.key,
-                }, [
+                }, h(`.primary-statistic-body`, [
                     h('span.stat-name', [stat.name]),
-                    input,
-                    extrema,
+                    inputVTree,
+                    extremaVTree,
                     effectedValue != null ? renderNumber(effectedValue - inputValue, 'diff', {
                         className: 'stat-effect',
                     }) : null,
                     effectedValue != null ? renderNumber(effectedValue, 'value', {
                         className: 'stat-total',
                     }) : null,
-                ]);
+                ]));
             })
             .startWith(loadingIndicator(stat.key))
             .catch(errorHandler(stat.key)),
@@ -80,7 +82,7 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
                         className: 'stat-total',
                     }) : null,
                 ])),
-        value$: inputView.value$,
+        value$: inputValue$,
         effectedValue$,
     };
 }

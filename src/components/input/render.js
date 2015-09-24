@@ -16,20 +16,25 @@ const typeToCalculateProps = {
         }, props);
     },
     integer(key, value, props) {
-        return Object.assign({
-            key,
-            type: 'number',
-            value,
-            pattern: '[0-9]*',
-        }, props);
+        return typeToCalculateProps.number(key, value, Object.assign({
+            step: 1,
+        }, props));
     },
     number(key, value, props) {
-        return Object.assign({
+        const isInteger = props.step && Math.floor(props.step) === props.step;
+        const resultProps = Object.assign({
             key,
             type: 'number',
             value,
-            pattern: '[0-9]*(?:\\.[0-9]*)?',
+            pattern: isInteger ? '[0-9]*' : '[0-9]*(?:\\.[0-9]*)?',
         }, props);
+        if (resultProps.max === Infinity) {
+            resultProps.max = undefined;
+        }
+        if (resultProps.min === -Infinity) {
+            resultProps.min = undefined;
+        }
+        return resultProps;
     },
     text(key, value, props, type) {
         return Object.assign({

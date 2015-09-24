@@ -7,5 +7,8 @@ export default function calculateString(key, calculations) {
             .map(value => renderString(key, value)),
         value$: calculations.get(key),
         equation$: Rx.Observable.return(key),
+        calculate() {
+            return calculations.get(key).first();
+        },
     };
 }

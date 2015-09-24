@@ -3,6 +3,31 @@
 @import "~purecss/build/grids-responsive.css";
 @import "~sass-mediaqueries/media-queries";
 @import "~font-awesome/css/font-awesome.css";
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300);
+@mixin screen-sm() {
+    @include min-screen(35.5em) {
+        @content;
+    }
+}
+@mixin screen-md() {
+    @include min-screen(48em) {
+        @content;
+    }
+}
+@mixin screen-lg() {
+    @include min-screen(64em) {
+        @content;
+    }
+}
+@mixin screen-xl() {
+    @include min-screen(80em) {
+        @content;
+    }
+}
+html {
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
 html,
 button,
 input,
@@ -11,14 +36,21 @@ textarea,
 .pure-g [class *= "pure-u"] {
     font-family: 'Roboto Condensed', sans-serif;
 }
-.character-sheet {
+.layout {
     max-width: 100%;
-    @include min-screen(960px) {
-        max-width: 960px;
+    margin: 0 auto;
+    @include screen-lg {
+        max-width: 64em;
+    }
+    @include screen-xl {
+        max-width: 80em;
     }
 }
 .content {
-    padding: 0 2em;
+    padding: 0 0.5em;
+    @include screen-sm {
+        padding: 0 2em;
+    }
 }
 .algorithm {
     display: inline-block;
@@ -70,6 +102,7 @@ textarea,
 .skill {
     padding-left: 1em;
     display: flex;
+    flex-flow: row wrap;
 }
 .skill-label {
     min-width: 7.5em;
@@ -87,11 +120,12 @@ textarea,
     text-align: right;
 }
 .skill .algorithm {
-    min-width: 12em;
+    
+    // min-width: 12em;
     margin: 0 0.5em;
 }
-.primary-statistic {
-    display: flex;
+.primary-statistic-body {
+    display: inline-flex;
     flex-flow: row;
     justify-content: flex-start;
     .stat-name {
@@ -102,6 +136,10 @@ textarea,
         min-width: 3em;
         text-align: right;
     }
+    .stat-select {
+        width: 3.5em;
+        text-align: right;
+    }
     .stat-extrema {
         min-width: 3em;
         text-align: center;
@@ -109,6 +147,15 @@ textarea,
     .stat-effect {
         min-width: 3em;
         text-align: right;
+        &.number-negative {
+            color: #a00;
+        }
+        &.number-positive {
+            color: #0a0;
+            &::before {
+                content: "+";
+            }
+        }
     }
     .stat-total {
         min-width: 3em;
@@ -136,7 +183,17 @@ textarea,
     margin-left: 1em;
 }
 .sub-body-part {
-    margin-left: 1em;
+    margin: 0 0.5em;
+    border-radius: 0.5em;
+}
+.sub-body-part--crippled {
+    background: #fdd;
+}
+.sub-body-part--damaged {
+    background: #ffd;
+}
+.sub-body-part--healthy {
+    background: #dfd;
 }
 .sub-body-part-title {
     min-width: 5em;
@@ -150,30 +207,66 @@ textarea,
 }
 .body-part {
     text-align: center;
+    border: solid 1px #333;
+    border-radius: 1em;
+    flex: 1;
+    margin: 0.5em;
 }
 .body-part-head {
-    flex: 1 0 100%;
+    min-width: 100%;
     order: 1;
 }
-.body-part-leftArm {
-    flex: 1 0 33%;
-    order: 2;
-}
 .body-part-torso {
-    flex: 1 0 33%;
+    min-width: 100%;
+    order: 2;
+    @include screen-md {
+        min-width: 30%;
+        order: 3;
+    }
+}
+.body-part-leftArm {
+    min-width: 100%;
     order: 3;
+    @include screen-sm {
+        min-width: 45%;
+    }
+    @include screen-md {
+        min-width: 30%;
+        order: 2;
+    }
 }
 .body-part-rightArm {
-    flex: 1 0 33%;
+    min-width: 100%;
     order: 4;
+    @include screen-sm {
+        min-width: 45%;
+    }
+    @include screen-md {
+        min-width: 30%;
+    }
 }
 .body-part-leftLeg {
-    flex: 1 0 50%;
+    min-width: 100%;
     order: 5;
+    @include screen-sm {
+        min-width: 45%;
+    }
 }
 .body-part-rightLeg {
-    flex: 1 0 50%;
+    min-width: 100%;
     order: 6;
+    @include screen-sm {
+        min-width: 45%;
+    }
+}
+.body-part--healthy {
+    background: #efe;
+}
+.body-part--damaged {
+    background: #ffe;
+}
+.body-part--crippled {
+    background: #fee;
 }
 .health-total {
     font-size: 200%;
@@ -192,6 +285,7 @@ textarea,
 }
 .trait {
     display: flex;
+    flex-flow: row wrap;
 }
 .trait-label {
     min-width: 9em;
@@ -203,10 +297,12 @@ textarea,
     content: ", ";
 }
 .trait-effect {
+    min-width: 10em;
     padding-right: 1em;
 }
 .secondary-statistic {
     display: flex;
+    flex-flow: row wrap;
 }
 .stat-value {
     min-width: 2em;
@@ -216,6 +312,117 @@ textarea,
     content: "%";
 }
 .stat-label {
-    min-width: 3em;
-    text-align: right;
+    min-width: 10em;
+}
+.secondary.collapsed {
+    .stat-label {
+        min-width: 3em;
+        text-align: right;
+    }
+}
+.perks {
+    flex: 2 0 20em;
+}
+.perks.collapsed {
+    flex: 1 0 10em;
+}
+.perk {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+.perk-label {
+    min-width: 13em;
+}
+.perk-choose-wrapper {
+    min-width: 2.5em;
+    display: inline-block;
+    text-align: center;
+}
+.perk-requirements,
+.trait-requirements {
+    min-width: 14em;
+    .algorithm {
+        & > .boolean-true {
+            color: #070;
+        }
+        & > .boolean-false {
+            color: #700;
+        }
+    }
+}
+.perk-effect {
+    min-width: 10em;
+}
+.primary-body {
+    display: flex;
+    flex-flow: column;
+}
+.primary-statistic {
+    margin: 0.25em;
+}
+.primary-statistic-body {
+    padding: 0.25em;
+    border-radius: 0.25em;
+}
+.primary-statistic-strength .primary-statistic-body {
+    background: hsl(0, 100%, 96%);
+}
+.primary-statistic-perception .primary-statistic-body {
+    background: hsl(120, 100%, 96%);
+}
+.primary-statistic-endurance .primary-statistic-body {
+    background: hsl(30, 100%, 96%);
+}
+.primary-statistic-charisma .primary-statistic-body {
+    background: hsl(180, 100%, 96%);
+}
+.primary-statistic-intelligence .primary-statistic-body {
+    background: hsl(300, 100%, 96%);
+}
+.primary-statistic-agility .primary-statistic-body {
+    background: hsl(240, 100%, 96%);
+}
+.primary-statistic-luck .primary-statistic-body {
+    background: hsl(60, 100%, 96%);
+}
+.perk,
+.trait,
+.secondary-statistic,
+.miscellaneous-statistic {
+    padding: 0.25em;
+    &:nth-child(odd) {
+        background: #eee;
+    }
+}
+.skill-category-body {
+    background: #eee;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    margin: 0.5em;
+    break-inside: avoid;
+}
+.skills-body {
+    column-width: 18em;
+}
+.skill-category-medicine .skill-category-body {
+    background: #fee;
+}
+.skill-category-rangedWeapons .skill-category-body {
+    background: #f0ffee;
+}
+.skill-category-simpleWeapons .skill-category-body {
+    background: #fff9ee;
+}
+.skill-category-social .skill-category-body {
+    background: #fbeeff;
+}
+.skill-category-survival .skill-category-body {
+    background: #eefffd;
+}
+.skill-category-technical .skill-category-body {
+    background: #f5f5f5;
+}
+.skill-category-thieving .skill-category-body {
+    background: #eef1ff;
 }

@@ -1,14 +1,10 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
-import BodyPart from '../../models/BodyPart';
 import algorithm from '../algorithm';
 import Immutable from 'immutable';
-import renderRef from './renderRef';
-import Calculations from './Calculations';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
-import renderNumber from '../algorithm/number/render';
 import * as localize from '../../localize';
 import renderEffect from './renderEffect';
 import Perk from '../../models/Perk';
@@ -70,6 +66,7 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
         .map(x => x ? 1 : 0);
 
     return {
+        name: perk.name,
         order: getMinimum(perk.requirements, 'level') || 0,
         perk,
         DOM: Rx.Observable.combineLatest(choosePerkView.DOM, requirementsView.DOM, effectVTree$, requirementsView.value$.startWith(true),
@@ -80,7 +77,7 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
                     h(`label.perk-label`, {
                         key: 'label',
                     }, [
-                        choosePerkVTree,
+                        h(`span.perk-choose-wrapper`, [choosePerkVTree]),
                         h(`span.perk-title`, {
                             key: 'title',
                         }, [perk.name]),
@@ -108,11 +105,21 @@ function makePerkView(perk, inputValue$, DOM, calculations) {
     };
 }
 
+function cmp(x, y) {
+    if (x === y) {
+        return 0;
+    }
+    if (x < y) {
+        return -1;
+    }
+    return 1;
+}
+
 function perks({DOM, value$: inputValue$, uiState$, calculations}) {
     const allPerkViews = Perk.all()
         .toArray()
         .map(perk => makePerkView(perk, inputValue$.map(x => x[perk.key] || 0), DOM, calculations))
-        .sort((x, y) => x.order - y.order);
+        .sort((x, y) => cmp(x.order, y.order) || cmp(x.name, y.name));
 
     const boxView = collapsableBox('perks', localize.name('perks'), {
         DOM,
@@ -125,7 +132,7 @@ function perks({DOM, value$: inputValue$, uiState$, calculations}) {
         DOM: boxView.DOM,
         value$: Rx.Observable.merge(allPerkViews
             .map(({perk: {key}, value$}) => value$.map(value => o => o.set(key, value))))
-            .startWith(Immutable.Map())
+            .startWith(new Immutable.Map())
             .scan((acc, modifier) => modifier(acc))
             .distinctUntilChanged(undefined, Immutable.is)
             .map(x => x.toJS())

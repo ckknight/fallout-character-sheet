@@ -1,15 +1,5 @@
-import Range from '../Range';
-
 const operationsByOperator = {
-    '+': (x, y) => {
-        if (x instanceof Range) {
-            return x.add(y);
-        }
-        if (y instanceof Range) {
-            return y.add(x);
-        }
-        return (+x) + (+y);
-    },
+    '+': (x, y) => (+x) + (+y),
     '-': (x, y) => x - y,
     '*': (x, y) => x * y,
     '/': (x, y) => x / y,

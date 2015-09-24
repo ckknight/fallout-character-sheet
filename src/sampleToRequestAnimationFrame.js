@@ -1,6 +1,6 @@
 import { Rx } from '@cycle/core';
 
-Rx.Observable.prototype.sampleToRequestAnimationFrame = function () {
+Rx.Observable.prototype.sampleToRequestAnimationFrame = function sampleToRequestAnimationFrame() {
     return Rx.Observable.create(subscriber => {
         let unsubscribed = false;
         let timer = false;

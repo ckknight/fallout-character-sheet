@@ -1,6 +1,6 @@
 function memoize(fetcher) {
     const cacheKey = Math.random().toString(36).slice(2);
-    return function () {
+    return function memoized() {
         let cache = this[cacheKey];
         if (!cache) {
             Object.defineProperty(this, cacheKey, {

@@ -4,13 +4,11 @@ import input from '../input';
 import Trait from '../../models/Trait';
 import algorithm from '../algorithm';
 import Immutable from 'immutable';
-import renderRef from './renderRef';
-import Calculations from './Calculations';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import renderEffect from './renderEffect';
 import collapsableBox from '../collapsableBox';
-import future from '../../future';
+// import future from '../../future';
 
 function isTraitChoosable(trait, calculations) {
     return algorithm({
@@ -18,6 +16,19 @@ function isTraitChoosable(trait, calculations) {
         calculations,
     })
         .value$;
+}
+
+function getTraitDescription(trait, calculations) {
+    const requirementsView = algorithm({
+        equation$: Rx.Observable.return(trait.requirements),
+        calculations,
+    });
+    return Rx.Observable.combineLatest(renderEffect(trait.effect, calculations), requirementsView.DOM, requirementsView.equation$,
+        (effect, requirements, equation) => [
+                h('span.trait-effect', [effect]),
+                trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
+                equation === true ? null : h('span.trait-requirements', [requirements]),
+        ]);
 }
 
 function makeTraitView(trait, inputValue$, DOM, calculations) {
@@ -54,9 +65,7 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
                             key: 'name',
                         }, [trait.name]),
                     ]),
-                    h(`span.trait-description`, {
-                        key: 'description',
-                    }, description),
+                    ...description,
                 ]))
             .startWith(loadingIndicator(trait.key))
             .catch(errorHandler(trait.key)),
@@ -117,22 +126,10 @@ function makeTraitView(trait, inputValue$, DOM, calculations) {
 // }
 //
 
-function getTraitDescription(trait, calculations) {
-    const requirementsView = algorithm({
-        equation$: Rx.Observable.return(trait.requirements),
-        calculations,
-    });
-    return Rx.Observable.combineLatest(renderEffect(trait.effect, calculations), requirementsView.DOM, requirementsView.equation$,
-        (effect, requirements, equation) => [
-                h('span.trait-effect', [effect]),
-                trait.meta ? h('span.trait-meta', ['Note: ', trait.meta]) : null,
-                equation === true ? null : h('span.trait-requirements', [requirements]),
-        ]);
-}
-
 export default function traits({DOM, value$: inputValue$, uiState$, calculations}) {
     const allTraitViews = Trait.all()
         .toArray()
+        .sort((x, y) => x.name < y.name ? -1 : 1)
         .map(trait => makeTraitView(trait, inputValue$, DOM, calculations));
     const value$ = Rx.Observable.from(allTraitViews)
         .flatMap(({key, value$: traitValue$}) => traitValue$

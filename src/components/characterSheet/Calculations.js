@@ -1,42 +1,41 @@
-import { Rx } from '@cycle/core';
 const owns = Object.prototype.hasOwnProperty;
 import InjectableObservable from 'rx-injectable-observable';
 
 const BLACKLISTED_KEYS = {};
 
 export default class Calculations {
-    constructor(values = {}) {
-        this.values = values;
+    constructor(observables = {}) {
+        this.observables = observables;
     }
 
-    set(key, value) {
+    set(key, observable) {
         if (key in BLACKLISTED_KEYS) {
             throw new Error(`Cannot set '${key}'`);
         }
-        if (owns.call(this.values, key)) {
-            const observable = this.values[key];
-            if (!(observable instanceof InjectableObservable)) {
+        if (owns.call(this.observables, key)) {
+            const existing = this.observables[key];
+            if (!(existing instanceof InjectableObservable)) {
                 throw new Error(`Key already set: ${key}`);
             }
-            observable.inject(value);
+            existing.inject(observable);
         }
-        return (this.values[key] = value);
+        return (this.observables[key] = observable);
     }
 
     get(key, future) {
         if (key in BLACKLISTED_KEYS) {
             throw new Error(`Cannot refer to '${key}'`);
         }
-        if (!(key in this.values)) {
+        if (!(key in this.observables)) {
             if (false && !future) {
                 throw new Error(`Unknown key: ${key}`);
             }
-            this.values[key] = new InjectableObservable();
+            this.observables[key] = new InjectableObservable();
         }
-        return this.values[key];
+        return this.observables[key];
     }
 
     with(object) {
-        return new Calculations(Object.assign(Object.create(this.values), object));
+        return new Calculations(Object.assign(Object.create(this.observables), object));
     }
 }

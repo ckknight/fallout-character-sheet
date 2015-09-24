@@ -14,14 +14,14 @@ const fields = {
     primaryTotal: 40,
     nonplayable: false,
 };
-Object.entries(PRIMARY_STATISTICS).sort().forEach(([key, value]) => {
+Object.keys(PRIMARY_STATISTICS).sort().forEach(key => {
     fields[key] = new Range(1, 10);
 });
-Object.entries(SECONDARY_STATISTICS).sort().forEach(([key, value]) => {
+Object.keys(SECONDARY_STATISTICS).sort().forEach(key => {
     fields[key] = 0;
 });
 
-export default withMethods(withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Race')), {
+export default withMethods(withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'Race')), {
     get(key) {
         const stats = RACES[key];
         if (!stats) {
@@ -35,7 +35,7 @@ export default withMethods(withNiceToString(withLookup(withLocalization(Immutabl
         return this.get(key) || new this();
     },
     all() {
-        return Immutable.Set(Object.keys(RACES)
+        return new Immutable.Set(Object.keys(RACES)
             .map(key => this.get(key)));
     },
 }), fields), {

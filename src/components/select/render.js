@@ -1,25 +1,37 @@
 import { h } from '@cycle/dom';
 
+const FALLBACK_VALUE = {};
 const FALLBACK_KEY = 'SELECT_FALLBACK';
 
 function renderOptions(options, value, fallback) {
     let hasSelected = false;
-    const optionsVTree = Array.from(options).map(({value: optionValue, text}) => {
-        const selected = value === optionValue;
-        hasSelected = hasSelected || selected;
-        return h('option', {
-            key: optionValue,
-            value: optionValue,
-            selected,
-        }, [text]);
-    });
-    if (fallback && !hasSelected) {
-        optionsVTree.unshift(h('option', {
-            key: FALLBACK_KEY,
-            selected: true,
-        }, [fallback]));
+    const data = Array.from(options)
+        .map(({value: optionValue, text}) => {
+            const selected = value === optionValue;
+            hasSelected = hasSelected || selected;
+            return {
+                selected,
+                optionValue,
+                text,
+            };
+        });
+    if (!hasSelected) {
+        if (fallback) {
+            data.unshift({
+                selected: true,
+                optionValue: FALLBACK_VALUE,
+                text: fallback,
+            });
+        } else if (data.length) {
+            data[0].selected = true;
+        }
     }
-    return optionsVTree;
+    return data
+        .map(({selected, optionValue, text}) => h('option', {
+            key: optionValue === FALLBACK_VALUE ? FALLBACK_KEY : optionValue,
+            value: optionValue === FALLBACK_VALUE ? undefined : optionValue,
+            selected,
+        }, [text]));
 }
 
 export default function renderSelect(key, options, value, props) {

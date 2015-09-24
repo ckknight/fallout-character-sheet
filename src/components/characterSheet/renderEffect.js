@@ -3,7 +3,7 @@ import { h } from '@cycle/dom';
 import algorithm from '../algorithm';
 import renderRef from './renderRef';
 import errorHandler from '../errorHandler';
-import { replace as equationReplace } from '../../models/Equation';
+import equationReplace from '../../models/Equation/replace';
 
 function renderEffectEquation(key, equation, calculations) {
     return algorithm({

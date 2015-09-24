@@ -46,5 +46,11 @@ export default function calculateBinary(equation, calculations, calculateAlgorit
             }),
         value$,
         equation$,
+        calculate() {
+            return Rx.Observable.combineLatest(
+                leftView.calculate(), rightView.calculate(),
+                (left, right) => operationsByOperator[operator](left, right))
+                .first();
+        },
     };
 }

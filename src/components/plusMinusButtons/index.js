@@ -22,7 +22,7 @@ export default function plusMinusButtons(key, {DOM, value$: inputValue$, min$, m
         props$: state$.combineLatest(minusProps$ || Rx.Observable.return({}),
             ({value, min}, props) => ({
                     disabled: value <= min,
-                    ...props
+                    ...props,
             }))
             .distinctUntilChanged(),
     });

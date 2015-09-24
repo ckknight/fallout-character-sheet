@@ -6,5 +6,8 @@ export default function calculateBoolean(value, type) {
         DOM: Rx.Observable.return(renderBoolean(value, type)),
         value$: Rx.Observable.return(value),
         equation$: Rx.Observable.return(value),
+        calculate() {
+            return Rx.Observable.return(value);
+        },
     };
 }

@@ -3,6 +3,8 @@
 var DEBUG = !!process.env.DEBUG;
 var path = require('path');
 var webpack = require('webpack');
+var autoprefixer = require('autoprefixer');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var validJsFolders = [
     path.resolve(__dirname, 'src')];
@@ -11,6 +13,7 @@ module.exports = {
     entry: './src/app',
     output: {
         path: './dist',
+        publicPath: '/dist/',
         filename: 'app.js',
         libraryTarget: 'umd',
     },
@@ -25,10 +28,19 @@ module.exports = {
     },
 
     plugins: [
+        new ExtractTextPlugin("styles.css", {
+            disable: DEBUG
+        })
+    ].concat(DEBUG ? [] : [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
-    ],
+        new webpack.optimize.UglifyJsPlugin({
+            output: {
+                comments: false
+            }
+        }),
+        new webpack.optimize.AggressiveMergingPlugin()
+    ]),
 
     resolve: {
         extensions: ['', '.js', '.json', '.css'],
@@ -67,12 +79,12 @@ module.exports = {
 
             {
                 test: /\.scss$/,
-                loader: 'style!css!sass',
+                loader: ExtractTextPlugin.extract('style', 'css!postcss!sass'),
             },
 
             {
                 test: /\.css$/,
-                loader: 'style!css',
+                loader: ExtractTextPlugin.extract('style', 'css!postcss'),
             },
 
             {
@@ -80,17 +92,20 @@ module.exports = {
                 include: validJsFolders,
                 loader: 'json-loader',
             },
+            //
+            // {
+            //     test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            //     loader: "url-loader?limit=10000&mimetype=application/font-woff",
+            // },
 
             {
-                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader?limit=100000&mimetype=application/font-woff",
-            },
-
-            {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.(ttf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader",
             },
         ],
     },
+    postcss: [
+        autoprefixer({ browsers: ['last 2 versions', '> 1%'] })
+    ]
 };
 /*eslint-enable */

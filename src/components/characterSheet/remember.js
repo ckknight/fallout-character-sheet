@@ -1,9 +1,10 @@
-export default function (fn) {
-    if (typeof fn !== 'function') {
-        throw new TypeError(`Expected ${fn} to be a function`);
+export default function (callback) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(`Expected ${callback} to be a function`);
     }
     let cache;
-    return function () {
+    let fn = callback;
+    return function remembered() {
         if (fn) {
             cache = fn.apply(this, arguments);
             fn = null;

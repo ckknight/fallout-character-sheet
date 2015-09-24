@@ -3,15 +3,13 @@ import { h } from '@cycle/dom';
 import input from '../input';
 import SkillCategory from '../../models/SkillCategory';
 import algorithm from '../algorithm';
-import { BinaryOperation } from '../../models/Equation';
+import { BinaryOperation } from '../../models/Equation/operations';
 import Immutable from 'immutable';
-import Effect from '../../models/Effect';
-import { replace as equationReplace } from '../../models/Equation';
 import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import * as localize from '../../localize';
 import collapsableBox from '../collapsableBox';
-import future from '../../future';
+// import future from '../../future';
 
 function makeSkillView(skill, categoryKey, {DOM, inputTags$, inputIncrease$, calculations, effecter}) {
     const tagInput = input(`skill-tag-${skill.key}`, 'checkbox', {
@@ -110,13 +108,13 @@ function makeSkillCategoryView(category, dependencies) {
     return {
         DOM: Rx.Observable.combineLatest(skillViews.map(o => o.DOM))
             .startWith([loadingIndicator(category.key)])
-            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}.pure-u-1.pure-u-md-1-2.pure-u-lg-1-3`, {
+            .map(skillVTrees => h(`section.skill-category.skill-category-${category.key}`, {
                     key: category.key,
-                }, [
+                }, h('.skill-category-body', [
                     h(`h3.skill-category-title`, {
                         key: 'title',
                     }, [category.name]),
-                ].concat(skillVTrees)))
+                ].concat(skillVTrees))))
             .catch(errorHandler(category.key)),
         smallDOM: Rx.Observable.combineLatest(skillViews.map(o => o.smallDOM))
             .startWith([loadingIndicator(category.key)])

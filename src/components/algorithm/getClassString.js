@@ -1,4 +1,4 @@
-import getBooleanClassString from './number/getClassString';
+import getBooleanClassString from './boolean/getClassString';
 import getNumberClassString from './number/getClassString';
 
 export default function getClassString(value) {

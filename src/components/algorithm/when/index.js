@@ -12,6 +12,7 @@ export default function calculateWhen(equation, calculations, calculateAlgorithm
                 DOM: operandView.DOM,
                 value$: operandView.value$,
                 equation$: operandView.equation$,
+                calculate: operandView.calculate,
             };
         })
         .toArray()
@@ -20,6 +21,7 @@ export default function calculateWhen(equation, calculations, calculateAlgorithm
             DOM: otherwiseView.DOM,
             value$: otherwiseView.value$,
             equation$: otherwiseView.equation$,
+            calculate: otherwiseView.calculate,
         }]);
 
     function calculate(key, defaultValue) {
@@ -46,5 +48,18 @@ export default function calculateWhen(equation, calculations, calculateAlgorithm
         equation$: equation$
             .distinctUntilChanged(undefined, Immutable.is)
             .shareReplay(1),
+        calculate() {
+            return possibilities
+                .reduceRight((acc, possibility) => {
+                    return possibility.condition$
+                        .flatMapLatest(condition => {
+                            if (condition) {
+                                return possibility.calculate();
+                            }
+                            return acc;
+                        });
+                }, Rx.Observable.return(0))
+                .first();
+        },
     };
 }

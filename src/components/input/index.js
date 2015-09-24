@@ -3,6 +3,7 @@ import loadingIndicator from '../loadingIndicator';
 import errorHandler from '../errorHandler';
 import render from './render';
 import '../../rx-pausable-buffered1';
+import '../../rx-start-with-throttled';
 
 const typeToEvents = {
     text: {
@@ -116,7 +117,7 @@ export default function input(key, type, {DOM, value$: inputValue$, props$ = Rx.
 
     return {
         DOM: vtree$
-            // .startWith(loadingIndicator(key))
+            .startWithThrottled(() => loadingIndicator(key))
             .catch(errorHandler(key)),
         value$: boundValue$
             .flatMapLatest(value => {

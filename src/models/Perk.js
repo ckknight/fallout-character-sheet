@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import Range from './Range';
 import withLocalization from './withLocalization';
 import withLookup from './withLookup';
 import withNiceToString from './withNiceToString';
@@ -16,6 +15,7 @@ const fields = {
     ranks: 1,
     requirements: true,
     meta: '',
+    order: 0,
 };
 
 const VALID_KEYS = [].concat(
@@ -34,7 +34,7 @@ const VALID_KEYS = [].concat(
         race: 'string',
     });
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'Perk')), {
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'Perk')), {
     get(key) {
         let stats = PERKS[key];
         if (!stats) {
@@ -55,7 +55,7 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         }
     },
     all() {
-        return Immutable.Set(Object.keys(PERKS)
+        return new Immutable.Set(Object.keys(PERKS)
             .map(key => this.get(key)));
     },
 }), fields);

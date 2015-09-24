@@ -1,8 +1,9 @@
 import Immutable from 'immutable';
 import withNiceToString from './withNiceToString';
-import { BODY_PARTS, PRIMARY_STATISTICS, SECONDARY_STATISTICS, SKILLS, MISCELLANEOUS } from '../constants.json';
+import { PRIMARY_STATISTICS, SECONDARY_STATISTICS, SKILLS, MISCELLANEOUS } from '../constants.json';
 import When from './When';
 import toEquation from './Equation';
+import equationReplace from './Equation/replace';
 
 const effectFields = {
     $when: null,
@@ -35,6 +36,8 @@ const VALID_KEYS = [].concat(
         value: 'number',
     });
 
+const Effect = withNiceToString(new Immutable.Record(effectFields, 'Effect'), effectFields);
+
 function convertEffectValue(key, value, path) {
     if (key === '$when') {
         return new When().mergeDeep({
@@ -56,18 +59,21 @@ function convertEffectValue(key, value, path) {
     return toEquation(value, path, VALID_KEYS, VALID_KEYS[key]);
 }
 
-const Effect = withNiceToString(Immutable.Record(effectFields, 'Effect'), effectFields);
-Effect.prototype.mergeEffects = function (other) {
-    return Object.keys(effectFields)
+const effectKeys = Object.keys(effectFields);
+Effect.prototype.mergeEffects = function mergeEffects(other) {
+    return effectKeys
         .reduce((acc, key) => {
             if (key.charAt(0) === '$') {
                 // TODO: do something
                 return acc;
             }
-            return acc.set(key, toEquation.replace(acc[key], 'value', other[key]));
+            if (other[key] === 'value') {
+                return acc;
+            }
+            return acc.set(key, equationReplace(acc[key], 'value', other[key]));
         }, this);
 };
-Effect.from = function (object, path) {
+Effect.from = function from(object, path) {
     return new Effect().mergeDeep(Object.entries(object || {})
         .reduce((acc, [key, value]) => {
             acc[key] = convertEffectValue(key, value, `${path}.${key}`);

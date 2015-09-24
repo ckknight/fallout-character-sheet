@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import Range from './Range';
 import withLocalization from './withLocalization';
 import withLookup from './withLookup';
 import withNiceToString from './withNiceToString';
@@ -15,41 +14,7 @@ const partFields = {
     damage: 'value',
     meta: '',
 };
-const SubPart = withNiceToString(withLocalization(Immutable.Record(partFields, 'BodySubPart')), partFields);
-
-function convertParts(object, path) {
-    return Object.entries(object)
-        .reduce((acc, [key, value]) => {
-            value = Object.assign({}, value);
-            value.damage = toEquation(fallback(value.damage, 'value'), `${path}.damage`, VALID_KEYS_WITH_VALUE, 'number');
-            value.crippleHealth = toEquation(value.crippleHealth, `${path}.crippleHealth`, VALID_KEYS, 'number');
-            value.crippleEffect = Effect.from(value.crippleEffect || {}, `${path}.crippleEffect`);
-            acc[key] = new SubPart({
-                key,
-            }).mergeDeep(value);
-            return acc;
-        }, {});
-}
-
-const fields = {
-    key: '',
-    multiple: null,
-    crippleEffect: new Effect(),
-    crippleHealth: 0,
-    cripplePartCount: 0,
-    parts: Immutable.Map(),
-    targetPenalty: 0,
-    damage: 'value',
-    meta: '',
-};
-
-function fallback(value, otherwise) {
-    if (value === undefined) {
-        return otherwise;
-    } else {
-        return value;
-    }
-}
+const SubPart = withNiceToString(withLocalization(new Immutable.Record(partFields, 'BodySubPart')), partFields);
 
 const VALID_KEYS = [].concat(
     Object.keys(PRIMARY_STATISTICS),
@@ -64,7 +29,40 @@ const VALID_KEYS_WITH_VALUE = Object.assign({
     value: true,
 }, VALID_KEYS);
 
-export default withNiceToString(withLookup(withLocalization(Immutable.Record(fields, 'BodyPart')), {
+function fallback(value, otherwise) {
+    if (value === undefined) {
+        return otherwise;
+    }
+    return value;
+}
+
+function convertParts(object, path) {
+    return Object.entries(object)
+        .reduce((acc, [key, value]) => {
+            const copy = Object.assign({}, value);
+            copy.damage = toEquation(fallback(copy.damage, 'value'), `${path}.damage`, VALID_KEYS_WITH_VALUE, 'number');
+            copy.crippleHealth = toEquation(copy.crippleHealth, `${path}.crippleHealth`, VALID_KEYS, 'number');
+            copy.crippleEffect = Effect.from(copy.crippleEffect || {}, `${path}.crippleEffect`);
+            acc[key] = new SubPart({
+                key,
+            }).mergeDeep(copy);
+            return acc;
+        }, {});
+}
+
+const fields = {
+    key: '',
+    multiple: null,
+    crippleEffect: new Effect(),
+    crippleHealth: 0,
+    cripplePartCount: 0,
+    parts: new Immutable.Map(),
+    targetPenalty: 0,
+    damage: 'value',
+    meta: '',
+};
+
+export default withNiceToString(withLookup(withLocalization(new Immutable.Record(fields, 'BodyPart')), {
     get(key) {
         let stats = BODY_PARTS[key];
         if (!stats) {
@@ -83,7 +81,7 @@ export default withNiceToString(withLookup(withLocalization(Immutable.Record(fie
         }).mergeDeep(stats);
     },
     all() {
-        return Immutable.Set(Object.keys(BODY_PARTS)
+        return new Immutable.Set(Object.keys(BODY_PARTS)
             .map(key => this.get(key)));
     },
 }), fields);

@@ -3,6 +3,9 @@ import { makeDOMDriver } from '@cycle/dom';
 import main from './components/main';
 import { makeLocalStorageSinkDriver, makeLocalStorageSourceDriver } from './drivers';
 import './base.scss';
+import FastClick from 'fastclick';
+
+setTimeout(() => FastClick.attach(document.body), 1000);
 
 run(main, {
     DOM: makeDOMDriver('.app'),

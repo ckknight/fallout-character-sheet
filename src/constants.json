@@ -2049,9 +2049,6 @@
     },
     "LOCALIZATION": {
         "en-US": {
-            "rangedActionPointCost": "Ranged Action Point Cost",
-            "meleeActionPointCost": "Melee Action Point Cost",
-            "unarmedActionPointCost": "Unarmed Action Point Cost",
             "actionChild": "Action Boy (or Girl)",
             "actionPointRegeneration": {
                 "abbr": "APR",
@@ -2080,6 +2077,7 @@
                 "abbr": "AC",
                 "name": "Armor Class"
             },
+            "armorClassPerUnusedActionPoint": "Armor Class Per Unused Action Point",
             "awareness": "Awareness",
             "barter": "Barter",
             "bendTheRules": "Bend The Rules",
@@ -2307,6 +2305,7 @@
             "medic": "Medic",
             "medicine": "Medicine",
             "melee": "Melee",
+            "meleeActionPointCost": "Melee Action Point Cost",
             "meleeDamage": {
                 "abbr": "MD",
                 "name": "Melee Damage"
@@ -2316,6 +2315,7 @@
             "mirelurkHunter": "Mirelurk Hunter",
             "mirelurkKing": "Mirelurk King",
             "moreCriticals": "More Criticals",
+            "movingVehicleDamagePenalty": "Moving Vehicle Damage Penalty",
             "mrFixit": "Mr. (or Ms.) Fixit",
             "mutate": "Mutate!",
             "mysteriousStranger": "Mysterious Stranger",
@@ -2351,13 +2351,16 @@
             "radResistance": "Rad Resistance",
             "radiationBurst": "Radiation Burst",
             "radroach": "Radroach",
+            "radsPerHour": "Rads per Hour",
             "ram": "Ram",
+            "rangedActionPointCost": "Ranged Action Point Cost",
             "rangedDamage": "Ranged Damage",
             "rangedWeapons": "Ranged Weapons",
             "ranger": "Ranger",
             "receivedExplosiveDamage": "Received Explosion Damage",
             "redBaron": "Red Baron",
             "repair": "Repair",
+            "repairHealing": "Repair Healing",
             "resistContactGas": {
                 "abbr": "CGR",
                 "name": "Contact Gas Resistance"
@@ -2489,8 +2492,10 @@
             "travelTime": "Travel Time",
             "tunnelRat": "Tunnel Rat",
             "unarmed": "Unarmed",
+            "unarmedActionPointCost": "Unarmed Action Point Cost",
             "value": "value",
             "vatSkin": "Vat Skin",
+            "vehicleMaximumSpeed": "Vehicle Maximum Speed",
             "vehicleWreckDamage": "Vehicle Wreck Damage",
             "wayOfTheFruit": "Way of the Fruit",
             "weaponHandling": "Weapon Handling",
@@ -2529,7 +2534,25 @@
         "doctorActionPointCost": {
             "value": 10
         },
+        "doctorHealing": {
+            "value": {
+                "$add": [
+                    {
+                        "$rand": 10
+                    },
+                    {
+                        "$rand": 10
+                    }
+                ]
+            }
+        },
         "experience": {
+            "value": {
+                "$input": {
+                    "min": 0,
+                    "step": 1
+                }
+            }
         },
         "experienceMultiplier": {
             "percent": true,
@@ -2552,6 +2575,11 @@
         "inventoryActionPointCost": {
         },
         "karma": {
+            "value": {
+                "$input": {
+                    "step": 1
+                }
+            }
         },
         "levelsPerPerk": {
         },
@@ -4782,19 +4810,6 @@
             "order": 21,
             "percent": true,
             "value": "perception"
-        },
-        "doctorHealing": {
-            "order": 29,
-            "value": {
-                "$add": [
-                    {
-                        "$rand": 10
-                    },
-                    {
-                        "$rand": 10
-                    }
-                ]
-            }
         },
         "healingRate": {
             "order": 2,

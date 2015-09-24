@@ -26,5 +26,9 @@ export default function calculateUnary(equation, calculations, calculateAlgorith
             (operand, value, eq) => renderUnary(name, value, operator, operand, eq)),
         value$,
         equation$,
+        calculate() {
+            return operandView.calculate()
+                .map(operand => operationsByOperator[operator](operand));
+        },
     };
 }

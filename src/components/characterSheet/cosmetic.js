@@ -1,7 +1,6 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
 import input from '../input';
-import select from '../select';
 import combineLatestObject from '../../combineLatestObject';
 import * as localize from '../../localize';
 import loadingIndicator from '../loadingIndicator';
@@ -23,8 +22,12 @@ function makeInput(key, type, defaultValue, DOM, value$, props$) {
 
 function makeForm(selector, object, calculations) {
     Object.entries(object)
-        .filter(([key, value]) => value.value$)
-        .forEach(([key, value]) => calculations.set(key, value.value$));
+        .map(([key, value]) => ({
+            key,
+            value$: value.value$,
+        }))
+        .filter(({value$}) => value$)
+        .forEach(({key, value$}) => calculations.set(key, value$));
     return {
         DOM: Rx.Observable.combineLatest(Object.keys(object)
             .map(key => object[key].DOM

@@ -1,6 +1,9 @@
 import { Rx } from '@cycle/core';
 
 Rx.Observable.prototype.startWithThrottled = function startWithThrottled(action, scheduler = Rx.Scheduler.default) {
+    if (typeof action !== 'function') {
+        throw new TypeError(`Expected ${action} to be a function`);
+    }
     return Rx.Observable.create(subscriber => {
         const disposable = new Rx.CompositeDisposable();
         let first = true;
