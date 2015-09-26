@@ -13,7 +13,7 @@ module.exports = {
     entry: './src/app',
     output: {
         path: './dist',
-        publicPath: './dist/',
+        publicPath: DEBUG ? '/dist/' : './',
         filename: 'app.js',
         libraryTarget: 'umd',
     },
