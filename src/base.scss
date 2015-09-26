@@ -203,9 +203,12 @@ textarea,
 }
 .health-body-parts {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column;
     justify-content: center;
     align-items: center;
+    @include screen-sm {
+        flex-flow: row wrap;
+    }
 }
 .body-part {
     text-align: center;
