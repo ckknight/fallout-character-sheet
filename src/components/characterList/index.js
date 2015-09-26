@@ -1,7 +1,8 @@
 import { Rx } from '@cycle/core';
 import { h } from '@cycle/dom';
-import characterMain from '../characterMain';
+import characterSheet from '../characterSheet';
 import '../../rx-start-with-throttled';
+import loadingIndicator from '../loadingIndicator';
 
 function makeNav(items) {
     return Object.entries(items)
@@ -31,22 +32,37 @@ function trimRoute(id, route) {
     return match[3];
 }
 
+function asArray(value) {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    return value;
+}
+
+function combineLatestArray(array) {
+    if (!array.length) {
+        return Rx.Observable.return([]);
+    }
+    return Rx.Observable.combineLatest(array);
+}
+
 export default function characterList({ DOM, value$, route$ }) {
     const newCharacter$ = new Rx.Subject();
     const characterViews$ = value$
         .first()
-        .map(characters => characters.map((character, id) => {
-            return characterMain({ DOM, value$: Rx.Observable.return(character), route$: route$.map(route => trimRoute(id, route)).distinctUntilChanged() });
+        .map(characters => asArray(characters).map((character, id) => {
+            return characterSheet({ DOM, value$: Rx.Observable.return(character), route$: route$.map(route => trimRoute(id, route)).distinctUntilChanged() });
         }))
         .map(characterViews => () => characterViews)
         .merge(newCharacter$
             .map(() => characterViews => {
                 const id = characterViews.length;
                 return characterViews.concat([
-                    characterMain({ DOM, value$: Rx.Observable.return({}), route$: route$.map(route => trimRoute(id, route)).distinctUntilChanged() }),
+                    characterSheet({ DOM, value$: Rx.Observable.return({}), route$: route$.map(route => trimRoute(id, route)).distinctUntilChanged() }),
                 ]);
             }))
-        .scan((acc, modifier) => modifier(acc), [])
+        .startWith([])
+        .scan((acc, modifier) => modifier(acc))
         .shareReplay(1);
 
     const selectedCharacterView$ = characterViews$
@@ -67,10 +83,10 @@ export default function characterList({ DOM, value$, route$ }) {
         .shareReplay(1);
 
     return {
-        DOM: characterViews$.combineLatest(route$.throttle(5),
+        DOM: characterViews$.combineLatest(route$.debounce(5),
             (characterViews, route) => {
                 if (!route) {
-                    const menuItems$ = Rx.Observable.combineLatest(characterViews
+                    const menuItems$ = combineLatestArray(characterViews
                         .map((view, i) => view.description$
                             .map(description => h('li.pure-menu-item', [
                                 h('a.pure-menu-link', {
@@ -90,22 +106,22 @@ export default function characterList({ DOM, value$, route$ }) {
                                     ]),
                                 ])),
                         ]))
-                        .startWithThrottled(() => null);
+                        .startWithThrottled(() => loadingIndicator('character list'));
                 }
                 if (route === 'new') {
-                    window.location = '#/' + characterViews.length;
-                    return Rx.Observable.return(h('div', ['Loading new character']));
+                    window.location = '#/' + characterViews.length + '/cosmetic';
+                    return Rx.Observable.return(loadingIndicator('new character'));
                 }
                 const match = /^(\d+)(\/|$)(.*)/.exec(route);
                 if (match) {
                     const id = +match[1];
                     const view = characterViews[id];
                     if (view) {
-                        return view.DOM.startWithThrottled(() => null);
+                        return view.DOM.startWithThrottled(() => loadingIndicator('character'));
                     }
                     if (id === characterViews.length) {
-                        newCharacter$.onNext();
-                        return Rx.Observable.return(h('div', ['Loading']));
+                        setTimeout(() => newCharacter$.onNext(), 17);
+                        return Rx.Observable.return(loadingIndicator('new character'));
                     }
                 }
                 return Rx.Observable.return(h('div', ['Character not found']));

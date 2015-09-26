@@ -1,0 +1,8 @@
+* Weight max/min should be more clear
+* Hide irrelevant racial traits, but positive racial traits are useful to see as accentuated (e.g. opt-in vs. default)
+* Jeromy did not tag skills until after the game started
+* Currency tracking
+* Gotta know what kind of weapons the guy has
+* Use Outdoorsman more
+* Unclear of separation of value vs. algorithm
+* Much better UI for XP

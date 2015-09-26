@@ -68,6 +68,7 @@ function primaryStatisticEntry(stat, {DOM, value$, calculations, effecter}) {
                     effectedValue != null ? renderNumber(effectedValue, 'value', {
                         className: 'stat-total',
                     }) : null,
+                    h('p.stat-desc', [stat.description]),
                 ]));
             })
             .startWith(loadingIndicator(stat.key))

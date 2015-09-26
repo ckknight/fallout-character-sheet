@@ -128,7 +128,7 @@ textarea,
 }
 .primary-statistic-body {
     display: inline-flex;
-    flex-flow: row;
+    flex-flow: row wrap;
     justify-content: flex-start;
     .stat-name {
         min-width: 5em;
@@ -445,4 +445,8 @@ textarea,
 }
 .skill-category-thieving .skill-category-body {
     background: #eef1ff;
+}
+.notes {
+    width: 100%;
+    min-height: 8em;
 }

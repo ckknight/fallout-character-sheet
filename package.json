@@ -16,6 +16,7 @@
     "@cycle/dom": "^5.1.x",
     "babel-runtime": "^5.8.20",
     "key-mirror": "^1.0.0",
+    "nouislider": "leongersen/noUiSlider",
     "rx": "^3.1.2",
     "rx-injectable-observable": "^3.0.0"
   },

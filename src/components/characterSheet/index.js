@@ -9,6 +9,7 @@ import skills from './skills';
 import traits from './traits';
 import perks from './perks';
 import health from './health';
+import notes from './notes';
 import combineLatestObject from '../../combineLatestObject';
 import Condition from '../../models/Condition';
 import Calculations from './Calculations';
@@ -23,6 +24,14 @@ function log(...args) {
         console.log(...args);
     }
     /* eslint-enable no-console */
+}
+
+function makeNav(items) {
+    return Object.entries(items)
+        .map(([route, name]) => ({
+            route,
+            name,
+        }));
 }
 
 function timer() {
@@ -135,6 +144,11 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
         calculations,
     });
     log('health', t());
+    const notesView = notes({
+        DOM,
+        value$: characterSavedData$.map(x => x.notes || ''),
+    });
+    log('notes', t());
 
     const routeToDOM = {
         cosmetic: cosmeticView.DOM.shareReplay(1),
@@ -145,6 +159,7 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
         traits: traitsView.DOM.shareReplay(1),
         perks: perksView.DOM.shareReplay(1),
         health: healthView.DOM.shareReplay(1),
+        notes: notesView.DOM.shareReplay(1),
     };
     const result = {
         DOM: route$
@@ -162,6 +177,7 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
                 traits: traitsView.value$,
                 perks: perksView.value$,
                 health: healthView.value$,
+                notes: notesView.value$,
             },
             ui: {
                 primary: primaryStatisticView.uiState$,
@@ -186,12 +202,23 @@ export default function characterSheet({DOM, value$: deserializedSavedData$, rou
                 return [
                     cosmetic && cosmetic.name,
                     race && race.name,
-                    secondary && secondary.level ? 'Level ' + secondary.level : ''
+                    secondary && secondary.level ? 'Level ' + secondary.level : '',
                 ]
                     .filter(Boolean)
                     .join(', ');
             })
             .distinctUntilChanged(),
+        nav$: Rx.Observable.return(makeNav({
+            cosmetic: 'Cosmetic',
+            primary: 'Primary',
+            secondary: 'Secondary',
+            miscellaneous: 'Miscellaneous',
+            skills: 'Skills',
+            perks: 'Perks',
+            traits: 'Traits',
+            health: 'Health',
+            notes: 'Notes',
+        })),
     };
     log('end', t(), Date.now());
     return result;

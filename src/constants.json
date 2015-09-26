@@ -2065,7 +2065,8 @@
             "age": "Age",
             "agility": {
                 "abbr": "Agi",
-                "name": "Agility"
+                "name": "Agility",
+                "description": "Agility measures the speed of a character's reactions. More or less, Agility describes how quickly an impulse is received by the brain, is encoded into the appropriate message, travels through the Central Nervous System, and reaches the character's arm, which jerks out of the way right before a bullet hits it. Characters with high Agility are jugglers and acrobats. Characters with low Agility dance with two left feet. This statistic is the basis for the Armor Class and Action Point secondary statistics. It modifies the greatest number of skills as well, especially combat skills. Rolls against Agility are made when your character dodges a poison dart trap or attempts to jerk his arm out of the sewer before a mutated rat bites it off."
             },
             "alphaMutant": "Mutant (Alpha)",
             "animalFriend": "Animal Friend",
@@ -2117,7 +2118,8 @@
             "changeStanceCost": "Change Stance Cost",
             "charisma": {
                 "abbr": "Cha",
-                "name": "Charisma"
+                "name": "Charisma",
+                "description": "Charisma measures how physically attractive your character is and how adept they are at knowing exactly what to say and do in social situations. Beauty as well as grace and leadership ability contribute to Charisma. A Charismatic character will be the leader of the pack, and everyone will follow his or her orders. John F. Kennedy was charismatic; Dan Quayle was not. No secondary statistics are based on Charisma. It heavily influences the Barter and Speech skills. Rolls against Charisma are made when a character is attempting to schmooze past some guards or trying to pick someone up in a bar."
             },
             "chemDuration": "Chem Duration",
             "chemReliant": "Chem Reliant",
@@ -2172,7 +2174,8 @@
             "empathy": "Empathy",
             "endurance": {
                 "abbr": "End",
-                "name": "Endurance"
+                "name": "Endurance",
+                "description": "Endurance measures the body’s constitution and overall health. Characters with a high Endurance have great immune systems, good cardiovascular fitness, and can outrun and outswim others. Characters with high Endurance can swim across the English Channel. Characters with low Endurance can drown in the kiddie pool. The Hit Point, Poison Resistance, Radiation Resistance, and Healing Rate secondary statistics are based on Endurance, which also modifies a character's Survival skills. Endurance is used to determine if burst hits knock characters down, or even unconscious. Rolls against Endurance determine things like whether your character can hang on to that rope over a canyon, or can resist the deadly cloud of bacteria some renegade scientist just sprayed in his or her face."
             },
             "energyWeapons": "Energy Weapons",
             "experience": {
@@ -2258,7 +2261,8 @@
             "input": "input",
             "intelligence": {
                 "abbr": "Int",
-                "name": "Intelligence"
+                "name": "Intelligence",
+                "description": "Intelligence is a character's higher reasoning power. Characters with high intelligence have better memories and are better at solving problems than people with low intelligence. Albert Einstein, Napoleon, and Alexander the Great had high intelligence. General Custer, Forrest Gump, and the guy in \"Sling Blade\" did not. No secondary statistics are based on intelligence. Many of the non-combat skills use it for their base values, however. Intelligence also determines the number of skill points your character gains each level (see Advancement: Experience in Chapter V: Advancement). Rolls against Intelligence are made when characters are attempting to guess a password or determine the pattern sequence of electric charges running through the pattern on the floor."
             },
             "inventoryActionPointCost": "Inventory Action Point Cost",
             "jinxed": "Jinxed",
@@ -2296,7 +2300,8 @@
             "loner": "Loner",
             "luck": {
                 "abbr": "Lck",
-                "name": "Luck"
+                "name": "Luck",
+                "description": "Perhaps the most ambiguous statistic, Luck is everything and nothing. Characters with a high amount of Luck just tend to have things go their way, and characters with a low amount of Luck always seem to be standing under the scaffolding just when someone drops that brick. Luck directly affects the Critical Chance secondary statistic as well as influences Social skills. Rolls against Luck are made at the GM's discretion; Luck rolls can determine if, when your character is out of ammo and lying half-unconscious on the ground, he happens to find that loaded shotgun lying concealed and forgotten in the dust."
             },
             "mandible": "Mandible",
             "mandibles": "Mandibles",
@@ -2333,7 +2338,8 @@
             "pathfinder": "Pathfinder",
             "perception": {
                 "abbr": "Per",
-                "name": "Perception"
+                "name": "Perception",
+                "description": "Perception is your character's awareness and \"street-smarts,\" sometimes called instinct or a \"sixth sense.\" Perceptive characters notice details instantly, like smells, sounds, and sights that don't fit a \"normal\" picture. Perceptive characters tend to be able to read another person's reactions, and can even tell when another person is lying. They can also make long-distance shots in combat that no one else can make. Highly perceptive characters are private investigators or snipers. Characters with low Perception walk about in their own little world. This statistic is used in the Sequence secondary statistic, and in several skills such as Lockpick, Traps, First Aid, and Doctor. The primary use of this statistic is to determine the maximum distance your character can shoot a ranged weapon effectively. The better the score, the farther you can accurately shoot. A high Perception is imperative for a sniper. Rolls against Perception are used when there is a little detail the character has a chance of noticing, such as the glisten off the scope of the sniper taking an aim at his or her head."
             },
             "perks": "Perks",
             "pickpocket": "Pickpocket",
@@ -2468,7 +2474,8 @@
             "stoneWall": "Stonewall",
             "strength": {
                 "abbr": "Str",
-                "name": "Strength"
+                "name": "Strength",
+                "description": "A measure of your character's physical strength and muscle power. Characters with a high Strength probably spent a lot of time in the gym in high school. Characters with low Strength probably got beat up by the characters with high Strength. This statistic is used in the secondary statistics Carry Weight and Melee Damage. All weapons have a minimum Strength requirement as well. Rolls against Strength are used when characters try to break doors down, bend the bars on their prison cell, and do other feats that require sheer muscle power."
             },
             "strongBack": "Strong Back",
             "stuntDevil": "Stunt Devil",
