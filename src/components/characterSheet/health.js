@@ -243,7 +243,7 @@ function makeSingleBodyPartView(key, bodyPart, inputValue$, DOM, calculations, i
             (damageVTree, totalHealth, crippleHealthVTree, vTrees, effectVTree, {damaged, crippled}, damageButton, healButton) => h(`section.body-part.body-part-${key}`, {
                     key,
                     className: `body-part--${crippled ? 'crippled' : damaged ? 'damaged' : 'healthy'}`
-                }, [
+                }, h('div.body-part-body', [
                     h(`span.body-part-title`, {
                         key: 'title',
                     }, [localize.name(key)]),
@@ -271,7 +271,7 @@ function makeSingleBodyPartView(key, bodyPart, inputValue$, DOM, calculations, i
                         key: 'targetPenalty',
                     }, [renderNumber(-bodyPart.targetPenalty)]),
                     ...vTrees,
-                ]))
+                ])))
             .startWith(loadingIndicator(key))
             .catch(errorHandler(key)),
         value$: Rx.Observable.from(subBodyPartViews)

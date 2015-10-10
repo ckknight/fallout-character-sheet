@@ -120,7 +120,7 @@ textarea,
     text-align: right;
 }
 .skill .algorithm {
-    
+
     // min-width: 12em;
     margin: 0 0.5em;
 }
@@ -179,9 +179,6 @@ textarea,
 .sub-body-part-damage {
     display: none;
 }
-.body-part > .body-part {
-    margin-left: 1em;
-}
 .sub-body-part {
     margin: 0 0.5em;
     border-radius: 0.5em;
@@ -202,73 +199,72 @@ textarea,
 .health-body-parts {
     display: flex;
     flex-flow: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    align-items: stretch;
     @include screen-sm {
         flex-flow: row wrap;
     }
 }
-.body-part {
+.body-part-body {
     text-align: center;
     border: solid 1px #333;
     border-radius: 1em;
-    flex: 1;
     margin: 0.5em;
 }
 .body-part-head {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 1;
 }
 .body-part-torso {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 2;
     @include screen-md {
-        min-width: 30%;
+        flex-basis: 33%;
         order: 3;
     }
 }
 .body-part-leftArm {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 3;
     @include screen-sm {
-        min-width: 45%;
+        flex-basis: 50%;
     }
     @include screen-md {
-        min-width: 30%;
+        flex-basis: 33%;
         order: 2;
     }
 }
 .body-part-rightArm {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 4;
     @include screen-sm {
-        min-width: 45%;
+        flex-basis: 50%;
     }
     @include screen-md {
-        min-width: 30%;
+        flex-basis: 33%;
     }
 }
 .body-part-leftLeg {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 5;
     @include screen-sm {
-        min-width: 45%;
+        flex-basis: 50%;
     }
 }
 .body-part-rightLeg {
-    min-width: 100%;
+    flex-basis: 100%;
     order: 6;
     @include screen-sm {
-        min-width: 45%;
+        flex-basis: 50%;
     }
 }
-.body-part--healthy {
+.body-part--healthy .body-part-body {
     background: #efe;
 }
-.body-part--damaged {
+.body-part--damaged .body-part-body {
     background: #ffe;
 }
-.body-part--crippled {
+.body-part--crippled .body-part-body {
     background: #fee;
 }
 .health-total {
